@@ -1,0 +1,88 @@
+
+.welcome-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: #f8f9fa; /* Light background */
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+  }
+  
+  /* Center the content */
+  .content {
+    text-align: center;
+    background: #fff; /* White background for the content area */
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Soft shadow */
+    width: 80%;
+    max-width: 600px;
+  }
+  
+  .welcome-text {
+    font-size: 3rem;
+    color: #007bff; /* Light blue color for the heading */
+    margin-bottom: 20px;
+    font-weight: 700;
+  }
+  
+  .image {
+    max-width: 200px;
+    height: auto;
+    margin-bottom: 30px;
+    transition: transform 0.3s ease; /* Smooth scaling effect */
+  }
+  
+  .image:hover {
+    transform: scale(1.1); /* Slight zoom on hover */
+  }
+  
+  .description {
+    font-size: 1.2rem;
+    color: #555; /* Darker gray for text */
+    margin-bottom: 30px;
+    line-height: 1.6;
+  }
+  
+  /* Button styles */
+  .button {
+    padding: 15px 30px;
+    font-size: 1.1rem;
+    color: #fff;
+    background-color: #007bff; /* Light blue button */
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+  }
+  
+  .button:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+    transform: scale(1.05); /* Slight scaling on hover */
+  }
+  
+  /* Button hover effect */
+  .button-hover {
+    background-color: #0056b3;
+  }
+  
+  /* Responsive design for mobile */
+  @media (max-width: 600px) {
+    .welcome-text {
+      font-size: 2.5rem; /* Adjust text size on smaller screens */
+    }
+  
+    .image {
+      max-width: 150px; /* Resize logo on smaller screens */
+    }
+  
+    .description {
+      font-size: 1rem; /* Smaller description text */
+    }
+  
+    .button {
+      padding: 12px 25px; /* Adjust button size */
+    }
+  }
+  
