@@ -1,26 +1,17 @@
-import React from "react";
+import './App.css';
 import Navbar from "./components/Navbar";
 import LoginSection from "./components/LoginSection";
+import Header from './components/Header';
 
 function App() {
   return (
     <div>
       <Navbar />
-      <header style={styles.header}>
-        <h1>Reserve Your Perfect Study Spot</h1>
-      </header>
+      <Header/>
       <LoginSection />
     </div>
   );
 }
-
-const styles = {
-  header: {
-    textAlign: "center",
-    margin: "20px 0",
-    fontSize: "2rem",
-  },
-};
 
 export default App;
 

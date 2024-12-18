@@ -1,0 +1,32 @@
+/* Header Container Styling */
+.header-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 50vh;  /* Full viewport height */
+    background-color: #007BFF;  /* Blue background */
+    color: white;
+    padding: 0 20px;
+    text-align: center;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif; /* Optional, if you want a clean modern font */
+  }
+  
+  /* Title Styling */
+  .header-title {
+    font-size: 36px;  /* Big font for the title */
+    font-weight: 600;
+    line-height: 1.2;
+    margin: 0;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2); /* Optional: subtle text shadow */
+  }
+  
+  /* Responsive Styling */
+  @media (max-width: 768px) {
+    .header-title {
+      font-size: 28px;  /* Adjust font size on smaller screens */
+    }
+  }
+  

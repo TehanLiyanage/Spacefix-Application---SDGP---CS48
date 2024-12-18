@@ -1,0 +1,62 @@
+/* Basic Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  /* Navbar Styling */
+  .navbar {
+    background-color: #0e3054; /* Blue background */
+    padding: 15px 30px; /* Add padding to the navbar */
+    width: 80%; /* Set the width to 80% of the page width */
+    max-width: 1200px; /* Maximum width for larger screens */
+    margin: 30px auto; /* Center the navbar horizontally with space from top */
+    border-radius: 20px;
+    position: relative; /* Adjust navbar positioning */
+  }
+  
+  /* Navbar List Styling */
+  .navList {
+    display: flex; /* Flexbox for horizontal alignment */
+    justify-content: center; /* Center the items horizontally */
+    align-items: center; /* Center the items vertically */
+    list-style-type: none; /* Remove default list styling */
+  }
+  
+  /* Individual Navbar Item Styling */
+  .navItem {
+    margin: 0 20px; /* Add space between items */
+  }
+  
+  /* Link Styling */
+  .link {
+    text-decoration: none; /* Remove the underline */
+    color: white; /* White text */
+    font-size: 18px; /* Font size for the links */
+    font-weight: 600; /* Make text bold */
+    transition: all 0.3s ease; /* Smooth transition for hover effect */
+  }
+  
+  /* Hover Effects */
+  .link:hover {
+    color: #f1f1f1; /* Slightly lighter text color on hover */
+    border-bottom: 2px solid #f1f1f1; /* Add an underline on hover */
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .navbar {
+      width: 90%; /* Reduce width on smaller screens */
+    }
+  
+    .navList {
+      flex-direction: column; /* Stack navbar items vertically on small screens */
+      align-items: center; /* Center the items */
+    }
+  
+    .navItem {
+      margin: 10px 0; /* Add vertical margin between items */
+    }
+  }
+  
