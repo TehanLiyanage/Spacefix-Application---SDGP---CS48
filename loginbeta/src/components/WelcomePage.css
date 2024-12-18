@@ -1,88 +1,97 @@
-
 .welcome-page {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    background: #f8f9fa; /* Light background */
-    font-family: 'Arial', sans-serif;
-    margin: 0;
-  }
-  
-  /* Center the content */
-  .content {
-    text-align: center;
-    background: #fff; /* White background for the content area */
-    padding: 40px;
-    border-radius: 10px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Soft shadow */
-    width: 80%;
-    max-width: 600px;
-  }
-  
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f8f9fa, #e9ecef); /* Subtle gradient background */
+  font-family: 'Arial', sans-serif;
+  margin: 0;
+  padding: 20px; /* Add padding for better spacing on smaller screens */
+}
+
+/* Center the content */
+.content {
+  text-align: center;
+  background: #fff; /* White background for the content area */
+  padding: 40px;
+  border-radius: 12px; /* Slightly larger rounded corners */
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15); /* More pronounced shadow */
+  width: 90%;
+  max-width: 500px;
+  transition: transform 0.3s ease; /* Smooth scaling effect for the content */
+}
+
+.content:hover {
+  transform: scale(1.02); /* Slight zoom effect on hover */
+}
+
+.welcome-text {
+  font-size: 2.8rem; /* Adjusted font size */
+  color: #007bff; /* Light blue color for the heading */
+  margin-bottom: 20px;
+  font-weight: 800; /* Slightly bolder font */
+  letter-spacing: 1px; /* Subtle letter spacing for better readability */
+}
+
+.image {
+  max-width: 180px; /* Adjusted image size */
+  height: auto;
+  margin-bottom: 25px;
+  border-radius: 8px; /* Rounded corners for the image */
+  transition: transform 0.4s ease, box-shadow 0.4s ease; /* Added shadow transition */
+}
+
+.image:hover {
+  transform: scale(1.1); /* Slight zoom on hover */
+  box-shadow: 0 8px 20px rgba(0, 123, 255, 0.3); /* Add shadow on hover */
+}
+
+.description {
+  font-size: 1.1rem;
+  color: #666; /* Slightly lighter gray for text */
+  margin-bottom: 30px;
+  line-height: 1.8; /* Increased line spacing for readability */
+}
+
+/* Button styles */
+.button {
+  padding: 14px 28px; /* Balanced padding */
+  font-size: 1rem;
+  color: #fff;
+  background: linear-gradient(90deg, #007bff, #0056b3); /* Gradient button */
+  border: none;
+  border-radius: 30px; /* Rounded pill-like buttons */
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.button:hover {
+  background: linear-gradient(90deg, #0056b3, #004080); /* Darker gradient on hover */
+  transform: translateY(-2px); /* Lift the button slightly */
+  box-shadow: 0 6px 15px rgba(0, 123, 255, 0.3); /* Add hover shadow */
+}
+
+/* Responsive design for mobile */
+@media (max-width: 600px) {
   .welcome-text {
-    font-size: 3rem;
-    color: #007bff; /* Light blue color for the heading */
-    margin-bottom: 20px;
-    font-weight: 700;
+    font-size: 2.2rem; /* Adjust text size for smaller screens */
   }
-  
+
   .image {
-    max-width: 200px;
-    height: auto;
-    margin-bottom: 30px;
-    transition: transform 0.3s ease; /* Smooth scaling effect */
+    max-width: 140px; /* Resize logo on smaller screens */
+    margin-bottom: 20px;
   }
-  
-  .image:hover {
-    transform: scale(1.1); /* Slight zoom on hover */
-  }
-  
+
   .description {
-    font-size: 1.2rem;
-    color: #555; /* Darker gray for text */
-    margin-bottom: 30px;
-    line-height: 1.6;
+    font-size: 0.95rem; /* Slightly smaller description text */
   }
-  
-  /* Button styles */
+
   .button {
-    padding: 15px 30px;
-    font-size: 1.1rem;
-    color: #fff;
-    background-color: #007bff; /* Light blue button */
-    border: none;
-    border-radius: 25px;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.3s ease;
+    padding: 12px 24px; /* Adjust button size for mobile */
+    font-size: 0.9rem;
   }
-  
-  .button:hover {
-    background-color: #0056b3; /* Darker blue on hover */
-    transform: scale(1.05); /* Slight scaling on hover */
+
+  .content {
+    padding: 30px; /* Reduce padding for better fit */
   }
-  
-  /* Button hover effect */
-  .button-hover {
-    background-color: #0056b3;
-  }
-  
-  /* Responsive design for mobile */
-  @media (max-width: 600px) {
-    .welcome-text {
-      font-size: 2.5rem; /* Adjust text size on smaller screens */
-    }
-  
-    .image {
-      max-width: 150px; /* Resize logo on smaller screens */
-    }
-  
-    .description {
-      font-size: 1rem; /* Smaller description text */
-    }
-  
-    .button {
-      padding: 12px 25px; /* Adjust button size */
-    }
-  }
-  
+}
