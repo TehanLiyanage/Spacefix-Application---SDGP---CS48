@@ -1,211 +1,124 @@
 import React from 'react';
-import { 
-  Calendar, 
-  Users, 
-  Map, 
-  Bell, 
-  Brain,
-  Building2
-} from 'lucide-react';
-import { motion } from 'framer-motion';
+
+const SmartBookingIcon = () => (
+  <svg viewBox="0 0 48 48" className="w-12 h-12">
+    <circle cx="24" cy="24" r="20" fill="#E8F5FF"/>
+    <circle cx="24" cy="24" r="16" fill="#2196F3"/>
+    <path d="M24 12v12l8 8" stroke="white" strokeWidth="3" strokeLinecap="round"/>
+    <circle cx="24" cy="24" r="3" fill="white"/>
+  </svg>
+);
+
+const OccupancyIcon = () => (
+  <svg viewBox="0 0 48 48" className="w-12 h-12">
+    <rect x="8" y="8" width="32" height="32" rx="16" fill="#F3E5F5"/>
+    <path d="M16 24h4v8h-4zm6-4h4v12h-4zm6-6h4v18h-4z" fill="#9C27B0"/>
+    <circle cx="36" cy="14" r="4" fill="#E91E63"/>
+  </svg>
+);
+
+const NavigationIcon = () => (
+  <svg viewBox="0 0 48 48" className="w-12 h-12">
+    <path d="M8 8h32v32H8z" fill="#E8F5E9"/>
+    <path d="M14 14h20v20H14z" fill="#4CAF50"/>
+    <circle cx="24" cy="24" r="6" fill="white"/>
+    <path d="M24 21v6m-3-3h6" stroke="#4CAF50" strokeWidth="2"/>
+  </svg>
+);
+
+const AlertsIcon = () => (
+  <svg viewBox="0 0 48 48" className="w-12 h-12">
+    <path d="M24 4l20 36H4z" fill="#FFEBEE"/>
+    <path d="M24 10l14 26H10z" fill="#F44336"/>
+    <path d="M24 20v8" stroke="white" strokeWidth="3" strokeLinecap="round"/>
+    <circle cx="24" cy="34" r="2" fill="white"/>
+  </svg>
+);
+
+const ManagementIcon = () => (
+  <svg viewBox="0 0 48 48" className="w-12 h-12">
+    <rect x="8" y="8" width="32" height="32" rx="6" fill="#FFF3E0"/>
+    <rect x="12" y="12" width="24" height="24" rx="4" fill="#FF9800"/>
+    <path d="M16 22h16M16 28h12" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+  </svg>
+);
+
+const AnalyticsIcon = () => (
+  <svg viewBox="0 0 48 48" className="w-12 h-12">
+    <circle cx="24" cy="24" r="20" fill="#E0F2F1"/>
+    <path d="M14 28l6-6 8 8 6-12" stroke="#009688" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+    <circle cx="14" cy="28" r="3" fill="#009688"/>
+    <circle cx="20" cy="22" r="3" fill="#009688"/>
+    <circle cx="28" cy="30" r="3" fill="#009688"/>
+    <circle cx="34" cy="18" r="3" fill="#009688"/>
+  </svg>
+);
 
 const features = [
   {
-    icon: <Calendar className="w-8 h-8 text-emerald-600" />,
-    title: "Smart Scheduling System",
-    description: "Seamlessly book lecture halls and study spaces with our intuitive scheduling platform designed for both students and faculty"
+    icon: <SmartBookingIcon />,
+    title: "Smart Booking System",
+    description: "Easily book classrooms, labs, and study spaces in advance with our intuitive scheduling system for students and faculty."
   },
   {
-    icon: <Users className="w-8 h-8 text-emerald-600" />,
+    icon: <OccupancyIcon />,
     title: "Dynamic Occupancy Tracking",
-    description: "Real-time space monitoring with advanced crowd management to ensure optimal space utilization and comfortable capacity levels"
+    description: "Monitor real-time space availability and manage incoming crowd levels dynamically to optimize resource usage."
   },
   {
-    icon: <Map className="w-8 h-8 text-emerald-600" />,
-    title: "Interactive Campus Navigator",
-    description: "Navigate your way through campus with our detailed indoor mapping system, helping you find the shortest route to your destination"
+    icon: <NavigationIcon />,
+    title: "Interactive Campus Navigation",
+    description: "Navigate seamlessly through the campus with an interactive mini-map providing real-time directions to lecture halls, labs, and study spaces."
   },
   {
-    icon: <Bell className="w-8 h-8 text-emerald-600" />,
+    icon: <AlertsIcon />,
     title: "Smart Schedule Alerts",
-    description: "Stay informed with automated notifications about your bookings, schedule changes, and space availability integrated with your timetable"
+    description: "Stay informed with automated notifications about lectures, room changes, and real-time availability updates."
   },
   {
-    icon: <Brain className="w-8 h-8 text-emerald-600" />,
-    title: "AI-Powered Space Analytics",
-    description: "Advanced machine learning algorithms to predict and manage classroom occupancy, ensuring optimal space distribution"
+    icon: <ManagementIcon />,
+    title: "Comprehensive Space Management",
+    description: "All classrooms, labs, and study areas are registered for efficient tracking, allocation, and management by students, lecturers, and staff."
   },
   {
-    icon: <Building2 className="w-8 h-8 text-emerald-600" />,
-    title: "Space Optimization Hub",
-    description: "Centralized dashboard for monitoring and managing all campus spaces with predictive analytics and usage patterns"
+    icon: <AnalyticsIcon />,
+    title: "Advanced Analytics",
+    description: "Machine learning-driven occupancy detection and classroom management to enhance space utilization and prevent overcrowding."
   }
 ];
 
 const FeaturesSection = () => {
-  // Animation variants
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.2
-      }
-    }
-  };
-
-  const featureVariants = {
-    hidden: { 
-      opacity: 0,
-      y: 20
-    },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.5,
-        ease: "easeOut"
-      }
-    }
-  };
-
   return (
-    <section id="features" className="py-20 sm:py-28 bg-white relative overflow-hidden">
-      {/* Animated background gradient */}
-      <motion.div 
-        className="absolute inset-0 bg-gradient-to-b from-gray-50/80 to-transparent"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1 }}
-      />
-      
-      {/* Decorative elements */}
-      <motion.div 
-        className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-emerald-100/20 to-cyan-100/20 rounded-full blur-3xl"
-        animate={{
-          scale: [1, 1.1, 1],
-          opacity: [0.3, 0.5, 0.3],
-        }}
-        transition={{
-          duration: 8,
-          repeat: Infinity,
-          ease: "easeInOut"
-        }}
-      />
-      <motion.div 
-        className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-tr from-emerald-100/20 to-cyan-100/20 rounded-full blur-3xl"
-        animate={{
-          scale: [1, 1.2, 1],
-          opacity: [0.3, 0.4, 0.3],
-        }}
-        transition={{
-          duration: 10,
-          repeat: Infinity,
-          ease: "easeInOut",
-          delay: 1
-        }}
-      />
+    <section id="features" className="py-20 sm:py-28 bg-gray-50 relative overflow-hidden">
+      <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 relative">
+        <div className="text-center mb-12 sm:mb-16">
+          <h2 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-emerald-600 to-cyan-600 bg-clip-text text-transparent mb-4 sm:mb-6">
+            Our Features
+          </h2>
+          <p className="text-lg sm:text-xl text-gray-700 max-w-3xl mx-auto">
+            Transform your campus experience with our cutting-edge space management solutions.
+          </p>
+        </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-        <motion.div 
-          className="text-center mb-16"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-        >
-          <motion.h2 
-            className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-emerald-600 to-cyan-600 bg-clip-text text-transparent mb-6"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-          >
-            Intelligent Campus Features
-          </motion.h2>
-          <motion.p 
-            className="text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-          >
-            Transform your campus experience with our cutting-edge space management solutions
-          </motion.p>
-        </motion.div>
-
-        <motion.div 
-          className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8"
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-        >
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-10">
           {features.map((feature, index) => (
-            <motion.div 
+            <div 
               key={index}
-              variants={featureVariants}
-              whileHover={{ scale: 1.02 }}
-              className="group relative bg-white rounded-2xl p-6 hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-emerald-200"
+              className="group relative bg-white rounded-xl p-8 shadow-md hover:shadow-lg transition-all duration-300 border border-gray-200 hover:border-emerald-300"
             >
-              <motion.div 
-                className="absolute inset-0 bg-gradient-to-br from-emerald-50 to-cyan-50 rounded-2xl"
-                initial={{ opacity: 0 }}
-                whileHover={{ opacity: 1 }}
-                transition={{ duration: 0.3 }}
-              />
-              
-              <div className="relative">
-                <motion.div 
-                  className="mb-4 inline-block"
-                  whileHover={{ 
-                    scale: 1.1,
-                    rotate: [0, 5, -5, 0],
-                    transition: { duration: 0.3 }
-                  }}
-                >
-                  {feature.icon}
-                </motion.div>
-                <motion.h3 
-                  className="text-xl font-semibold mb-3 text-gray-900"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                >
-                  {feature.title}
-                </motion.h3>
-                <motion.p 
-                  className="text-gray-600"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.5, delay: index * 0.1 + 0.2 }}
-                >
-                  {feature.description}
-                </motion.p>
+              <div className="mb-5 inline-block">
+                {feature.icon}
               </div>
-            </motion.div>
+              <h3 className="text-2xl font-semibold mb-4 text-gray-900">
+                {feature.title}
+              </h3>
+              <p className="text-gray-700">
+                {feature.description}
+              </p>
+            </div>
           ))}
-        </motion.div>
+        </div>
       </div>
-
-      {/* Additional decorative floating elements */}
-      {[...Array(3)].map((_, i) => (
-        <motion.div
-          key={i}
-          className="absolute w-2 h-2 bg-emerald-400/30 rounded-full"
-          style={{
-            left: `${20 + i * 30}%`,
-            top: `${30 + (i % 2) * 40}%`,
-          }}
-          animate={{
-            y: [0, -30, 0],
-            opacity: [0.5, 1, 0.5],
-            scale: [1, 1.2, 1],
-          }}
-          transition={{
-            duration: 4 + i,
-            repeat: Infinity,
-            ease: "easeInOut",
-            delay: i * 0.8,
-          }}
-        />
-      ))}
     </section>
   );
 };

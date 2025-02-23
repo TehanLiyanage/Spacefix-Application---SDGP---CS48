@@ -7,17 +7,17 @@ const socialLinks = [
   { 
     icon: <Linkedin className="w-5 h-5" />, 
     name: 'LinkedIn',
-    href: 'https://www.linkedin.com/company/spacefix'
+    href: 'http://www.linkedin.com/in/spacefix'
   },
   { 
     icon: <Instagram className="w-5 h-5" />, 
     name: 'Instagram',
-    href: 'https://www.instagram.com/spacefix'
+    href: 'https://www.instagram.com/spacefixlk?igsh=MTZoNTk2MWNjdnYzYw%3D%3D&utm_source=qr'
   },
   { 
     icon: <Twitter className="w-5 h-5" />, 
     name: 'Twitter',
-    href: 'https://twitter.com/spacefix'
+    href: 'https://x.com/Spacefixlk'
   }
 ];
 

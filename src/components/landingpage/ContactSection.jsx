@@ -1,22 +1,17 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { 
-  Mail, 
-  Phone, 
-  Linkedin,
-  Instagram,
-  Twitter
-} from 'lucide-react';
+import { MdEmail, MdPhone } from 'react-icons/md';
+import { FaLinkedin, FaInstagram, FaTwitter } from 'react-icons/fa';
 
 const contactInfo = [
   {
-    icon: <Mail className="w-6 h-6" />,
+    icon: <MdEmail className="w-6 h-6" />,
     title: "Email Us",
     info: "support@spacefix.com",
     href: "mailto:support@spacefix.com"
   },
   {
-    icon: <Phone className="w-6 h-6" />,
+    icon: <MdPhone className="w-6 h-6" />,
     title: "Call Us",
     info: "+94 70 132 8192",
     href: "tel:+94701328192"
@@ -25,21 +20,21 @@ const contactInfo = [
 
 const socialLinks = [
   { 
-    icon: <Linkedin className="w-6 h-6" />, 
+    icon: <FaLinkedin className="w-6 h-6" />, 
     name: 'LinkedIn',
-    href: 'https://www.linkedin.com/company/spacefix',
+    href: 'http://www.linkedin.com/in/spacefix',
     color: 'hover:text-[#0077B5]'
   },
   { 
-    icon: <Instagram className="w-6 h-6" />, 
+    icon: <FaInstagram className="w-6 h-6" />, 
     name: 'Instagram',
-    href: 'https://www.instagram.com/spacefix',
+    href: 'https://www.instagram.com/spacefixlk?igsh=MTZoNTk2MWNjdnYzYw%3D%3D&utm_source=qr',
     color: 'hover:text-[#E4405F]'
   },
   { 
-    icon: <Twitter className="w-6 h-6" />, 
+    icon: <FaTwitter className="w-6 h-6" />, 
     name: 'Twitter',
-    href: 'https://twitter.com/spacefix',
+    href: 'https://x.com/Spacefixlk',
     color: 'hover:text-[#1DA1F2]'
   }
 ];
@@ -102,7 +97,7 @@ const ContactSection = () => {
         >
           <div className="text-center mb-16">
             <motion.h2 
-              className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-emerald-500 to-cyan-600 bg-clip-text text-transparent mb-4"
+              className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-emerald-600 to-cyan-600 bg-clip-text text-transparent mb-4 sm:mb-6"
               variants={itemVariants}
             >
               Let's Connect
