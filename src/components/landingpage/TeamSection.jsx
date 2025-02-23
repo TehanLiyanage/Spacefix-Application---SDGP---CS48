@@ -15,9 +15,7 @@ const teamMembers = [
     role: "Developer",
     image: "/api/placeholder/300/300",
     links: {
-      github: "https://github.com/akilatehan",
-      linkedin: "https://linkedin.com/in/akilatehan",
-      email: "mailto:akila@spacefix.com"
+      email: "mailto:tehanliyanage04@gmail.com"
     }
   },
   {
@@ -25,19 +23,15 @@ const teamMembers = [
     role: "Developer",
     image: yasithImg,
     links: {
-      github: "https://github.com/yasithrashan2003",
-      linkedin: "https://www.linkedin.com/in/yasith-rashan-a44b54295/",
-      email: "mailto:yasith@spacefix.com"
+      email: "mailto:y.rashan22gmail.com"
     }
   },
   {
-    name: "Kasuni Dulanjalee",
+    name: "Kasuni Dulanjaly",
     role: "Developer",
     image: "/api/placeholder/300/300",
     links: {
-      github: "https://github.com/kasunidulanjalee",
-      linkedin: "https://linkedin.com/in/kasunidulanjalee",
-      email: "mailto:kasuni@spacefix.com"
+      email: "mailto:kasunidulanjalygmail.com"
     }
   },
   {
@@ -45,9 +39,7 @@ const teamMembers = [
     role: "Developer",
     image: sandewdiImg,
     links: {
-      github: "https://github.com/GSNowanyaFonseka",
-      linkedin: "https://www.linkedin.com/in/sandewdi-nowanya-790213312/",
-      email: "mailto:sandewdi@spacefix.com"
+      email: "mailto:nowanyafonsekagmail.com"
     }
   },
   {
@@ -55,8 +47,6 @@ const teamMembers = [
     role: "Developer",
     image: sameehaImg,
     links: {
-      github: "",
-      linkedin: "",
       email: ""
     }
   },
@@ -65,8 +55,6 @@ const teamMembers = [
     role: "Developer",
     image: nisiniImg,
     links: {
-      github: "https://github.com/",
-      linkedin: "https://linkedin.com/in/",
       email: "mailto:nisini@spacefix.com"
     }
   }
