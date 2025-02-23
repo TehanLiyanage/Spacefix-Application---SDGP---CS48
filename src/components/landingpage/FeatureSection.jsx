@@ -72,7 +72,7 @@ const features = [
   },
   {
     icon: <AlertsIcon />,
-    title: "Smart Schedule Alerts",
+    title: "Real-time Alerts",
     description: "Stay informed with automated notifications about lectures, room changes, and real-time availability updates."
   },
   {
