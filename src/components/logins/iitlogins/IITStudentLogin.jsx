@@ -27,7 +27,7 @@ const IITStudentLogin = () => {
           setCheckingAuth(false);
         } else {
           // User is logged in and token is valid, redirect to dashboard
-          navigate('/dashboard');
+          navigate('/student-dashboard');
         }
       } else {
         setCheckingAuth(false);
@@ -86,7 +86,7 @@ const IITStudentLogin = () => {
       
       const result = await signInWithPopup(auth, googleProvider);
       await saveUserToFirestore(result.user);
-      navigate('/dashboard');
+      navigate('/student-dashboard'); // Fixed to consistently navigate to student-dashboard
     } catch (error) {
       console.error('Google sign-in error:', error);
       if (error.code === 'auth/popup-closed-by-user') {
