@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import React, { useState, useEffect } from 'react';
+import { GoogleAuthProvider, signInWithPopup, setPersistence, browserLocalPersistence, onAuthStateChanged, signOut } from 'firebase/auth';
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { auth, db, googleProvider } from '../../../firebase/firebaseConfig';
 import { useNavigate } from 'react-router-dom';
@@ -9,6 +9,34 @@ const IITStudentLogin = () => {
   const navigate = useNavigate();
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [checkingAuth, setCheckingAuth] = useState(true);
+
+  useEffect(() => {
+    // Check if user is already logged in when component mounts
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        // User is logged in, check if token is expired (3 months)
+        const lastLoginTime = localStorage.getItem('iit_last_login');
+        const currentTime = Date.now();
+        const threeMonthsInMs = 3 * 30 * 24 * 60 * 60 * 1000; // ~3 months in milliseconds
+        
+        if (lastLoginTime && (currentTime - parseInt(lastLoginTime)) > threeMonthsInMs) {
+          // Force sign out if token is older than 3 months
+          await signOut(auth);
+          localStorage.removeItem('iit_last_login');
+          setCheckingAuth(false);
+        } else {
+          // User is logged in and token is valid, redirect to dashboard
+          navigate('/dashboard');
+        }
+      } else {
+        setCheckingAuth(false);
+      }
+    });
+
+    // Clean up subscription
+    return () => unsubscribe();
+  }, [navigate]);
 
   const saveUserToFirestore = async (user) => {
     try {
@@ -33,9 +61,29 @@ const IITStudentLogin = () => {
     try {
       setLoading(true);
       setError('');
+      
+      // Set the persistence first to keep the user logged in
+      await setPersistence(auth, browserLocalPersistence);
+      
+      // Check for expired token (3 months)
+      const lastLoginTime = localStorage.getItem('iit_last_login');
+      const currentTime = Date.now();
+      const threeMonthsInMs = 3 * 30 * 24 * 60 * 60 * 1000; // ~3 months in milliseconds
+      
+      if (lastLoginTime && (currentTime - parseInt(lastLoginTime)) > threeMonthsInMs) {
+        // Force sign out if token is older than 3 months
+        await auth.signOut();
+        localStorage.removeItem('iit_last_login');
+        // This will make the user log in again, which will reset the timer
+      }
+      
+      // Store the login timestamp
+      localStorage.setItem('iit_last_login', currentTime.toString());
+      
       googleProvider.setCustomParameters({
         prompt: 'select_account'
       });
+      
       const result = await signInWithPopup(auth, googleProvider);
       await saveUserToFirestore(result.user);
       navigate('/dashboard');
@@ -52,6 +100,15 @@ const IITStudentLogin = () => {
       setLoading(false);
     }
   };
+
+  // Show loading indicator while checking authentication state
+  if (checkingAuth) {
+    return (
+      <div className="min-h-screen flex justify-center items-center bg-gray-50">
+        <div className="w-8 h-8 border-3 border-emerald-600 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col lg:flex-row bg-gray-50">
