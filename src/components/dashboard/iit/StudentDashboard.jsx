@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import MyTimetable from "./studentDashboardComponents/MyTimetable";
 import Sidebar from "./studentDashboardComponents/Sidebar";
 import Header from "./studentDashboardComponents/Header";
-import SpaceReservation from "./studentDashboardComponents/SpaceReservation";
+import SpaceAvailability from "./components/SpaceAvailability";
 
 
 
@@ -15,6 +15,8 @@ const StudentDashboard = () => {
     switch (activePage) {
       case "timetable":
         return <MyTimetable/>;
+      case "spaces":
+        return < SpaceAvailability/>;  
       default:
         return < MyTimetable/>;
     }
