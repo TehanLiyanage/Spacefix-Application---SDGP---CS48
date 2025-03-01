@@ -3,6 +3,7 @@ import SpaceBooking from './lectureDashboardComponents/SpaceBooking';
 import Timetable from './lectureDashboardComponents/Timetable';
 import CampusMap from './lectureDashboardComponents/MiniMap';
 import Header from './lectureDashboardComponents/Header';
+import Sidebar from './lectureDashboardComponents/Sidebar';
 
 
 // Feature card component for the dashboard home
@@ -76,6 +77,8 @@ const LectureDashboard = ({ setCurrentPage, currentPage }) => {
 
   return (
     <div className="flex bg-gray-50 min-h-screen">
+      {/* Sidebar */}
+      <Sidebar activePage={activePage} setActivePage={setCurrentPage} />
       
       {/* Main Content Area */}
       <div className="flex flex-col flex-grow ml-64">
@@ -84,7 +87,6 @@ const LectureDashboard = ({ setCurrentPage, currentPage }) => {
           showNotifications={showNotifications}
           setShowNotifications={setShowNotifications}
         />
-        
         <main className="p-6 mt-16">
           <div className="max-w-6xl mx-auto">
             {renderContent()}
