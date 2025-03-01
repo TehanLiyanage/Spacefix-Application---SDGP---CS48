@@ -1,9 +1,8 @@
 import React, { useState } from "react";
 import MyTimetable from "./studentDashboardComponents/MyTimetable";
+import SpaceAvailability from "./studentDashboardComponents/SpaceAvailability";
 import Sidebar from "./studentDashboardComponents/Sidebar";
 import Header from "./studentDashboardComponents/Header";
-import SpaceAvailability from "./components/SpaceAvailability";
-
 
 
 const StudentDashboard = () => {
@@ -16,7 +15,7 @@ const StudentDashboard = () => {
       case "timetable":
         return <MyTimetable/>;
       case "spaces":
-        return < SpaceAvailability/>;  
+        return < SpaceAvailability />;
       default:
         return < MyTimetable/>;
     }
