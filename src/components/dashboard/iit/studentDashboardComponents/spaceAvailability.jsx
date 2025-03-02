@@ -1,10 +1,10 @@
 import React from "react";
 
 const spaceAvailability = {
-  Library: { capacity: 70, totalSeats: 200, currentOccupancy: 140 },
-  StudyHall: { capacity: 45, totalSeats: 150, currentOccupancy: 68 },
-  ComputerLab: { capacity: 60, totalSeats: 100, currentOccupancy: 60 },
-  QuietZone: { capacity: 30, totalSeats: 50, currentOccupancy: 15 },
+  "1LA": { capacity: 70, totalSeats: 200, currentOccupancy: 140 },
+  "2LC": { capacity: 45, totalSeats: 150, currentOccupancy: 68 },
+  "1LB": { capacity: 60, totalSeats: 100, currentOccupancy: 60 },
+  "3LA": { capacity: 30, totalSeats: 50, currentOccupancy: 15 },
 };
 
 const SpaceAvailability = () => (
