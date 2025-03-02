@@ -1,12 +1,13 @@
 import { useState } from 'react'
-import Sidebar from './components/Sidebar'
-import StudentRequestHandler from './components/StudentRequestHandler'
-import LecturerRequestHandler from './components/LecturerequestHandler'
-import Header from './components/Header'
-import UpdateLecturerInfo from './components/UpdateLecturerInfo'
-import UpdateStudentInfo from './components/UpdateStudentInfo'
+import StudentRequestHandler from './admindashboardcomponents/StudentRequestHandler';
+import LecturerRequestHandler from './admindashboardcomponents/LecturerequestHandler';
+import UpdateLecturerInfo from './admindashboardcomponents/UpdateLecturerInfo';
+import UpdateStudentInfo from './admindashboardcomponents/UpdateStudentInfo';
+import Sidebar from './admindashboardcomponents/Sidebar';
+import Header from './admindashboardcomponents/Header';
 
-const AdmiDashboard = () => {
+
+const AdminDashboard = () => {
   const [activePage, setActivePage] = useState('dashboard');
   const [showNotifications, setShowNotifications] = useState(false);
 
@@ -15,11 +16,11 @@ const AdmiDashboard = () => {
       case 'student-request':
         return <StudentRequestHandler />;
       case 'lectures-request':
-        return <LecturerRequestHandler />;
+        return <LecturerRequestHandler/>;
       case 'update-lecturer-info':
-        return <UpdateLecturerInfo />;
+        return <UpdateLecturerInfo/>;
       case 'update-student-info':
-        return <UpdateStudentInfo />;
+        return <UpdateStudentInfo/>;
       default:
         return (
           <div className="p-6">
@@ -34,7 +35,7 @@ const AdmiDashboard = () => {
     <div className="flex min-h-screen bg-gray-50">
       <Sidebar activePage={activePage} setActivePage={setActivePage} />
       <div className="flex-1 ml-64">
-      <Header 
+      <Header
         showNotifications={showNotifications}
         setShowNotifications={setShowNotifications}
       />

@@ -8,7 +8,7 @@ const UpdateLecturerInfo = () => {
       firstName: "John",
       lastName: "Smith",
       title: "Dr.",
-      email: "john.smith@university.edu",
+      email: "john.smith@university.edu",           
       phone: "+1234567890",
       department: "Computer Science"
     },
