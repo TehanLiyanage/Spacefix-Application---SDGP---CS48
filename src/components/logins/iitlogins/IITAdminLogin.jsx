@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Lock, User, ArrowRight, Shield } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-const AdminLogin = ({ onLoginSuccess }) => {
+const IITAdminLogin = ({ onLoginSuccess }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -14,7 +14,7 @@ const AdminLogin = ({ onLoginSuccess }) => {
     setIsLoading(true);
     await new Promise(resolve => setTimeout(resolve, 800));
     
-    if (username === 'admin' && password === '1234') {
+    if (username === '123' && password === '123') {
       onLoginSuccess?.();
       navigate('/admin-dashboard');
     } else {
@@ -139,4 +139,4 @@ const AdminLogin = ({ onLoginSuccess }) => {
   );
 };
 
-export default AdminLogin;
+export default IITAdminLogin;

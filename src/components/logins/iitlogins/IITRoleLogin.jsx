@@ -27,7 +27,7 @@ const IITRoleLogin = () => {
       title: 'Admin Login',
       icon: <Building2 className="w-8 h-8" />,
       description: 'Access administrative tools and system settings',
-      path: '/a-dashboard',
+      path: '/iit-admin-login',
       gradient: 'from-emerald-600 to-cyan-600'
     },
     {
