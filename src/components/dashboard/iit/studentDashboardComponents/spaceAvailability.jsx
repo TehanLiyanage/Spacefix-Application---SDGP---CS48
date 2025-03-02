@@ -37,11 +37,11 @@ const SpaceAvailability = () => (
             </div>
             <div className="space-y-2">
               <div className="flex justify-between">
-                <span className="text-gray-600">Current Occupancy:</span>
+                <span className="text-gray-600">Current Occupancy (Approx.) :</span>
                 <span className="font-medium">{data.currentOccupancy} / {data.totalSeats}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-600">Available Seats:</span>
+                <span className="text-gray-600">Available Seats (Approx.) :</span>
                 <span className="font-medium text-blue-600">
                   {data.totalSeats - data.currentOccupancy} seats
                 </span>
