@@ -57,9 +57,9 @@ const LostItems = () => {
         <h2 className="text-2xl font-semibold text-gray-800 mb-4">Lost & Found</h2>
 
         {/* Tab Navigation */}
-        <div className="flex space-x-3 mb-6">
+        <div className="flex space-x-3 mb-6 ">
           <button
-            className={`flex-1 py-2 text-base font-medium rounded-md transition ${
+            className={`flex-1 py-2 text-base font-medium rounded-lg transition ${
               activeTab === 'report-lost' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'
             }`}
             onClick={() => setActiveTab('report-lost')}
@@ -67,7 +67,7 @@ const LostItems = () => {
             Report Lost Item
           </button>
           <button
-            className={`flex-1 py-2 text-base font-medium rounded-md transition ${
+            className={`flex-1 py-2 text-base font-medium rounded-lg transition ${
               activeTab === 'my-items' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'
             }`}
             onClick={() => setActiveTab('my-items')}
@@ -110,7 +110,7 @@ const LostItems = () => {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
             ></textarea>
-            <button className="w-full bg-indigo-600 text-white py-3 text-base rounded-md hover:bg-indigo-700 transition">
+            <button className="w-full bg-blue-600 text-white py-3 text-base rounded-md hover:bg-blue-900 transition">
               Submit Lost Item
             </button>
           </form>
