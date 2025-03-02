@@ -5,7 +5,7 @@ import UpdateLecturerInfo from './admindashboardcomponents/UpdateLecturerInfo';
 import UpdateStudentInfo from './admindashboardcomponents/UpdateStudentInfo';
 import Sidebar from './admindashboardcomponents/Sidebar';
 import Header from './admindashboardcomponents/Header';
-
+import ViewClassroomInfo from './admindashboardcomponents/ViewClassRoomInfo';
 
 const AdminDashboard = () => {
   const [activePage, setActivePage] = useState('dashboard');
@@ -21,6 +21,8 @@ const AdminDashboard = () => {
         return <UpdateLecturerInfo/>;
       case 'update-student-info':
         return <UpdateStudentInfo/>;
+      case 'classroom-info':
+        return <ViewClassroomInfo/>;
       default:
         return (
           <div className="p-6">
