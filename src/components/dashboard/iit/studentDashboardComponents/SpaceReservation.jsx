@@ -88,29 +88,34 @@ const SpaceReservation = () => {
           </div>
 
           {/* Select Multiple Time Slots */}
+          
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Select Time Slots
             </label>
             <div className="w-full border rounded-lg p-2">
-              {selectedDay && getAvailableTimeSlots(selectedDay.date).map((slot) => (
-                <label key={slot.label} className="block">
-                  <input
-                    type="checkbox"
-                    className="mr-2"
-                    value={slot.label}
-                    checked={selectedTimeSlots.includes(slot.label)}
-                    onChange={() => handleTimeSlotChange(slot.label)}
-                  />
-                  {slot.label}
-                </label>
-              ))}
+              {selectedDay ? (
+                getAvailableTimeSlots(selectedDay.date).map((slot) => (
+                  <label key={slot.label} className="block">
+                    <input
+                      type="checkbox"
+                      className="mr-2"
+                      value={slot.label}
+                      checked={selectedTimeSlots.includes(slot.label)}
+                      onChange={() => handleTimeSlotChange(slot.label)}
+                    />
+                    {slot.label}
+                  </label>
+                ))
+              ) : (
+                <p className="text-gray-500 text-sm">Please select a day to see available slots</p>
+              )}
             </div>
           </div>
 
           {/* Reservation Button */}
           <button
-            className="w-full bg-blue-600 text-white rounded-lg py-2 px-4 hover:bg-cyan-600 transition-colors disabled:bg-gray-400"
+            className="w-full bg-blue-600 text-white rounded-lg py-2 px-4 hover:bg-blue-900 transition-colors disabled:bg-gray-400"
             disabled={!selectedDay || selectedTimeSlots.length === 0}
             onClick={handleReservation}
           >
