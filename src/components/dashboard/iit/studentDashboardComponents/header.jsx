@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Bell, HelpCircle, User, LogOut, Menu, X } from "lucide-react";
-
+import Notifications from "./Notifications"; // Ensure Notifications component is mobile-friendly
 
 const Header = ({ showNotifications, setShowNotifications }) => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -28,6 +28,12 @@ const Header = ({ showNotifications, setShowNotifications }) => {
         absolute top-16 left-0 right-0 bg-white md:bg-transparent md:static md:flex md:items-center md:space-x-4 p-4 md:p-0 shadow-md md:shadow-none transition-transform 
         ${menuOpen ? "block" : "hidden md:flex"}`}
       >
+        {/* Notifications */}
+        <Notifications
+          notifications={notifications}
+          showNotifications={showNotifications}
+          setShowNotifications={setShowNotifications}
+        />
         {/* Help Center */}
         <button className="p-2 hover:bg-gray-100 rounded-full">
           <HelpCircle className="w-6 h-6" />
