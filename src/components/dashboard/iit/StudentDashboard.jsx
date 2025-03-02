@@ -3,6 +3,7 @@ import MyTimetable from "./studentDashboardComponents/MyTimetable";
 import SpaceAvailability from "./studentDashboardComponents/SpaceAvailability";
 import Sidebar from "./studentDashboardComponents/Sidebar";
 import Header from "./studentDashboardComponents/Header";
+import LostItems from "./studentDashboardComponents/LostItems";
 import SpaceReservation from "./studentDashboardComponents/SpaceReservation";
 
 const StudentDashboard = () => {
@@ -18,6 +19,8 @@ const StudentDashboard = () => {
         return < SpaceAvailability />;
       case "reservation":
         return <SpaceReservation />;
+      case "lost-items":
+        return < LostItems />;  
       default:
         return < MyTimetable/>;
     }
