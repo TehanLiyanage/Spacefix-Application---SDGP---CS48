@@ -1,7 +1,11 @@
 import React from 'react';
 import { Search } from 'lucide-react';
+import { useNavigate } from 'react-router-dom'; // Import for React Router
 
 const HeroSection = () => {
+  // Use navigate from React Router
+  const navigate = useNavigate();
+
   const scrollToSection = (id) => {
     const element = document.getElementById(id);
     if (element) {
@@ -14,6 +18,11 @@ const HeroSection = () => {
         behavior: 'smooth'
       });
     }
+  };
+
+  // Function to handle navigation to inquiry page
+  const goToInquiryPage = () => {
+    navigate('/inquiry'); // Navigate to the inquiry page route
   };
 
   return (
@@ -42,7 +51,7 @@ const HeroSection = () => {
 
             <div className="flex flex-col sm:flex-row gap-4 opacity-0 animate-fadeInDelay2">
               <button 
-                onClick={() => window.location.href = '#inquiry'}
+                onClick={goToInquiryPage}
                 className="group px-8 py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-full hover:shadow-xl transition-all duration-300 font-medium text-lg relative overflow-hidden hover:scale-105 active:scale-95"
               >
                 <span className="relative z-10">Inquire Now</span>
@@ -69,8 +78,8 @@ const HeroSection = () => {
               {/* Main image */}
               <div className="relative z-20 animate-float">
                 <img 
-                  src="https://images.unsplash.com/photo-1485182708500-e8f1f318ba72?q=80&w=2110&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-                  alt="Modern University Campus"
+                  src="https://images.unsplash.com/photo-1563461660947-507ef49e9c47?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                  alt="spacefix Campus"
                   className="rounded-lg shadow-2xl object-cover w-full transform transition-transform hover:scale-105 duration-500"
                 />
               </div>

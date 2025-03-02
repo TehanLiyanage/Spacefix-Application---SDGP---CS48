@@ -6,6 +6,7 @@ import UpdateStudentInfo from './admindashboardcomponents/UpdateStudentInfo';
 import Sidebar from './admindashboardcomponents/Sidebar';
 import Header from './admindashboardcomponents/Header';
 import ViewClassroomInfo from './admindashboardcomponents/ViewClassRoomInfo';
+import UpdateTimeTable from './admindashboardcomponents/UpdateTimetable';
 
 const AdminDashboard = () => {
   const [activePage, setActivePage] = useState('dashboard');
@@ -17,6 +18,8 @@ const AdminDashboard = () => {
         return <StudentRequestHandler />;
       case 'lectures-request':
         return <LecturerRequestHandler/>;
+        case 'update-timetable': 
+        return <UpdateTimeTable/>;
       case 'update-lecturer-info':
         return <UpdateLecturerInfo/>;
       case 'update-student-info':
