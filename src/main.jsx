@@ -11,7 +11,8 @@ import IITStudentLogin from './components/logins/iitlogins/IITStudentLogin.jsx';
 import TimeTableUpdate from './components/iitadmin/TimeTableUpdate.jsx';
 import InquiryForm from './components/InquiryForm.jsx';
 import StudentDashboard from './components/dashboard/iit/StudentDashboard.jsx';
-
+import AdminPortalAdminDashboard from './components/adminportal/AdminPortalAdminDashboard.jsx';
+import AdminDashboard from './components/dashboard/iit/AdminDashboard.jsx';
 
 
 createRoot(document.getElementById('root')).render(
@@ -27,7 +28,7 @@ createRoot(document.getElementById('root')).render(
         <Route path="/timetable-update" element={<TimeTableUpdate />} />
         <Route path="/inquiry" element={<InquiryForm />} />
         <Route path="/student-dashboard" element={<StudentDashboard />} />
-
+        <Route path="/a-dashboard" element={<AdminDashboard/>} />
       </Routes>
     </BrowserRouter>
   </StrictMode>,
