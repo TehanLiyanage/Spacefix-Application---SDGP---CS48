@@ -81,14 +81,7 @@ const Timetable = ({ setCurrentPage }) => {
   
   return (
     <div className="min-h-screen bg-gray-100 p-4 pt-16">
-      <div className="max-w-6xl mx-auto">
-        <button
-          onClick={() => setCurrentPage('dashboard')}
-          className="mb-6 text-gray-600 hover:text-gray-900"
-        >
-          Back to Dashboard
-        </button>
-        
+      <div className="max-w-6xl mx-auto">      
         <h1 className="text-3xl font-bold text-gray-900 mb-6">Timetable Management</h1>
         
         {/* Add New Entry Form */}
@@ -284,5 +277,4 @@ const Timetable = ({ setCurrentPage }) => {
     </div>
   );
 };
-
 export default Timetable;

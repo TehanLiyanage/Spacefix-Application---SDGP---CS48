@@ -56,13 +56,6 @@ const SpaceBooking = ({ setCurrentPage }) => {
   return (
     <div className="min-h-screen bg-gray-100 p-4 pt-16">
       <div className="max-w-2xl mx-auto">
-        <button 
-          onClick={() => setCurrentPage('dashboard')}
-          className="mb-6 text-gray-600 hover:text-gray-900 flex items-center"
-        >
-          <span>← Back to Dashboard</span>
-        </button>
-        
         <h1 className="text-3xl font-bold text-gray-900 mb-6">Space Booking</h1>
 
         {submitted ? (
@@ -228,5 +221,4 @@ const SpaceBooking = ({ setCurrentPage }) => {
     </div>
   );
 };
-
 export default SpaceBooking;
