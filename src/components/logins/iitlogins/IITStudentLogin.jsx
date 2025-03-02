@@ -27,7 +27,7 @@ const IITStudentLogin = () => {
           setCheckingAuth(false);
         } else {
           // User is logged in and token is valid, redirect to dashboard
-          navigate('/dashboard');
+          navigate('/student-dashboard');
         }
       } else {
         setCheckingAuth(false);
