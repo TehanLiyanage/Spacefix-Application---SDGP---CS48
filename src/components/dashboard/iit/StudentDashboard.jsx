@@ -5,6 +5,7 @@ import Sidebar from "./studentDashboardComponents/Sidebar";
 import Header from "./studentDashboardComponents/Header";
 import LostItems from "./studentDashboardComponents/LostItems";
 import SpaceReservation from "./studentDashboardComponents/SpaceReservation";
+import MiniMap from "./studentDashboardComponents/MiniMap";
 
 const StudentDashboard = () => {
   const [activePage, setActivePage] = useState("timetable");
@@ -19,6 +20,8 @@ const StudentDashboard = () => {
         return < SpaceAvailability />;
       case "reservation":
         return <SpaceReservation />;
+      case "mini-map":
+        return < MiniMap/>;
       case "lost-items":
         return < LostItems />;  
       default:
