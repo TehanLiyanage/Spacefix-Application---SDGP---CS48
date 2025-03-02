@@ -25,7 +25,7 @@ const LostItems = () => {
     }
   ]);
 
-  const categories = ['Select category', 'Electronics', 'Clothing', 'Books', 'Personal Items', 'Other'];
+  const categories = ['Select category','Student Card', 'Mobile Phones' , 'Laptops' ,'Other Electronics' , 'Clothing', 'Helmet' , 'Books', 'Personal Items','Wallet', 'Other'];
 
   const handleSubmit = (e) => {
     e.preventDefault();
