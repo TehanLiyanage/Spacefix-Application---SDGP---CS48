@@ -4,13 +4,13 @@ const MiniMap = () => {
   const [selectedClassroom, setSelectedClassroom] = useState(null);
 
   const classrooms = [
-    { id: "Library", building: "Building A", floor: 1, map: "/images/floor1.png" },
-    { id: "Computer Lab 01", building: "Building A", floor: 1, map: "/images/floor1.png" },
-    { id: "Study Area 01", building: "Building B", floor: 2, map: "/images/floor2.png" },
-    { id: "Study Area 02", building: "Building B", floor: 2, map: "/images/floor2.png" },
-    { id: "Computer Lab 02", building: "Building B", floor: 2, map: "/images/floor2.png" },
-    { id: "Classroom 01", building: "Building C", floor: 3, map: "/images/floor3.png" },
-    { id: "Classroom 02", building: "Building C", floor: 3, map: "/images/floor3.png" },
+    { id: "1LA", building: "GP Building ", floor: 1, map: "/images/floor1.png" },
+    { id: "1LB", building: "SP Building ", floor: 1, map: "/images/floor1.png" },
+    { id: "2LA", building: "GP Building ", floor: 2, map: "/images/floor2.png" },
+    { id: "2LB", building: "GP Building ", floor: 2, map: "/images/floor2.png" },
+    { id: "2LC", building: "SP Building ", floor: 2, map: "/images/floor2.png" },
+    { id: "3LA", building: "SP Building ", floor: 3, map: "/images/floor3.png" },
+    { id: "3LB", building: "SP Building ", floor: 3, map: "/images/floor3.png" },
   ];
 
   return (
