@@ -4,28 +4,26 @@ const mockTimetable = [
   {
     day: "Monday",
     courses: [
-      { id: 1, name: "Mathematics", time: "09:00 - 11:00", room: "A201", professor: "Dr. Smith" },
-      { id: 2, name: "Computer Science", time: "13:00 - 15:00", room: "B305", professor: "Dr. Johnson" },
+      { id: 1, name: "Object Oriented Programming (5COSC009)", time: "09:00 - 11:00", room: "5LA", professor: "Dr. Smith" },
+      { id: 2, name: "Advanced Client-Side Development (4COCS007)", time: "13:00 - 15:00", room: "3LC", professor: "Dr. Johnson" },
     ],
   },
   {
     day: "Tuesday",
     courses: [
-      { id: 3, name: "Physics", time: "10:00 - 12:00", room: "C102", professor: "Dr. Brown" },
-      { id: 4, name: "English", time: "14:00 - 16:00", room: "D405", professor: "Prof. Wilson" },
+      { id: 3, name: "Advanced Server-Side Development (3COSC009)", time: "10:00 - 12:00", room: "1LC", professor: "Dr. Brown" },
+      { id: 4, name: "Human Computer Interaction (6COSC008)", time: "14:00 - 16:00", room: "4LA", professor: "Prof. Wilson" },
     ],
   },
 ];
 
 const MyTimetable = () => {
   const [group, setGroup] = useState("");
-  const [semester, setSemester] = useState("");
   const [batch, setBatch] = useState("");
   const [year, setYear] = useState("");
   const [timetable, setTimetable] = useState([]);
 
   const loadTimetable = () => {
-    const key = `${year}-${semester}-${batch}`;
     const data = mockTimetable[key] || [];
     setTimetable(data);
   };
@@ -41,19 +39,10 @@ const MyTimetable = () => {
             className="w-full border rounded-lg p-2"
             value={group}
             onChange={(e) => setGroup(e.target.value)}
-            placeholder="Enter your group number"
+            placeholder="Enter your group number (e.g. G23)"
           />
         </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Semester</label>
-          <input
-            type="text"
-            className="w-full border rounded-lg p-2"
-            value={semester}
-            onChange={(e) => setSemester(e.target.value)}
-            placeholder="Enter your semester (e.g., A, B)"
-          />
-        </div>
+
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">Batch</label>
           <input
@@ -61,7 +50,7 @@ const MyTimetable = () => {
             className="w-full border rounded-lg p-2"
             value={batch}
             onChange={(e) => setBatch(e.target.value)}
-            placeholder="Enter your batch (e.g., B1, B2)"
+            placeholder="Enter your batch (e.g. L5)"
           />
         </div>
         <div>
@@ -71,7 +60,7 @@ const MyTimetable = () => {
             className="w-full border rounded-lg p-2"
             value={year}
             onChange={(e) => setYear(e.target.value)}
-            placeholder="Enter your year (e.g., 2023)"
+            placeholder="Enter your year (e.g. 2023)"
           />
         </div>
         <button
