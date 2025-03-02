@@ -7,7 +7,7 @@ import IITRoleLogin from './components/logins/iitlogins/IITRoleLogin.jsx';
 import UniversityLoginDashboard from './components/logins/UniversityLoginDashboard.jsx';
 import IITStudentLogin from './components/logins/iitlogins/IITStudentLogin.jsx';
 import TimeTableUpdate from './components/iitadmin/TimeTableUpdate.jsx';
-import InquiryForm from './components/InquiryForm.jsx';
+import InquiryForm from './components/landingpage/InquiryForm.jsx';
 import AdminDashboard from './components/dashboard/iit/AdminDashboard.jsx';
 import IITAdminLogin from './components/logins/iitlogins/IITAdminLogin.jsx';
 
