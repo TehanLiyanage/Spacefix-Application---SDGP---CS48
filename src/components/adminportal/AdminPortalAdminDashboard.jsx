@@ -8,7 +8,7 @@ const IconFallback = ({ className }) => (
   </div>
 );
 
-const AdminDashboard = () => {
+const AdminPortalAdminDashboard = () => {
   const navigate = useNavigate();
 
   const features = [
@@ -82,4 +82,4 @@ const AdminDashboard = () => {
   );
 };
 
-export default AdminDashboard;
+export default AdminPortalAdminDashboard;
