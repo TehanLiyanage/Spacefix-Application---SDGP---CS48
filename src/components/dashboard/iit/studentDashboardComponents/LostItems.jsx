@@ -53,8 +53,8 @@ const LostItems = () => {
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
+      <h2 className="text-2xl font-bold mb-6">Lost & Found</h2>
       <div className="max-w-4xl mx-auto bg-white shadow-md rounded-lg p-5">
-        <h2 className="text-2xl font-semibold text-gray-800 mb-4">Lost & Found</h2>
 
         {/* Tab Navigation */}
         <div className="flex space-x-3 mb-6 ">
