@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
-import SpaceBooking from './lectureDashboardComponents/SpaceBooking';
-import Timetable from './lectureDashboardComponents/Timetable';
-import CampusMap from './lectureDashboardComponents/MiniMap';
 import Header from './lectureDashboardComponents/Header';
+import Timetable from './lectureDashboardComponents/Timetable';
 import Sidebar from './lectureDashboardComponents/Sidebar';
-
+import MiniMap from './studentDashboardComponents/MiniMap';
+import SpaceBooking from './lectureDashboardComponents/SpaceBooking';
 
 // Feature card component for the dashboard home
 const FeatureCard = ({ title, description, onClick }) => (
@@ -23,6 +22,20 @@ const LectureDashboard = ({ setCurrentPage, currentPage }) => {
   
   // Set default page to home if not specified
   const activePage = currentPage || 'home';
+  
+  // Internal page state to ensure UI updates
+  const [internalPage, setInternalPage] = useState(activePage);
+  
+  // Handling page changes
+  const handlePageChange = (page) => {
+    console.log("Changing page to:", page); // Debug log
+    setInternalPage(page);
+    
+    // Also call parent's setCurrentPage if it exists
+    if (setCurrentPage && typeof setCurrentPage === 'function') {
+      setCurrentPage(page);
+    }
+  };
 
   const features = [
     {
@@ -44,13 +57,14 @@ const LectureDashboard = ({ setCurrentPage, currentPage }) => {
 
   // Content to render based on the selected page
   const renderContent = () => {
-    switch (activePage) {
+    // Use internalPage for local rendering
+    switch (internalPage) {
       case 'booking':
-        return <SpaceBooking setCurrentPage={setCurrentPage} />;
+        return <SpaceBooking setCurrentPage={handlePageChange} />;
       case 'timetable':
-        return <Timetable setCurrentPage={setCurrentPage} />;
+        return <Timetable setCurrentPage={handlePageChange} />;
       case 'map':
-        return <CampusMap setCurrentPage={setCurrentPage} />;
+        return <MiniMap setCurrentPage={handlePageChange} />;
       default:
         // Home dashboard with feature cards
         return (
@@ -66,7 +80,7 @@ const LectureDashboard = ({ setCurrentPage, currentPage }) => {
                   key={index}
                   title={feature.title}
                   description={feature.description}
-                  onClick={() => setCurrentPage(feature.page)}
+                  onClick={() => handlePageChange(feature.page)}
                 />
               ))}
             </div>
@@ -78,11 +92,10 @@ const LectureDashboard = ({ setCurrentPage, currentPage }) => {
   return (
     <div className="flex bg-gray-50 min-h-screen">
       {/* Sidebar */}
-      <Sidebar activePage={activePage} setActivePage={setCurrentPage} />
+      <Sidebar activePage={internalPage} setActivePage={handlePageChange} />
       
       {/* Main Content Area */}
       <div className="flex flex-col flex-grow ml-64">
-        
         <Header
           showNotifications={showNotifications}
           setShowNotifications={setShowNotifications}

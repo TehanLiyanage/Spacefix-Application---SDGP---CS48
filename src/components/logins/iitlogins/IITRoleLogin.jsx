@@ -19,7 +19,7 @@ const IITRoleLogin = () => {
       title: 'Lecturer Login',
       icon: <BookOpen className="w-8 h-8" />,
       description: 'Manage your courses and student assessments',
-      path: '/iit-lecturer-login',
+      path: '/lecture-dashboard',
       gradient: 'from-cyan-500 to-cyan-600'
     },
     {
