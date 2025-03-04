@@ -11,7 +11,7 @@ import InquiryForm from './components/landingpage/InquiryForm.jsx';
 import AdminDashboard from './components/dashboard/iit/AdminDashboard.jsx';
 import IITAdminLogin from './components/logins/iitlogins/IITAdminLogin.jsx';
 import StudentDashboard from './components/dashboard/iit/StudentDashboard.jsx';
-import StudentDashboard from './components/dashboard/iit/StaffDashboard.jsx';
+import StaffDashboard from './components/dashboard/iit/StaffDashboard.jsx';
 
 
 createRoot(document.getElementById('root')).render(
@@ -27,7 +27,7 @@ createRoot(document.getElementById('root')).render(
         <Route path="/inquiry" element={<InquiryForm />} />
         <Route path="/admin-dashboard" element={<AdminDashboard/>} />
         <Route path="/student-dashboard" element={<StudentDashboard />} />
-        <Route path="/student-dashboard" element={<StaffDashboard />} />
+        <Route path="/staff-dashboard" element={<StaffDashboard />} />
         
 
 
