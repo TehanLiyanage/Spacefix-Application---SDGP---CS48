@@ -79,7 +79,7 @@ const HeroSection = () => {
               <div className="relative z-20 animate-float">
                 <img 
                   // src="https://images.unsplash.com/photo-1563461660947-507ef49e9c47?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-                  src="src\assets\background\Spacefixbg.png"
+                  src="src/assets/background/Spacefixbg.png"
                   alt="spacefix Campus"
                   className="rounded-lg shadow-2xl object-cover w-full transform transition-transform hover:scale-105 duration-500"
                 />
