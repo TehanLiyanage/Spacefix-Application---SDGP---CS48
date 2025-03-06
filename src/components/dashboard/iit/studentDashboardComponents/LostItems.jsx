@@ -25,7 +25,7 @@ const LostItems = () => {
     }
   ]);
 
-  const categories = ['Select category', 'Electronics', 'Clothing', 'Books', 'Personal Items', 'Other'];
+  const categories = ['Select category','Student Card', 'Mobile Phones' , 'Laptops' ,'Other Electronics' , 'Clothing', 'Helmet' , 'Books', 'Personal Items','Wallet', 'Other'];
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -53,13 +53,13 @@ const LostItems = () => {
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
+      <h2 className="text-2xl font-bold mb-6">Lost & Found</h2>
       <div className="max-w-4xl mx-auto bg-white shadow-md rounded-lg p-5">
-        <h2 className="text-2xl font-semibold text-gray-800 mb-4">Lost & Found</h2>
 
         {/* Tab Navigation */}
-        <div className="flex space-x-3 mb-6">
+        <div className="flex space-x-3 mb-6 ">
           <button
-            className={`flex-1 py-2 text-base font-medium rounded-md transition ${
+            className={`flex-1 py-2 text-base font-medium rounded-lg transition ${
               activeTab === 'report-lost' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'
             }`}
             onClick={() => setActiveTab('report-lost')}
@@ -67,7 +67,7 @@ const LostItems = () => {
             Report Lost Item
           </button>
           <button
-            className={`flex-1 py-2 text-base font-medium rounded-md transition ${
+            className={`flex-1 py-2 text-base font-medium rounded-lg transition ${
               activeTab === 'my-items' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'
             }`}
             onClick={() => setActiveTab('my-items')}
@@ -110,7 +110,7 @@ const LostItems = () => {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
             ></textarea>
-            <button className="w-full bg-indigo-600 text-white py-3 text-base rounded-md hover:bg-indigo-700 transition">
+            <button className="w-full bg-blue-600 text-white py-3 text-base rounded-md hover:bg-blue-900 transition">
               Submit Lost Item
             </button>
           </form>

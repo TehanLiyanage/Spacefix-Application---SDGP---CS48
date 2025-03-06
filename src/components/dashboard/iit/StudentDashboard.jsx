@@ -1,12 +1,11 @@
 import React, { useState } from "react";
 import MyTimetable from "./studentDashboardComponents/MyTimetable";
-import SpaceAvailability from "./studentDashboardComponents/SpaceAvailability";
+import SpaceAvailability from "./studentDashboardComponents/spaceAvailability";
+import Sidebar from "./studentDashboardComponents/sidebar";
+import Header from "./studentDashboardComponents/header";
+import LostItems from "./studentDashboardComponents/LostItems";
 import SpaceReservation from "./studentDashboardComponents/SpaceReservation";
 import MiniMap from "./studentDashboardComponents/MiniMap";
-import LostItems from "./studentDashboardComponents/LostItems";
-import Sidebar from "./studentDashboardComponents/Sidebar";
-import Header from "./studentDashboardComponents/Header";
-
 
 const StudentDashboard = () => {
   const [activePage, setActivePage] = useState("timetable");
@@ -23,8 +22,8 @@ const StudentDashboard = () => {
         return <SpaceReservation />;
       case "mini-map":
         return < MiniMap/>;
-      case "lost-items": //
-        return < LostItems />;
+      case "lost-items":
+        return < LostItems />;  
       default:
         return < MyTimetable/>;
     }

@@ -4,13 +4,13 @@ const MiniMap = () => {
   const [selectedClassroom, setSelectedClassroom] = useState(null);
 
   const classrooms = [
-    { id: "1LA", building: "Building A", floor: 1, map: "/images/floor1.png" },
-    { id: "1LB", building: "Building A", floor: 1, map: "/images/floor1.png" },
-    { id: "2LA", building: "Building B", floor: 2, map: "/images/floor2.png" },
-    { id: "2LB", building: "Building B", floor: 2, map: "/images/floor2.png" },
-    { id: "2LC", building: "Building B", floor: 2, map: "/images/floor2.png" },
-    { id: "3LA", building: "Building C", floor: 3, map: "/images/floor3.png" },
-    { id: "3LB", building: "Building C", floor: 3, map: "/images/floor3.png" },
+    { id: "1LA", building: "GP Building ", floor: 1, map: "/images/floor1.png" },
+    { id: "1LB", building: "SP Building ", floor: 1, map: "/images/floor1.png" },
+    { id: "2LA", building: "GP Building ", floor: 2, map: "/images/floor2.png" },
+    { id: "2LB", building: "GP Building ", floor: 2, map: "/images/floor2.png" },
+    { id: "2LC", building: "SP Building ", floor: 2, map: "/images/floor2.png" },
+    { id: "3LA", building: "SP Building ", floor: 3, map: "/images/floor3.png" },
+    { id: "3LB", building: "SP Building ", floor: 3, map: "/images/floor3.png" },
   ];
 
   return (

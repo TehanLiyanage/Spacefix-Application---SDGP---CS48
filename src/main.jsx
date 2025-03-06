@@ -3,16 +3,14 @@ import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Routes, Route } from 'react-router-dom'; 
 import './index.css';
 import HomePage from './components/HomePage';
-import AdminLogin from './components/adminportal/AdminLogin';
-import AdminDashboard from './components/adminportal/AdminDashboard';
 import IITRoleLogin from './components/logins/iitlogins/IITRoleLogin.jsx';
 import UniversityLoginDashboard from './components/logins/UniversityLoginDashboard.jsx';
 import IITStudentLogin from './components/logins/iitlogins/IITStudentLogin.jsx';
 import TimeTableUpdate from './components/iitadmin/TimeTableUpdate.jsx';
-import InquiryForm from './components/InquiryForm.jsx';
+import InquiryForm from './components/landingpage/InquiryForm.jsx';
+import AdminDashboard from './components/dashboard/iit/AdminDashboard.jsx';
+import IITAdminLogin from './components/logins/iitlogins/IITAdminLogin.jsx';
 import StudentDashboard from './components/dashboard/iit/StudentDashboard.jsx';
-import LectureDashboard from './components/dashboard/iit/LectureDashboad.jsx';
-
 
 
 createRoot(document.getElementById('root')).render(
@@ -20,15 +18,15 @@ createRoot(document.getElementById('root')).render(
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<HomePage />} />
-        <Route path="/admin-login" element={<AdminLogin />} />
-        <Route path="/admin-dashboard" element={<AdminDashboard />} />
+        <Route path="/iit-admin-login" element={<IITAdminLogin />} />
         <Route path="/uni-login" element={<UniversityLoginDashboard />} />
         <Route path="/iit-role-login" element={<IITRoleLogin />} />
         <Route path="/iit-student-login" element={<IITStudentLogin />} />
         <Route path="/timetable-update" element={<TimeTableUpdate />} />
         <Route path="/inquiry" element={<InquiryForm />} />
-        <Route path="student-dashboard" element={<StudentDashboard />} />
-        <Route path="/lecture-dashboard" element={<LectureDashboard />} />
+        <Route path="/admin-dashboard" element={<AdminDashboard/>} />
+        <Route path="/student-dashboard" element={<StudentDashboard />} />
+
 
       </Routes>
     </BrowserRouter>
