@@ -27,7 +27,7 @@ createRoot(document.getElementById('root')).render(
         <Route path="/inquiry" element={<InquiryForm />} />
         <Route path="/admin-dashboard" element={<AdminDashboard/>} />
         <Route path="/student-dashboard" element={<StudentDashboard />} />
-        <Route path="" element={<LectureDashboard />} />
+        <Route path="/iit-lecturer-login" element={<LectureDashboard />} />
 
 
       </Routes>
