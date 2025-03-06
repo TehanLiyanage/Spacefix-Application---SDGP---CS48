@@ -47,7 +47,7 @@ const Navigation = () => {
         <div className="flex justify-between items-center h-16 sm:h-20">
           <div className="flex items-center">
             <span className="text-xl sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-emerald-500 via-emerald-400 to-cyan-500 bg-clip-text text-transparent">
-              SPACEFIX
+            S P A C E F I X
             </span>
           </div>
 
