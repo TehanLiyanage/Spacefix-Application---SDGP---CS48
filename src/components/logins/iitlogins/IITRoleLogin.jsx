@@ -35,7 +35,7 @@ const IITRoleLogin = () => {
       title: 'Staff Login',
       icon: <Users className="w-8 h-8" />,
       description: 'Access staff resources and department tools',
-      path: '/iit-staff-login',
+      path: '/labkeeper-dashboard',
       gradient: 'from-cyan-600 to-emerald-600'
     }
   ];
