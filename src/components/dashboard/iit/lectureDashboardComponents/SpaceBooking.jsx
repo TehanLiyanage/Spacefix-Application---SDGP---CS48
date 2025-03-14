@@ -6,7 +6,9 @@ const SpaceBooking = ({ setCurrentPage }) => {
     date: '',
     hallSize: '',
     studentCount: '',
-    adminNote: ''
+    adminNote: '',
+    startTime: '', // Added startTime field
+    endTime: ''    // Added endTime field
   });
   const [submitted, setSubmitted] = useState(false);
   const [bookings, setBookings] = useState([]);
@@ -71,7 +73,9 @@ const SpaceBooking = ({ setCurrentPage }) => {
                     date: '',
                     hallSize: '',
                     studentCount: '',
-                    adminNote: ''
+                    adminNote: '',
+                    startTime: '', // Reset startTime
+                    endTime: ''    // Reset endTime
                   });
                 }}
                 className="text-blue-600 hover:text-blue-800"
@@ -117,6 +121,39 @@ const SpaceBooking = ({ setCurrentPage }) => {
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
+            </div>
+
+            {/* Time Slot (Start Time and End Time) */}
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="startTime">
+                  Start Time *
+                </label>
+                <input
+                  type="time"
+                  id="startTime"
+                  name="startTime"
+                  required
+                  value={formData.startTime}
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="endTime">
+                  End Time *
+                </label>
+                <input
+                  type="time"
+                  id="endTime"
+                  name="endTime"
+                  required
+                  value={formData.endTime}
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
             </div>
 
             {/* Hall Size */}
@@ -197,6 +234,7 @@ const SpaceBooking = ({ setCurrentPage }) => {
                     <div>
                       <h3 className="font-medium text-gray-900">{formatTaskType(booking.taskType)}</h3>
                       <p className="text-sm text-gray-600">Date: {booking.date}</p>
+                      <p className="text-sm text-gray-600">Time Slot: {booking.startTime} - {booking.endTime}</p> {/* Display start and end time */}
                       <p className="text-sm text-gray-600">Hall Size: {booking.hallSize}</p>
                       {booking.studentCount && (
                         <p className="text-sm text-gray-600">Students: {booking.studentCount}</p>
