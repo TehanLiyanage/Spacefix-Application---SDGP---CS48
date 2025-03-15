@@ -13,6 +13,7 @@ import IITAdminLogin from './components/logins/iitlogins/IITAdminLogin.jsx';
 import StudentDashboard from './components/dashboard/iit/StudentDashboard.jsx';
 import LectureDashboard from './components/dashboard/iit/LectureDashboard.jsx';
 import LabkeeperDashboard from './components/dashboard/iit/LabkeeperDashboard.jsx';
+import IITLecturerLogin from './components/logins/iitlogins/IITLectureLogin.jsx';
 
 
 createRoot(document.getElementById('root')).render(
@@ -24,11 +25,12 @@ createRoot(document.getElementById('root')).render(
         <Route path="/uni-login" element={<UniversityLoginDashboard />} />
         <Route path="/iit-role-login" element={<IITRoleLogin />} />
         <Route path="/iit-student-login" element={<IITStudentLogin />} />
+        <Route path="/iit-lecturer-login" element={< IITLecturerLogin/>} />
         <Route path="/timetable-update" element={<TimeTableUpdate />} />
         <Route path="/inquiry" element={<InquiryForm />} />
         <Route path="/admin-dashboard" element={<AdminDashboard/>} />
         <Route path="/student-dashboard" element={<StudentDashboard />} />
-        <Route path="/iit-lecturer-login" element={<LectureDashboard />} />
+        <Route path="/lecturer-dashboard" element={<LectureDashboard />} />
         <Route path="/labkeeper-dashboard" element={<LabkeeperDashboard />} />
 
 
