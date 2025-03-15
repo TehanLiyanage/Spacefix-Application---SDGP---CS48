@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import MyTimetable from "./studentDashboardComponents/MyTimetable";
-import SpaceAvailability from "./studentDashboardComponents/SpaceAvailability";
-import Sidebar from "./studentDashboardComponents/Sidebar";
-import Header from "./studentDashboardComponents/Header";
+import SpaceAvailability from "./studentDashboardComponents/spaceAvailability";
+import Sidebar from "./studentDashboardComponents/sidebar";
+import Header from "./studentDashboardComponents/header";
 import LostItems from "./studentDashboardComponents/LostItems";
 import SpaceReservation from "./studentDashboardComponents/SpaceReservation";
 import MiniMap from "./studentDashboardComponents/MiniMap";
