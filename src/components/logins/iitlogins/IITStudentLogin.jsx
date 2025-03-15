@@ -86,7 +86,7 @@ const IITStudentLogin = () => {
       
       const result = await signInWithPopup(auth, googleProvider);
       await saveUserToFirestore(result.user);
-      navigate('/dashboard');
+      navigate('/student-dashboard');
     } catch (error) {
       console.error('Google sign-in error:', error);
       if (error.code === 'auth/popup-closed-by-user') {
