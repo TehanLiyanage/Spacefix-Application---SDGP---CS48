@@ -1,22 +1,22 @@
 import React from "react";
-import { Calendar, Users, Map, LayoutDashboard } from "lucide-react";
+import { Calendar, Clock, Book, LayoutDashboard } from "lucide-react";
 
 const Sidebar = ({ activePage, setActivePage }) => {
   return (
-    <div className="w-64 bg-white h-screen fixed left-0 shadow-lg z-10">
-      <div className="p-4 border-b">
-        <h1 className="text-xl font-bold text-blue-600">Lecture Portal</h1>
+    <div className="w-64 h-screen fixed left-0 bg-gradient-to-br from-emerald-500 to-cyan-600 text-white fixed z-50">
+      <div className="p-4 border-b border-white text-center">
+        <h1 className="text-xl text-white">S P A C E F I X</h1>
       </div>
-      <nav className="p-4">
-        <ul className="space-y-2">
+      <nav className="p-4 overflow-y-auto">
+        <ul className="space-y-4">
           {/* Dashboard */}
           <li>
             <button
               onClick={() => setActivePage("home")}
               className={`w-full flex items-center p-2 rounded-lg ${
                 activePage === "home"
-                  ? "bg-blue-100 text-blue-600"
-                  : "hover:bg-gray-100"
+                  ? "bg-emerald-100 text-emerald-600"
+                  : "text-white hover:bg-emerald-50/50 hover:text-emerald-600"
               }`}
             >
               <LayoutDashboard className="w-5 h-5 mr-3" />
@@ -30,8 +30,8 @@ const Sidebar = ({ activePage, setActivePage }) => {
               onClick={() => setActivePage("timetable")}
               className={`w-full flex items-center p-2 rounded-lg ${
                 activePage === "timetable"
-                  ? "bg-blue-100 text-blue-600"
-                  : "hover:bg-gray-100"
+                  ? "bg-emerald-100 text-emerald-600"
+                  : "text-white hover:bg-emerald-50/50 hover:text-emerald-600"
               }`}
             >
               <Calendar className="w-5 h-5 mr-3" />
@@ -45,11 +45,11 @@ const Sidebar = ({ activePage, setActivePage }) => {
               onClick={() => setActivePage("booking")}
               className={`w-full flex items-center p-2 rounded-lg ${
                 activePage === "booking"
-                  ? "bg-blue-100 text-blue-600"
-                  : "hover:bg-gray-100"
+                  ? "bg-emerald-100 text-emerald-600"
+                  : "text-white hover:bg-emerald-50/50 hover:text-emerald-600"
               }`}
             >
-              <Users className="w-5 h-5 mr-3" />
+              <Clock className="w-5 h-5 mr-3" />
               Space Booking
             </button>
           </li>
@@ -60,11 +60,11 @@ const Sidebar = ({ activePage, setActivePage }) => {
               onClick={() => setActivePage("map")}
               className={`w-full flex items-center p-2 rounded-lg ${
                 activePage === "map"
-                  ? "bg-blue-100 text-blue-600"
-                  : "hover:bg-gray-100"
+                  ? "bg-emerald-100 text-emerald-600"
+                  : "text-white hover:bg-emerald-50/50 hover:text-emerald-600"
               }`}
             >
-              <Map className="w-5 h-5 mr-3" />
+              <Book className="w-5 h-5 mr-3" />
               Mini Map
             </button>
           </li>
