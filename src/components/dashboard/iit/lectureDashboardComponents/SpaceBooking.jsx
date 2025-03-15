@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { auth, db } from '../../../../firebase/firebaseConfig.js';
+import { collection, addDoc, query, where, getDocs, orderBy } from 'firebase/firestore';
 
 const SpaceBooking = ({ setCurrentPage }) => {
   const [formData, setFormData] = useState({
@@ -7,11 +9,41 @@ const SpaceBooking = ({ setCurrentPage }) => {
     hallSize: '',
     studentCount: '',
     adminNote: '',
-    startTime: '', // Added startTime field
-    endTime: ''    // Added endTime field
+    startTime: '',
+    endTime: ''
   });
   const [submitted, setSubmitted] = useState(false);
   const [bookings, setBookings] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  // Fetch user's previous bookings when component mounts
+  useEffect(() => {
+    const fetchBookings = async () => {
+      const user = auth.currentUser;
+      if (!user) return;
+
+      try {
+        const bookingsRef = collection(db, 'IIT/reservation/lecturers');
+        const q = query(
+          bookingsRef,
+          where("lecturer.uid", "==", user.uid),
+          orderBy("submittedAt", "desc")
+        );
+        
+        const querySnapshot = await getDocs(q);
+        const fetchedBookings = [];
+        querySnapshot.forEach((doc) => {
+          fetchedBookings.push({ id: doc.id, ...doc.data() });
+        });
+        
+        setBookings(fetchedBookings);
+      } catch (error) {
+        console.error("Error fetching bookings:", error);
+      }
+    };
+
+    fetchBookings();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -21,19 +53,45 @@ const SpaceBooking = ({ setCurrentPage }) => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Create a new booking with a timestamp and status
-    const newBooking = {
-      ...formData,
-      id: Date.now(),
-      status: 'pending',
-      submittedAt: new Date().toLocaleString()
-    };
+    setLoading(true);
     
-    // Add the new booking to the list
-    setBookings(prev => [newBooking, ...prev]);
-    setSubmitted(true);
+    try {
+      // Get current user
+      const user = auth.currentUser;
+      if (!user) {
+        console.error("No authenticated user found");
+        setLoading(false);
+        return;
+      }
+      
+      // Create booking object with lecturer information
+      const newBooking = {
+        ...formData,
+        lecturer: {
+          email: user.email,
+          name: user.displayName || 'Unknown Lecturer',
+          uid: user.uid
+        },
+        status: 'pending',
+        submittedAt: new Date().toISOString(),
+        submittedAtFormatted: new Date().toLocaleString()
+      };
+      
+      // Save to Firestore
+      const bookingsRef = collection(db, 'IIT/reservation/lecturers');
+      const docRef = await addDoc(bookingsRef, newBooking);
+      
+      // Add to local state with the Firestore document ID
+      setBookings(prev => [{ id: docRef.id, ...newBooking }, ...prev]);
+      setSubmitted(true);
+    } catch (error) {
+      console.error("Error submitting booking:", error);
+      alert("Failed to submit booking. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const getStatusColor = (status) => {
@@ -74,8 +132,8 @@ const SpaceBooking = ({ setCurrentPage }) => {
                     hallSize: '',
                     studentCount: '',
                     adminNote: '',
-                    startTime: '', // Reset startTime
-                    endTime: ''    // Reset endTime
+                    startTime: '',
+                    endTime: ''
                   });
                 }}
                 className="text-blue-600 hover:text-blue-800"
@@ -98,6 +156,7 @@ const SpaceBooking = ({ setCurrentPage }) => {
                 value={formData.taskType}
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                disabled={loading}
               >
                 <option value="">Select a task type</option>
                 <option value="extra_lecture">Extra Lecture</option>
@@ -120,6 +179,7 @@ const SpaceBooking = ({ setCurrentPage }) => {
                 value={formData.date}
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                disabled={loading}
               />
             </div>
 
@@ -137,6 +197,7 @@ const SpaceBooking = ({ setCurrentPage }) => {
                   value={formData.startTime}
                   onChange={handleChange}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  disabled={loading}
                 />
               </div>
 
@@ -152,6 +213,7 @@ const SpaceBooking = ({ setCurrentPage }) => {
                   value={formData.endTime}
                   onChange={handleChange}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  disabled={loading}
                 />
               </div>
             </div>
@@ -168,6 +230,7 @@ const SpaceBooking = ({ setCurrentPage }) => {
                 value={formData.hallSize}
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                disabled={loading}
               >
                 <option value="">Select hall size</option>
                 <option value="small">Small</option>
@@ -190,6 +253,7 @@ const SpaceBooking = ({ setCurrentPage }) => {
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Enter number of students"
+                disabled={loading}
               />
             </div>
 
@@ -206,6 +270,7 @@ const SpaceBooking = ({ setCurrentPage }) => {
                 rows="3"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Add any additional notes for the admin"
+                disabled={loading}
               />
             </div>
 
@@ -213,9 +278,10 @@ const SpaceBooking = ({ setCurrentPage }) => {
             <div>
               <button
                 type="submit"
-                className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50"
+                disabled={loading}
               >
-                Submit Booking Request
+                {loading ? 'Submitting...' : 'Submit Booking Request'}
               </button>
             </div>
           </form>
@@ -234,7 +300,7 @@ const SpaceBooking = ({ setCurrentPage }) => {
                     <div>
                       <h3 className="font-medium text-gray-900">{formatTaskType(booking.taskType)}</h3>
                       <p className="text-sm text-gray-600">Date: {booking.date}</p>
-                      <p className="text-sm text-gray-600">Time Slot: {booking.startTime} - {booking.endTime}</p> {/* Display start and end time */}
+                      <p className="text-sm text-gray-600">Time Slot: {booking.startTime} - {booking.endTime}</p>
                       <p className="text-sm text-gray-600">Hall Size: {booking.hallSize}</p>
                       {booking.studentCount && (
                         <p className="text-sm text-gray-600">Students: {booking.studentCount}</p>
@@ -247,7 +313,7 @@ const SpaceBooking = ({ setCurrentPage }) => {
                       <span className={`font-medium ${getStatusColor(booking.status)}`}>
                         {booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
                       </span>
-                      <p className="text-xs text-gray-500 mt-1">{booking.submittedAt}</p>
+                      <p className="text-xs text-gray-500 mt-1">{booking.submittedAtFormatted || booking.submittedAt}</p>
                     </div>
                   </div>
                 </div>
@@ -259,4 +325,5 @@ const SpaceBooking = ({ setCurrentPage }) => {
     </div>
   );
 };
+
 export default SpaceBooking;
