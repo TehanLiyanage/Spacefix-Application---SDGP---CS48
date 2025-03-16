@@ -691,6 +691,9 @@ import { Users, Clock, MapPin, Book, Calendar, Info, Check, X, MessageSquare, Ho
 import useSocket from "../../../../hooks/useSockets.js";
 import axios from "axios";
 
+// Use Vite environment variable with fallback to localhost for development
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
 const LecturerRequestHandler = () => {
   const [requests, setRequests] = useState({
     today: [],
@@ -720,7 +723,8 @@ const LecturerRequestHandler = () => {
   useEffect(() => {
     const fetchRequests = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/lecturer/requests");
+        // const response = await axios.get("http://localhost:5000/api/lecturer/requests");
+        const response = await axios.get(`${API_BASE_URL}/api/lecturer/requests`);
         setRequests(response.data);
         setLoading(false);
       } catch (err) {
@@ -879,7 +883,8 @@ const LecturerRequestHandler = () => {
     }
     
     try {
-      await axios.put(`http://localhost:5000/api/lecturer/requests/${approvalData.requestId}/status`, {
+      // await axios.put(`http://localhost:5000/api/lecturer/requests/${approvalData.requestId}/status`, {
+        await axios.put(`${API_BASE_URL}/api/lecturer/requests/${approvalData.requestId}/status`, {
         status: 'approved',
         approvalMessage: approvalData.approvalMessage,
         allocatedRoom: approvalData.allocatedRoom
@@ -900,7 +905,8 @@ const LecturerRequestHandler = () => {
     e.preventDefault();
     
     try {
-      await axios.put(`http://localhost:5000/api/lecturer/requests/${rejectionData.requestId}/status`, {
+      // await axios.put(`http://localhost:5000/api/lecturer/requests/${rejectionData.requestId}/status`, {
+        await axios.put(`${API_BASE_URL}/api/lecturer/requests/${rejectionData.requestId}/status`, {
         status: 'rejected',
         rejectionReason: rejectionData.rejectionReason
       });
@@ -922,7 +928,8 @@ const LecturerRequestHandler = () => {
     }
     
     try {
-      await axios.delete(`http://localhost:5000/api/lecturer/requests/${requestId}`);
+      // await axios.delete(`http://localhost:5000/api/lecturer/requests/${requestId}`);
+      await axios.delete(`${API_BASE_URL}/api/lecturer/requests/${requestId}`);
       // No need to update state manually as we'll receive a WebSocket update
     } catch (err) {
       console.error("Error deleting request:", err);

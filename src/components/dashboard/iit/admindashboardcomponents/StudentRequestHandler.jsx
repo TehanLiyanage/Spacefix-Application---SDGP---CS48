@@ -2,6 +2,10 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { format } from "date-fns";
 
+
+// Use Vite environment variable with fallback to localhost for development
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
 const StudentRequestHandler = () => {
   const [currentAndFutureReservations, setCurrentAndFutureReservations] = useState([]);
   const [pastReservations, setPastReservations] = useState([]);
@@ -18,7 +22,8 @@ const StudentRequestHandler = () => {
   const fetchReservations = async () => {
     setLoading(true);
     try {
-      const response = await axios.get("http://localhost:5000/api/studentsreservation/reservations");
+      // const response = await axios.get("http://localhost:5000/api/studentsreservation/reservations");
+      const response = await axios.get(`${API_BASE_URL}/api/studentsreservation/reservations`);
       if (response.data.success) {
         setCurrentAndFutureReservations(response.data.currentAndFutureReservations);
         setPastReservations(response.data.pastReservations);
@@ -35,7 +40,8 @@ const StudentRequestHandler = () => {
 
   const deleteReservation = async (id) => {
     try {
-      const response = await axios.delete(`http://localhost:5000/api/studentsreservation/reservations/${id}`);
+      // const response = await axios.delete(`http://localhost:5000/api/studentsreservation/reservations/${id}`);
+      const response = await axios.delete(`${API_BASE_URL}/api/studentsreservation/reservations/${id}`);
       if (response.data.success) {
         // Remove the deleted reservation from the state
         setCurrentAndFutureReservations(prev => 
