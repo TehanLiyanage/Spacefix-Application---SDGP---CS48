@@ -1,69 +1,110 @@
-import React, { useState } from 'react';
-import { Users,  Book, HelpCircle, AlertCircle } from 'lucide-react';
+import React from "react";
+import { Book, Users, HelpCircle, AlertCircle, Menu, ChevronLeft, X } from "lucide-react";
 
-const Sidebar = ({ activePage, setActivePage }) => {
+const Sidebar = ({ activePage, setActivePage, isOpen, toggleSidebar, isMobile }) => {
+  // Handle both setting page and closing sidebar on mobile
+  const handleNavClick = (page) => {
+    setActivePage(page);
+    if (isMobile) {
+      toggleSidebar();
+    }
+  };
 
   return (
-    <div className="w-64 bg-white h-screen fixed left-0 shadow-lg overflow-y-auto">
-      <div className="p-4 border-b">
-        <h1 className="text-xl font-bold text-blue-600">Labkeep Portal</h1>
+    <>
+      {/* Sidebar component - higher z-index than overlay */}
+      <div 
+        className={`bg-gradient-to-br from-emerald-500 to-cyan-600 text-white fixed z-50 transition-all duration-300 h-screen 
+        ${isOpen ? 'translate-x-0' : '-translate-x-full'} 
+        ${isMobile ? 'w-64' : isOpen ? 'w-64' : 'w-16 md:translate-x-0'} 
+        shadow-xl`}
+      >
+        <div className="flex items-center justify-between p-4 border-b border-cyan-400">
+          {isMobile ? (
+            <>
+              <h1 className="text-xl text-white">LABKEEP PORTAL</h1>
+              <button onClick={toggleSidebar} className="text-gray-300 hover:text-white">
+                <X className="w-5 h-5" />
+              </button>
+            </>
+          ) : isOpen ? (
+            <>
+              <h1 className="text-xl text-white">LABKEEP PORTAL</h1>
+              <button onClick={toggleSidebar} className="text-gray-300 hover:text-white">
+                <ChevronLeft className="w-5 h-5" />
+              </button>
+            </>
+          ) : (
+            <button onClick={toggleSidebar} className="mx-auto text-gray-300 hover:text-white">
+              <Menu className="w-5 h-5" />
+            </button>
+          )}
+        </div>
+        <nav className="p-4 overflow-y-auto">
+          <ul className="space-y-4">
+            {/* Tasks */}
+            <li>
+              <button
+                onClick={() => handleNavClick("tasks")}
+                className={`w-full flex items-center p-2 rounded-lg transition-colors ${
+                  activePage === "tasks" 
+                    ? "bg-emerald-100 text-emerald-600" 
+                    : "text-white hover:bg-emerald-50/50 hover:text-emerald-600"
+                }`}
+              >
+                <Book className={`w-5 h-5 ${(isOpen || isMobile) ? 'mr-3' : 'mx-auto'}`} />
+                {(isOpen || isMobile) && <span>Tasks</span>}
+              </button>
+            </li>
+
+            {/* My Tasks */}
+            <li>
+              <button
+                onClick={() => handleNavClick("mytasks")}
+                className={`w-full flex items-center p-2 rounded-lg transition-colors ${
+                  activePage === "mytasks" 
+                    ? "bg-emerald-100 text-emerald-600" 
+                    : "text-white hover:bg-emerald-50/50 hover:text-emerald-600"
+                }`}
+              >
+                <Users className={`w-5 h-5 ${(isOpen || isMobile) ? 'mr-3' : 'mx-auto'}`} />
+                {(isOpen || isMobile) && <span>My Tasks</span>}
+              </button>
+            </li>
+
+            {/* Help */}
+            <li>
+              <button
+                onClick={() => handleNavClick("help")}
+                className={`w-full flex items-center p-2 rounded-lg transition-colors ${
+                  activePage === "help" 
+                    ? "bg-emerald-100 text-emerald-600" 
+                    : "text-white hover:bg-emerald-50/50 hover:text-emerald-600"
+                }`}
+              >
+                <HelpCircle className={`w-5 h-5 ${(isOpen || isMobile) ? 'mr-3' : 'mx-auto'}`} />
+                {(isOpen || isMobile) && <span>Help</span>}
+              </button>
+            </li>
+
+            {/* Report */}
+            <li>
+              <button
+                onClick={() => handleNavClick("report")}
+                className={`w-full flex items-center p-2 rounded-lg transition-colors ${
+                  activePage === "report" 
+                    ? "bg-emerald-100 text-emerald-600" 
+                    : "text-white hover:bg-emerald-50/50 hover:text-emerald-600"
+                }`}
+              >
+                <AlertCircle className={`w-5 h-5 ${(isOpen || isMobile) ? 'mr-3' : 'mx-auto'}`} />
+                {(isOpen || isMobile) && <span>Report</span>}
+              </button>
+            </li>
+          </ul>
+        </nav>
       </div>
-      <nav className="p-4">
-        <ul className="space-y-2">
-          {/*   Tasks tab */}
-          <li>
-            <button 
-                onClick={() => setActivePage('tasks')}
-                className={`w-full flex items-center p-2 rounded-lg ${
-                    activePage === 'tasks' ? 'bg-blue-100 text-blue-600' : 'hover:bg-gray-100'
-                }`}
-            >
-                <Book className='w-5 h-5 mr-3'/>
-                Tasks
-            </button>
-          </li>
-
-          {/* My Tasks tab  */}
-          <li>
-            <button
-              onClick={() => setActivePage('mytasks')}
-              className={`w-full flex items-center p-2 rounded-lg ${
-                activePage === 'mytasks' ? 'bg-blue-100 text-blue-600' : 'hover:bg-gray-100'
-              }`}
-            >
-              <Users className="w-5 h-5 mr-3" />
-              My Tasks
-            </button>
-          </li>
-
-          {/* Help tab */}
-          <li>
-            <button 
-                onClick={() => setActivePage('help')}
-                className={`w-full flex items-center p-2 rounded-lg ${
-                    activePage === 'help' ? 'bg-blue-100 text-blue-600' : 'hover:bg-gray-100'
-                }`}
-            >
-                <HelpCircle className='w-5 h-5 mr-3'/>
-                Help
-            </button>
-          </li>
-
-          {/* Report Tab */}
-          <li>
-            <button
-                onClick={() => setActivePage('report')}
-                className={`w-full flex items-center p-2 rounded-lg ${
-                    activePage === 'report' ? 'bg-blue-100 text-blue-600' : 'hover:bg-gray-100'
-                }`}
-            >
-                <AlertCircle className='w-5 h-5 mr-3'/>
-                Report
-            </button>
-          </li>
-        </ul>
-      </nav>
-    </div>
+    </>
   );
 };
 
