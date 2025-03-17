@@ -1,135 +1,195 @@
 import React, { useState } from 'react';
 
 const Report = () => {
-  const [activeTab, setActiveTab] = useState('found'); // Default to found items form
-  const [formData, setFormData] = useState({
-    category: '',
-    itemName: '',
-    location: '',
-    description: ''
-  });
+  const [activeTab, setActiveTab] = useState('found');
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [itemName, setItemName] = useState('');
+  const [location, setLocation] = useState('');
+  const [description, setDescription] = useState('');
+  const [reportedItems, setReportedItems] = useState([
+    {
+      id: 1,
+      name: 'AirPods',
+      category: 'Electronics',
+      location: 'Library',
+      description: 'White AirPods in a black case',
+      status: 'Found',
+      reporter: 'John Smith (Student)'
+    },
+    {
+      id: 2,
+      name: 'Blue Notebook',
+      category: 'Books',
+      location: 'Chemistry Lab',
+      description: 'Blue hardcover notebook with notes',
+      status: 'Lost',
+      reporter: 'Emma Johnson (Student)'
+    }
+  ]);
+
+  const categories = ['Select category', 'Student Card', 'Mobile Phones', 'Laptops', 'Other Electronics', 'Clothing', 'Helmet', 'Books', 'Personal Items', 'Wallet', 'Other'];
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Handle form submission based on active tab
-    if (activeTab === 'lost') {
-      console.log('Submitting lost item:', formData);
-    } else if (activeTab === 'found') {
-      console.log('Submitting found item:', formData);
+    if (!itemName || !location || !selectedCategory || selectedCategory === 'Select category') {
+      alert('Please fill in all required fields');
+      return;
     }
-    // Reset form
-    setFormData({
-      category: '',
-      itemName: '',
-      location: '',
-      description: ''
-    });
+
+    const newItem = {
+      id: reportedItems.length + 1,
+      name: itemName,
+      category: selectedCategory,
+      location: location,
+      description: description,
+      status: activeTab === 'found' ? 'Found' : 'Lost',
+      reporter: 'Lab Keeper'
+    };
+
+    setReportedItems([...reportedItems, newItem]);
+    setItemName('');
+    setLocation('');
+    setDescription('');
+    setSelectedCategory('');
   };
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+  const handleStatusChange = (id, newStatus) => {
+    setReportedItems(
+      reportedItems.map(item => 
+        item.id === id ? { ...item, status: newStatus } : item
+      )
+    );
   };
 
   return (
-    <div className="p-8 max-w-4xl mx-auto">
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-2xl font-semibold text-gray-900">Welcome to Spacefix</h1>
-        <p className="text-gray-600 mt-1">Select a feature to get started</p>
-      </div>
+    <div className="p-6 bg-gray-100 min-h-screen">
+      <h2 className="text-2xl font-bold mb-6 bg-gradient-to-r from-emerald-600 to-cyan-600 bg-clip-text text-transparent">Lost & Found Management</h2>
+      <div className="max-w-4xl mx-auto bg-white shadow-md rounded-lg p-5">
 
-      {/* Report Section */}
-      <div className="bg-white rounded-lg p-6 shadow-sm">
-        <h2 className="text-xl font-semibold text-gray-900 mb-6">Lost & Found Report</h2>
-
-        {/* Tabs */}
-        <div className="flex space-x-4 mb-6">
+        {/* Tab Navigation */}
+        <div className="flex space-x-3 mb-6">
           <button
-            onClick={() => setActiveTab('lost')}
-            className={`flex-1 py-2 px-4 rounded-lg transition-colors ${
-              activeTab === 'lost'
-                ? 'bg-emerald-500 text-white'
-                : 'text-gray-600 hover:bg-gray-50'
+            className={`flex-1 py-2 text-base font-medium rounded-lg transition ${
+              activeTab === 'found' ? 'bg-emerald-600 text-white' : 'bg-gray-200 text-gray-700'
             }`}
-          >
-            Report Lost Item
-          </button>
-          <button
             onClick={() => setActiveTab('found')}
-            className={`flex-1 py-2 px-4 rounded-lg transition-colors ${
-              activeTab === 'found'
-                ? 'bg-emerald-500 text-white'
-                : 'text-gray-600 hover:bg-gray-50'
-            }`}
           >
             Report Found Item
           </button>
           <button
-            onClick={() => setActiveTab('student')}
-            className={`flex-1 py-2 px-4 rounded-lg transition-colors ${
-              activeTab === 'student'
-                ? 'bg-emerald-500 text-white'
-                : 'text-gray-600 hover:bg-gray-50'
+            className={`flex-1 py-2 text-base font-medium rounded-lg transition ${
+              activeTab === 'lost' ? 'bg-emerald-600 text-white' : 'bg-gray-200 text-gray-700'
             }`}
+            onClick={() => setActiveTab('lost')}
           >
-            Student Lost Items
+            Report Lost Item
+          </button>
+          <button
+            className={`flex-1 py-2 text-base font-medium rounded-lg transition ${
+              activeTab === 'all-items' ? 'bg-emerald-600 text-white' : 'bg-gray-200 text-gray-700'
+            }`}
+            onClick={() => setActiveTab('all-items')}
+          >
+            All Items
           </button>
         </div>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <select
-            name="category"
-            value={formData.category}
-            onChange={handleInputChange}
-            className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-          >
-            <option value="">Select category</option>
-            <option value="electronics">Electronics</option>
-            <option value="clothing">Clothing</option>
-            <option value="books">Books</option>
-            <option value="accessories">Accessories</option>
-            <option value="other">Other</option>
-          </select>
+        {/* Report Forms */}
+        {(activeTab === 'found' || activeTab === 'lost') && (
+          <form onSubmit={handleSubmit} className="bg-white p-5 rounded-md shadow-sm space-y-3">
+            <select
+              className="w-full p-3 text-base border border-gray-300 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+            >
+              {categories.map((category, index) => (
+                <option key={index} value={category}>
+                  {category}
+                </option>
+              ))}
+            </select>
+            <input
+              type="text"
+              placeholder="Item name"
+              className="w-full p-3 text-base border border-gray-300 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+              value={itemName}
+              onChange={(e) => setItemName(e.target.value)}
+            />
+            <input
+              type="text"
+              placeholder={activeTab === 'found' ? "Found location" : "Last seen location"}
+              className="w-full p-3 text-base border border-gray-300 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+            />
+            <textarea
+              placeholder="Item description..."
+              className="w-full p-3 text-base border border-gray-300 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 h-24 resize-none"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+            ></textarea>
+            <button className="w-full bg-emerald-600 text-white py-3 text-base rounded-md hover:bg-emerald-700 transition">
+              {activeTab === 'found' ? "Submit Found Item" : "Submit Lost Item"}
+            </button>
+          </form>
+        )}
 
-          <input
-            type="text"
-            name="itemName"
-            value={formData.itemName}
-            onChange={handleInputChange}
-            placeholder="Item name"
-            className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-          />
-
-          <input
-            type="text"
-            name="location"
-            value={formData.location}
-            onChange={handleInputChange}
-            placeholder={activeTab === 'found' ? 'Found location' : 'Last seen location'}
-            className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-          />
-
-          <textarea
-            name="description"
-            value={formData.description}
-            onChange={handleInputChange}
-            placeholder="Item description..."
-            rows={4}
-            className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 resize-none"
-          />
-
-          <button
-            type="submit"
-            className="w-full py-2 px-4 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors font-medium"
-          >
-            {activeTab === 'found' ? 'Submit Found Item Report' : 'Submit Lost Item Report'}
-          </button>
-        </form>
+        {/* All Items List */}
+        {activeTab === 'all-items' && (
+          <div>
+            <h3 className="text-lg font-semibold text-gray-700 mb-3">All Lost & Found Items</h3>
+            {reportedItems.length === 0 ? (
+              <p className="text-gray-500 text-base">No items reported.</p>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                {reportedItems.map((item) => (
+                  <div key={item.id} className="bg-white shadow-sm rounded-md p-4 border border-gray-200">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h4 className="text-lg font-semibold">{item.name}</h4>
+                        <p className="text-sm text-gray-600">{item.category}</p>
+                        <p className="text-sm text-gray-500">Location: {item.location}</p>
+                        <p className="text-sm text-gray-500">{item.description}</p>
+                        <p className="text-sm text-gray-500 mt-1">Reported by: {item.reporter}</p>
+                      </div>
+                      <span
+                        className={`text-sm px-3 py-1 rounded-md font-medium ${
+                          item.status === 'Lost' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'
+                        }`}
+                      >
+                        {item.status}
+                      </span>
+                    </div>
+                    <div className="mt-3 flex space-x-2">
+                      {item.status === 'Lost' && (
+                        <button
+                          className="flex-1 bg-emerald-500 text-white py-2 text-sm rounded-md hover:bg-emerald-600 transition"
+                          onClick={() => handleStatusChange(item.id, 'Found')}
+                        >
+                          Mark as Found
+                        </button>
+                      )}
+                      {item.status === 'Found' && (
+                        <button
+                          className="flex-1 bg-amber-500 text-white py-2 text-sm rounded-md hover:bg-amber-600 transition"
+                          onClick={() => handleStatusChange(item.id, 'Claimed')}
+                        >
+                          Mark as Claimed
+                        </button>
+                      )}
+                      <button
+                        className="flex-1 bg-red-500 text-white py-2 text-sm rounded-md hover:bg-red-600 transition"
+                        onClick={() => setReportedItems(reportedItems.filter((i) => i.id !== item.id))}
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
