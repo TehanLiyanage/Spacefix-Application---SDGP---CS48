@@ -1,4 +1,7 @@
-import React, { useState } from 'react';
+// src/components/dashboard/iit/studentDashboardComponents/LostItems.jsx
+import React, { useState, useEffect } from 'react';
+import lostItemsAPI from '../../../../services/lostItemsAPI';
+import { toast } from 'react-toastify'; // Make sure to install react-toastify
 
 const LostItems = () => {
   const [activeTab, setActiveTab] = useState('report-lost');
@@ -6,67 +9,142 @@ const LostItems = () => {
   const [itemName, setItemName] = useState('');
   const [location, setLocation] = useState('');
   const [description, setDescription] = useState('');
-  const [reportedItems, setReportedItems] = useState([
-    {
-      id: 1,
-      name: 'AirPods',
-      category: 'Electronics',
-      location: 'Library',
-      description: 'White AirPods in a black case',
-      status: 'Found', // ✅ Lab Keeper has marked this as Found
-      date: '2025-03-01'
-    },
-    {
-      id: 2,
-      name: 'Blue Notebook',
-      category: 'Books',
-      location: 'Chemistry Lab',
-      description: 'Blue hardcover notebook with notes',
-      status: 'Lost', // ❌ Still lost
-      date: '2025-03-03'
-    },
-    {
-      id: 3,
-      name: 'Water Bottle',
-      category: 'Personal Items',
-      location: 'Cafeteria',
-      description: 'Blue metal water bottle with stickers',
-      status: 'Lost',
-      date: '2025-03-05'
-    }
-  ]);
+  
+  // State for items fetched from API
+  const [myLostItems, setMyLostItems] = useState([]);
+  const [foundItems, setFoundItems] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [submitLoading, setSubmitLoading] = useState(false);
 
   const categories = ['Select category','Student Card', 'Mobile Phones', 'Laptops', 'Other Electronics', 'Clothing', 'Helmet', 'Books', 'Personal Items', 'Wallet', 'Other'];
 
-  const handleSubmit = (e) => {
+  // Fetch data when component mounts or tab changes
+  useEffect(() => {
+    if (activeTab === 'my-items') {
+      fetchMyLostItems();
+    } else if (activeTab === 'found-items') {
+      fetchFoundItems();
+    }
+  }, [activeTab]);
+
+  // Fetch user's lost items
+  const fetchMyLostItems = async () => {
+    setIsLoading(true);
+    try {
+      const response = await lostItemsAPI.getMyLostItems();
+      if (response.success) {
+        setMyLostItems(response.data || []);
+      } else {
+        toast.error(response.message || 'Failed to load your lost items');
+      }
+    } catch (error) {
+      console.error('Error fetching my lost items:', error);
+      toast.error('Failed to load your lost items. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Fetch found items
+  const fetchFoundItems = async () => {
+    setIsLoading(true);
+    try {
+      const response = await lostItemsAPI.getFoundItems();
+      if (response.success) {
+        setFoundItems(response.data || []);
+      } else {
+        toast.error(response.message || 'Failed to load found items');
+      }
+    } catch (error) {
+      console.error('Error fetching found items:', error);
+      toast.error('Failed to load found items. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Submit a new lost item
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    
     if (!itemName || !location || !selectedCategory || selectedCategory === 'Select category') {
-      alert('Please fill in all required fields');
+      toast.error('Please fill in all required fields');
       return;
     }
 
-    const currentDate = new Date().toISOString().split('T')[0];
-    const newItem = {
-      id: reportedItems.length + 1,
-      name: itemName,
-      category: selectedCategory,
-      location: location,
-      description: description,
-      status: 'Lost', // Default is always "Lost"
-      date: currentDate
-    };
+    setSubmitLoading(true);
+    
+    try {
+      const itemData = {
+        category: selectedCategory,
+        name: itemName,
+        location: location,
+        description: description
+      };
 
-    setReportedItems([...reportedItems, newItem]);
-    setItemName('');
-    setLocation('');
-    setDescription('');
-    setSelectedCategory('');
-    setActiveTab('my-items');
+      const response = await lostItemsAPI.submitLostItem(itemData);
+      
+      if (response.success) {
+        toast.success('Item reported successfully!');
+        
+        // Reset form
+        setItemName('');
+        setLocation('');
+        setDescription('');
+        setSelectedCategory('');
+        
+        // Switch to my items tab and refresh
+        setActiveTab('my-items');
+      } else {
+        toast.error(response.message || 'Failed to submit item');
+      }
+    } catch (error) {
+      console.error('Error submitting lost item:', error);
+      toast.error('Failed to submit item. Please try again.');
+    } finally {
+      setSubmitLoading(false);
+    }
+  };
+
+  // Mark an item as found
+  const handleMarkAsFound = async (itemId) => {
+    try {
+      const response = await lostItemsAPI.markAsFound(itemId);
+      
+      if (response.success) {
+        toast.success('Item marked as found!');
+        fetchMyLostItems(); // Refresh the list
+      } else {
+        toast.error(response.message || 'Failed to update item status');
+      }
+    } catch (error) {
+      console.error('Error marking item as found:', error);
+      toast.error('Failed to update item status. Please try again.');
+    }
+  };
+
+  // Remove an item
+  const handleRemoveItem = async (itemId) => {
+    if (window.confirm('Are you sure you want to remove this item?')) {
+      try {
+        const response = await lostItemsAPI.removeItem(itemId);
+        
+        if (response.success) {
+          toast.success('Item removed successfully!');
+          fetchMyLostItems(); // Refresh the list
+        } else {
+          toast.error(response.message || 'Failed to remove item');
+        }
+      } catch (error) {
+        console.error('Error removing item:', error);
+        toast.error('Failed to remove item. Please try again.');
+      }
+    }
   };
 
   return (
     <div className="p-4 md:p-6 bg-white rounded-lg shadow max-w-3xl mx-auto">
-     <h2 className="text-xl sm:text-2xl font-medium text-center text-emerald-600 mb-6">
+      <h2 className="text-xl sm:text-2xl font-medium text-center text-emerald-600 mb-6">
         Lost and Found
       </h2>
       
@@ -152,8 +230,12 @@ const LostItems = () => {
             ></textarea>
           </div>
           
-          <button className="w-full bg-emerald-500 text-white py-2 text-sm rounded-md hover:bg-emerald-600 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-opacity-50">
-            Submit Lost Item
+          <button 
+            type="submit" 
+            className="w-full bg-emerald-500 text-white py-2 text-sm rounded-md hover:bg-emerald-600 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-opacity-50"
+            disabled={submitLoading}
+          >
+            {submitLoading ? 'Submitting...' : 'Submit Lost Item'}
           </button>
         </form>
       )}
@@ -162,7 +244,13 @@ const LostItems = () => {
       {activeTab === 'my-items' && (
         <div>
           <h3 className="text-md font-semibold text-emerald-600 mb-3">My Lost Items</h3>
-          {reportedItems.filter(item => item.status === 'Lost').length === 0 ? (
+          
+          {isLoading ? (
+            <div className="text-center py-4">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500 mx-auto"></div>
+              <p className="mt-2 text-sm text-gray-500">Loading your items...</p>
+            </div>
+          ) : myLostItems.length === 0 ? (
             <div className="text-center py-6">
               <svg className="mx-auto h-10 w-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -172,7 +260,7 @@ const LostItems = () => {
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-3">
-              {reportedItems.filter(item => item.status === 'Lost').map((item) => (
+              {myLostItems.map((item) => (
                 <div key={item.id} className="bg-white rounded-md p-3 border border-gray-200 hover:border-emerald-300 transition-colors">
                   <div className="flex justify-between items-start">
                     <div>
@@ -183,7 +271,7 @@ const LostItems = () => {
                         </span>
                         <span className="mx-1 text-gray-300">•</span>
                         <span className="text-xs text-gray-500">
-                          {item.date}
+                          {item.dateFormatted}
                         </span>
                       </div>
                     </div>
@@ -200,19 +288,13 @@ const LostItems = () => {
                   <div className="mt-2 pt-2 border-t border-gray-100 flex justify-between">
                     <button
                       className="text-xs font-medium text-emerald-600 hover:text-emerald-700"
-                      onClick={() => {
-                        setReportedItems(
-                          reportedItems.map((i) =>
-                            i.id === item.id ? { ...i, status: 'Found' } : i
-                          )
-                        );
-                      }}
+                      onClick={() => handleMarkAsFound(item.id)}
                     >
                       Mark as Found
                     </button>
                     <button
                       className="text-xs font-medium text-red-600 hover:text-red-700"
-                      onClick={() => setReportedItems(reportedItems.filter((i) => i.id !== item.id))}
+                      onClick={() => handleRemoveItem(item.id)}
                     >
                       Remove
                     </button>
@@ -228,7 +310,13 @@ const LostItems = () => {
       {activeTab === 'found-items' && (
         <div>
           <h3 className="text-md font-semibold text-emerald-600 mb-3">Found Items</h3>
-          {reportedItems.filter(item => item.status === 'Found').length === 0 ? (
+          
+          {isLoading ? (
+            <div className="text-center py-4">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500 mx-auto"></div>
+              <p className="mt-2 text-sm text-gray-500">Loading found items...</p>
+            </div>
+          ) : foundItems.length === 0 ? (
             <div className="text-center py-6">
               <svg className="mx-auto h-10 w-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -238,7 +326,7 @@ const LostItems = () => {
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-3">
-              {reportedItems.filter(item => item.status === 'Found').map((item) => (
+              {foundItems.map((item) => (
                 <div key={item.id} className="bg-white rounded-md p-3 border border-gray-200 hover:border-emerald-300 transition-colors">
                   <div className="flex justify-between items-start">
                     <div>
@@ -249,7 +337,7 @@ const LostItems = () => {
                         </span>
                         <span className="mx-1 text-gray-300">•</span>
                         <span className="text-xs text-gray-500">
-                          {item.date}
+                          {item.dateFoundFormatted || item.dateFormatted}
                         </span>
                       </div>
                     </div>
@@ -263,16 +351,10 @@ const LostItems = () => {
                     <p className="text-xs text-gray-600 mt-0.5"><span className="font-medium">Description:</span> {item.description}</p>
                   </div>
                   
-                  <div className="mt-2 pt-2 border-t border-gray-100 flex justify-between">
+                  <div className="mt-2 pt-2 border-t border-gray-100">
                     <span className="text-xs font-medium text-emerald-600">
                       ✓ Marked as Found
                     </span>
-                    <button
-                      className="text-xs font-medium text-red-600 hover:text-red-700"
-                      onClick={() => setReportedItems(reportedItems.filter((i) => i.id !== item.id))}
-                    >
-                      Remove
-                    </button>
                   </div>
                 </div>
               ))}
