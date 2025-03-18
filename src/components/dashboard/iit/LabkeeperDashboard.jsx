@@ -7,7 +7,7 @@ import Sidebar from './labkeeperDashboardcomponents/Sidebar';
 import Header from './labkeeperDashboardcomponents/Header';
 
 const LabkeeperDashboard = () => {
-  const [activePage, setActivePage] = useState('dashboard');
+  const [activePage, setActivePage] = useState('tasks'); // Changed default to 'tasks'
   const [showNotifications, setShowNotifications] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -43,12 +43,7 @@ const LabkeeperDashboard = () => {
       case 'report':
         return <Report />;
       default:
-        return (
-          <div className="p-6">
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-cyan-600 bg-clip-text text-transparent">Welcome to Admin Dashboard</h1>
-            <p className="text-gray-600">Select an option from the sidebar to get started.</p>
-          </div>
-        );
+        return <Tasks />; // Default to Tasks instead of welcome message
     }
   };
 
