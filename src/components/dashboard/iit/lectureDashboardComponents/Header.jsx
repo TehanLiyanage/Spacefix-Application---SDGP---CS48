@@ -20,7 +20,19 @@ const Header = ({ showNotifications, setShowNotifications, toggleSidebar }) => {
         </div>
 
         <div className="flex items-center space-x-2 md:space-x-4">
-          
+          <div className="relative">
+            <button
+              onClick={() => setShowNotifications(!showNotifications)}
+              className="p-2 rounded-full text-emerald-500 hover:bg-emerald-50 hover:text-emerald-600 transition-colors"
+              aria-label="Notifications"
+            >
+              <Bell className="w-5 h-5 md:w-6 md:h-6" />
+              {/* Notification indicator */}
+              <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500"></span>
+            </button>
+
+            
+          </div>
 
           <div className="border-l border-gray-300 h-8 hidden sm:block"></div>
 
