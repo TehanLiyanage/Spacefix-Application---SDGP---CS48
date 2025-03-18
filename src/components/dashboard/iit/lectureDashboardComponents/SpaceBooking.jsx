@@ -8,7 +8,7 @@ const SpaceBooking = ({ setCurrentPage }) => {
     date: '',
     hallSize: '',
     studentCount: '',
-    adminNote: '',
+    lectureNote: '',
     startTime: '', 
     endTime: ''
   });
@@ -208,7 +208,7 @@ const SpaceBooking = ({ setCurrentPage }) => {
                     date: '',
                     hallSize: '',
                     studentCount: '',
-                    adminNote: '',
+                    lectureNote: '',
                     startTime: '',
                     endTime: ''
                   });
@@ -340,19 +340,19 @@ const SpaceBooking = ({ setCurrentPage }) => {
                 />
               </div>
 
-              {/* Admin Reference Note (Optional) */}
+              {/* Lecture Reference Note (Optional) */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="adminNote">
-                  Admin Reference Note (Optional)
+                <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="lectureNote">
+                  Lecture Reference Note (Optional)
                 </label>
                 <textarea
-                  id="adminNote"
-                  name="adminNote"
-                  value={formData.adminNote}
+                  id="lectureNote"
+                  name="lectureNote"
+                  value={formData.lectureNote}
                   onChange={handleChange}
                   rows="3"
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-emerald-500"
-                  placeholder="Add any additional notes for the admin"
+                  placeholder="Add any additional notes for the booking"
                   disabled={loading}
                 />
               </div>
@@ -417,16 +417,51 @@ const SpaceBooking = ({ setCurrentPage }) => {
                           <span className="font-medium">{booking.studentCount}</span>
                         </div>
                       )}
+                      {booking.allocatedRoom && (
+                        <div className="flex justify-between items-center mb-1 text-sm">
+                          <span className="text-gray-600">Allocated Room</span>
+                          <span className="font-medium">{booking.allocatedRoom}</span>
+                        </div>
+                      )}
                     </div>
                     
-                    {booking.adminNote && (
+                    {booking.lectureNote && (
                       <div className="text-sm text-gray-600 mt-2 border-t border-gray-100 pt-2">
-                        <p className="italic">"{booking.adminNote}"</p>
+                        <p className="italic">Note: "{booking.lectureNote}"</p>
+                      </div>
+                    )}
+                    
+                    {/* Support for older data format */}
+                    {!booking.lectureNote && booking.adminNote && (
+                      <div className="text-sm text-gray-600 mt-2 border-t border-gray-100 pt-2">
+                        <p className="italic">Note: "{booking.adminNote}"</p>
+                      </div>
+                    )}
+                    
+                    {/* Display approval message for approved bookings */}
+                    {booking.status === 'approved' && booking.approvalMessage && (
+                      <div className="text-sm bg-emerald-50 border border-emerald-100 rounded-md p-2 mt-2">
+                        <p className="font-medium text-emerald-800">Approval Message:</p>
+                        <p className="text-emerald-700">"{booking.approvalMessage}"</p>
+                      </div>
+                    )}
+                    
+                    {/* Display rejection reason for rejected bookings */}
+                    {booking.status === 'rejected' && booking.rejectionReason && (
+                      <div className="text-sm bg-red-50 border border-red-100 rounded-md p-2 mt-2">
+                        <p className="font-medium text-red-800">Rejection Reason:</p>
+                        <p className="text-red-700">"{booking.rejectionReason}"</p>
                       </div>
                     )}
                     
                     <div className="text-xs text-gray-500 mt-2 text-right">
-                      Submitted: {booking.submittedAtFormatted}
+                      <div>Submitted: {booking.submittedAtFormatted}</div>
+                      {booking.status === 'approved' && booking.approvedAt && (
+                        <div>Approved: {new Date(booking.approvedAt).toLocaleString()}</div>
+                      )}
+                      {booking.status === 'rejected' && booking.rejectedAt && (
+                        <div>Rejected: {new Date(booking.rejectedAt).toLocaleString()}</div>
+                      )}
                     </div>
                   </div>
                 </div>

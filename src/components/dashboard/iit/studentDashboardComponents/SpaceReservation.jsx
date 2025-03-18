@@ -17,21 +17,18 @@ import { db, auth } from "../../../../firebase/firebaseConfig.js";
 const getCurrentWeekWeekdays = () => {
   const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
   const today = new Date();
-  const currentDay = today.getDay();
-
-  const startOfWeek = new Date(today);
-  startOfWeek.setDate(today.getDate() - currentDay);
-
-  return Array.from({ length: 7 }, (_, index) => {
-    const date = new Date(startOfWeek);
-    date.setDate(startOfWeek.getDate() + index);
+  
+  // Create an array to hold the next 14 days
+  return Array.from({ length: 14 }, (_, index) => {
+    const date = new Date(today);
+    date.setDate(today.getDate() + index);
     return {
-      day: daysOfWeek[index],
+      day: daysOfWeek[date.getDay()],
       date: date.toISOString().split("T")[0],
     };
   })
-    .filter((day) => day.day !== "Saturday" && day.day !== "Sunday")
-    .filter((day) => new Date(day.date).setHours(0, 0, 0, 0) >= today.setHours(0, 0, 0, 0));
+    // Filter out weekends
+    .filter((day) => day.day !== "Saturday" && day.day !== "Sunday");
 };
 
 const getAvailableTimeSlots = (selectedDate) => {
@@ -168,14 +165,12 @@ const SpaceReservation = () => {
             updatedAt: serverTimestamp()
           });
         } else {
-          // Create new reservation count document
+          // Create new reservation count document - removed status and roomAssigned fields
           await addDoc(collection(db, "IIT", "reservation", "students"), {
             day: selectedDay.day,
             date: selectedDay.date,
             timeSlot: timeSlot,
             requestCount: 1,
-            status: "pending",
-            roomAssigned: null,
             createdAt: serverTimestamp(),
             updatedAt: serverTimestamp()
           });
@@ -345,8 +340,8 @@ const SpaceReservation = () => {
 
           {/* Calendar View */}
           <div className="bg-white rounded-md shadow p-5 md:p-6 mt-6">
-            <h3 className="text-lg font-medium text-gray-800 mb-4">Weekly Availability</h3>
-            <div className="grid grid-cols-5 gap-2">
+            <h3 className="text-lg font-medium text-gray-800 mb-4">Two-Week Availability</h3>
+            <div className="grid grid-cols-5 gap-2 overflow-x-auto">
               {currentWeekWeekdays.map((day) => (
                 <div 
                   key={day.date} 
@@ -381,16 +376,9 @@ const SpaceReservation = () => {
                         <p className="text-sm text-gray-600">{reservation.timeSlot}</p>
                       </div>
                       <div className="text-right">
-                        <span className={`inline-block px-2 py-1 text-xs rounded-full ${
-                          reservation.status === 'confirmed' 
-                            ? 'bg-green-100 text-green-800' 
-                            : 'bg-yellow-100 text-yellow-800'
-                        }`}>
-                          {reservation.status === 'confirmed' ? 'Confirmed' : 'Pending'}
+                        <span className="inline-block px-2 py-1 text-xs rounded-full bg-emerald-100 text-emerald-800">
+                          Requested
                         </span>
-                        {reservation.roomAssigned && (
-                          <p className="text-sm mt-1">Room: {reservation.roomAssigned}</p>
-                        )}
                       </div>
                     </div>
                   </div>
