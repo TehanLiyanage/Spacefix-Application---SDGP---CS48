@@ -70,7 +70,7 @@ const Report = () => {
         <div className="flex space-x-3 mb-6">
           <button
             className={`flex-1 py-2 text-base font-medium rounded-lg transition ${
-              activeTab === 'found' ? 'bg-emerald-600 text-white' : 'bg-gray-200 text-gray-700'
+              activeTab === 'found' ? 'bg-gradient-to-r from-emerald-500 to-cyan-500 text-white' : 'bg-gray-200 text-gray-700'
             }`}
             onClick={() => setActiveTab('found')}
           >
@@ -78,7 +78,7 @@ const Report = () => {
           </button>
           <button
             className={`flex-1 py-2 text-base font-medium rounded-lg transition ${
-              activeTab === 'lost' ? 'bg-emerald-600 text-white' : 'bg-gray-200 text-gray-700'
+              activeTab === 'lost' ? 'bg-gradient-to-r from-emerald-500 to-cyan-500 text-white' : 'bg-gray-200 text-gray-700'
             }`}
             onClick={() => setActiveTab('lost')}
           >
@@ -86,7 +86,7 @@ const Report = () => {
           </button>
           <button
             className={`flex-1 py-2 text-base font-medium rounded-lg transition ${
-              activeTab === 'all-items' ? 'bg-emerald-600 text-white' : 'bg-gray-200 text-gray-700'
+              activeTab === 'all-items' ? 'bg-gradient-to-r from-emerald-500 to-cyan-500 text-white' : 'bg-gray-200 text-gray-700'
             }`}
             onClick={() => setActiveTab('all-items')}
           >
@@ -128,7 +128,7 @@ const Report = () => {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
             ></textarea>
-            <button className="w-full bg-emerald-600 text-white py-3 text-base rounded-md hover:bg-emerald-700 transition">
+            <button className="w-full bg-gradient-to-r from-emerald-500 to-cyan-500 text-white py-3 text-base rounded-md hover:from-emerald-600 hover:to-cyan-600 transition-colors">
               {activeTab === 'found' ? "Submit Found Item" : "Submit Lost Item"}
             </button>
           </form>
@@ -143,7 +143,7 @@ const Report = () => {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 {reportedItems.map((item) => (
-                  <div key={item.id} className="bg-white shadow-sm rounded-md p-4 border border-gray-200">
+                  <div key={item.id} className="bg-white shadow-sm rounded-md p-4 border-l-4 border-l-emerald-500">
                     <div className="flex justify-between items-start">
                       <div>
                         <h4 className="text-lg font-semibold">{item.name}</h4>
@@ -153,8 +153,8 @@ const Report = () => {
                         <p className="text-sm text-gray-500 mt-1">Reported by: {item.reporter}</p>
                       </div>
                       <span
-                        className={`text-sm px-3 py-1 rounded-md font-medium ${
-                          item.status === 'Lost' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'
+                        className={`text-sm px-3 py-1 rounded-full font-medium ${
+                          item.status === 'Lost' ? 'bg-red-100 text-red-700' : item.status === 'Found' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'
                         }`}
                       >
                         {item.status}
@@ -163,7 +163,7 @@ const Report = () => {
                     <div className="mt-3 flex space-x-2">
                       {item.status === 'Lost' && (
                         <button
-                          className="flex-1 bg-emerald-500 text-white py-2 text-sm rounded-md hover:bg-emerald-600 transition"
+                          className="flex-1 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white py-2 text-sm rounded-md hover:from-emerald-600 hover:to-cyan-600 transition-colors"
                           onClick={() => handleStatusChange(item.id, 'Found')}
                         >
                           Mark as Found
@@ -171,14 +171,14 @@ const Report = () => {
                       )}
                       {item.status === 'Found' && (
                         <button
-                          className="flex-1 bg-amber-500 text-white py-2 text-sm rounded-md hover:bg-amber-600 transition"
+                          className="flex-1 bg-gradient-to-r from-amber-500 to-yellow-500 text-white py-2 text-sm rounded-md hover:from-amber-600 hover:to-yellow-600 transition-colors"
                           onClick={() => handleStatusChange(item.id, 'Claimed')}
                         >
                           Mark as Claimed
                         </button>
                       )}
                       <button
-                        className="flex-1 bg-red-500 text-white py-2 text-sm rounded-md hover:bg-red-600 transition"
+                        className="flex-1 bg-red-500 text-white py-2 text-sm rounded-md hover:bg-red-600 transition-colors"
                         onClick={() => setReportedItems(reportedItems.filter((i) => i.id !== item.id))}
                       >
                         Remove
