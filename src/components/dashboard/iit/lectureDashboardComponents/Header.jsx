@@ -31,12 +31,39 @@ const Header = ({ showNotifications, setShowNotifications, toggleSidebar }) => {
               <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500"></span>
             </button>
 
-            
+            {showNotifications && (
+              <div className="absolute right-0 mt-2 w-64 sm:w-80 bg-white rounded-lg shadow-lg py-2 z-30 border border-gray-200">
+                <div className="px-4 py-2 border-b border-gray-200">
+                  <h3 className="font-semibold text-gray-800">Notifications</h3>
+                </div>
+                <div className="max-h-60 overflow-y-auto">
+                  <div className="px-4 py-3 hover:bg-gray-50 border-b border-gray-100">
+                    <p className="text-sm font-medium text-gray-800">Class Canceled</p>
+                    <p className="text-xs text-gray-500">
+                      Object Oriented Programming class is canceled tomorrow.
+                    </p>
+                    <p className="text-xs text-gray-400 mt-1">2 hours ago</p>
+                  </div>
+                  <div className="px-4 py-3 hover:bg-gray-50">
+                    <p className="text-sm font-medium text-gray-800">New Assignment</p>
+                    <p className="text-xs text-gray-500">
+                      HCI assignment uploaded - due next Friday.
+                    </p>
+                    <p className="text-xs text-gray-400 mt-1">Yesterday</p>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="border-l border-gray-300 h-8 hidden sm:block"></div>
 
-          
+          <div className="flex items-center">
+            <span className="hidden sm:block text-sm text-gray-700 mr-2">John Doe</span>
+            <div className="w-8 h-8 rounded-full bg-gradient-to-r from-emerald-100 to-cyan-100 flex items-center justify-center text-emerald-600">
+              <User className="w-5 h-5" />
+            </div>
+          </div>
         </div>
       </div>
     </header>
