@@ -2,7 +2,7 @@ import React from 'react';
 import { Linkedin, Instagram, Twitter, Youtube } from 'lucide-react';
 
 
-const quickLinks = ['Home', 'Features', 'Solutions', 'Team', 'Contact'];
+const quickLinks = ['Home', 'Solutions', 'Features', 'Team', 'Contact'];
 
 const socialLinks = [
   { 

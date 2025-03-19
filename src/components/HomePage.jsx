@@ -13,8 +13,8 @@ const HomePage = () => {
     <div className="relative min-h-screen bg-gray-50">
       <Navigation />
       <HeroSection />
-      <FeaturesSection />
       <SolutionsSection />
+      <FeaturesSection />
       <TeamSection />
       <ContactSection />
       <Footer />

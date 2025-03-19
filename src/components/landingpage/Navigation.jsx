@@ -52,7 +52,7 @@ const Navigation = () => {
           </div>
 
           <div className="hidden lg:flex items-center space-x-8">
-            {['Home', 'Features', 'Solutions', 'Team', 'Contact'].map((item) => (
+            {['Home', 'Solutions', 'Features', 'Team', 'Contact'].map((item) => (
               <button
                 key={item}
                 onClick={() => scrollToSection(item.toLowerCase())}
