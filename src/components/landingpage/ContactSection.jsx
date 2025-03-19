@@ -7,8 +7,8 @@ const contactInfo = [
   {
     icon: <MdEmail className="w-6 h-6" />,
     title: "Email Us",
-    info: "support@spacefix.com",
-    href: "mailto:support@spacefix.com"
+    info: "spacefix.contact@gmail.com",
+    href: "mailto:spacefix.contact@gmail.com"
   },
   {
     icon: <MdPhone className="w-6 h-6" />,
@@ -36,7 +36,14 @@ const socialLinks = [
     name: 'Twitter',
     href: 'https://x.com/Spacefixlk',
     color: 'hover:text-[#1DA1F2]'
+  }, 
+  { 
+    icon: <FaTwitter className="w-6 h-6" />, 
+    name: 'YouTube',
+    href: 'https://www.youtube.com/@Spacefixlk',
+    color: 'hover:text-[#1DA1F2]'
   }
+
 ];
 
 const ContactSection = () => {
@@ -97,7 +104,7 @@ const ContactSection = () => {
         >
           <div className="text-center mb-16">
             <motion.h2 
-              className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-emerald-600 to-cyan-600 bg-clip-text text-transparent mb-4 sm:mb-6"
+              className="text-3xl sm:text-5xl md:text-4xl font-bold bg-gradient-to-r from-emerald-600 to-cyan-600 bg-clip-text text-transparent mb-4 sm:mb-6"
               variants={itemVariants}
             >
               Let's Connect

@@ -39,7 +39,7 @@ const HeroSection = () => {
         <div className="flex flex-col lg:flex-row items-center justify-between h-full gap-12 py-12">
           {/* Left Content */}
           <div className="flex-1 max-w-xl">
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight mb-6 opacity-0 animate-fadeIn">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight mb-6 mt-10 opacity-0 animate-fadeIn">
               Transform Your Campus
               <span className="block mt-2 bg-gradient-to-r from-emerald-500 to-cyan-500 bg-clip-text text-transparent">
                 Experience

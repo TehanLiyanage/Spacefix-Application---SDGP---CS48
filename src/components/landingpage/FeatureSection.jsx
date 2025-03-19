@@ -92,7 +92,7 @@ const FeaturesSection = () => {
     <section id="features" className="py-20 sm:py-28 bg-gray-50 relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 relative">
         <div className="text-center mb-12 sm:mb-16">
-          <h2 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-emerald-600 to-cyan-600 bg-clip-text text-transparent mb-4 sm:mb-6">
+        <h2 className="text-3xl sm:text-5xl md:text-4xl font-bold bg-gradient-to-r from-emerald-600 to-cyan-600 bg-clip-text text-transparent mb-4 sm:mb-6">
             Our Features
           </h2>
           <p className="text-lg sm:text-xl text-gray-700 max-w-3xl mx-auto">

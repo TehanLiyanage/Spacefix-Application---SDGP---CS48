@@ -53,7 +53,7 @@ const TeamSection = () => {
     <section id="team" className="py-16 bg-[rgb(249,250,251)]">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
-          <h2 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-emerald-600 to-cyan-600 bg-clip-text text-transparent mb-4 sm:mb-6">
+        <h2 className="text-3xl sm:text-5xl md:text-4xl font-bold bg-gradient-to-r from-emerald-600 to-cyan-600 bg-clip-text text-transparent mb-4 sm:mb-6">
             Meet Our Team
           </h2>
           <p className="text-gray-600">
