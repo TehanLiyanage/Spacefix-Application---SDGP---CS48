@@ -1,7 +1,8 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { MdEmail, MdPhone } from 'react-icons/md';
-import { FaLinkedin, FaInstagram, FaTwitter } from 'react-icons/fa';
+import { FaLinkedin, FaInstagram, FaTwitter, FaYoutube } from 'react-icons/fa';
+
 
 const contactInfo = [
   {
@@ -22,7 +23,7 @@ const socialLinks = [
   { 
     icon: <FaLinkedin className="w-6 h-6" />, 
     name: 'LinkedIn',
-    href: 'http://www.linkedin.com/in/spacefix',
+    href: 'https://www.linkedin.com/company/spacefixlk',
     color: 'hover:text-[#0077B5]'
   },
   { 
@@ -36,15 +37,15 @@ const socialLinks = [
     name: 'Twitter',
     href: 'https://x.com/Spacefixlk',
     color: 'hover:text-[#1DA1F2]'
-  }, 
-  { 
-    icon: <FaTwitter className="w-6 h-6" />, 
+  },
+  {
+    icon: <FaYoutube className="w-6 h-6" />,
     name: 'YouTube',
-    href: 'https://www.youtube.com/@Spacefixlk',
-    color: 'hover:text-[#1DA1F2]'
+    href: 'https://www.youtube.com/@spacefixlk',
+    color: 'hover:text-[#FF0000]'
   }
-
 ];
+
 
 const ContactSection = () => {
   const containerVariants = {

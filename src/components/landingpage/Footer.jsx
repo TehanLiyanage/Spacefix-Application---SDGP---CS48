@@ -1,5 +1,6 @@
 import React from 'react';
-import { Linkedin, Instagram, Twitter } from 'lucide-react';
+import { Linkedin, Instagram, Twitter, Youtube } from 'lucide-react';
+
 
 const quickLinks = ['Home', 'Features', 'Solutions', 'Team', 'Contact'];
 
@@ -7,7 +8,7 @@ const socialLinks = [
   { 
     icon: <Linkedin className="w-5 h-5" />, 
     name: 'LinkedIn',
-    href: 'http://www.linkedin.com/in/spacefix'
+    href: 'https://www.linkedin.com/company/spacefixlk'
   },
   { 
     icon: <Instagram className="w-5 h-5" />, 
@@ -18,8 +19,14 @@ const socialLinks = [
     icon: <Twitter className="w-5 h-5" />, 
     name: 'Twitter',
     href: 'https://x.com/Spacefixlk'
+  },
+  {
+    icon: <Youtube className="w-5 h-5" />,
+    name: 'YouTube',
+    href: 'https://www.youtube.com/@spacefixlk'
   }
 ];
+
 
 const Footer = () => {
   return (
