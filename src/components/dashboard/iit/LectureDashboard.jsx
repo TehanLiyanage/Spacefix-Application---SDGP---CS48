@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from './lectureDashboardComponents/Header';
 import Timetable from './lectureDashboardComponents/Timetable';
 import Sidebar from './lectureDashboardComponents/Sidebar';
@@ -26,6 +26,29 @@ const LectureDashboard = ({ setCurrentPage, currentPage }) => {
   // Internal page state to ensure UI updates
   const [internalPage, setInternalPage] = useState(activePage);
   
+  // Add responsive sidebar state
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Check if viewport is mobile
+  useEffect(() => {
+    const checkIsMobile = () => {
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
+      // Auto-close sidebar on mobile, open on desktop
+      setSidebarOpen(window.innerWidth >= 768);
+    };
+    
+    // Initial check
+    checkIsMobile();
+    
+    // Add event listener for window resize
+    window.addEventListener("resize", checkIsMobile);
+    
+    // Cleanup
+    return () => window.removeEventListener("resize", checkIsMobile);
+  }, []);
+  
   // Handling page changes
   const handlePageChange = (page) => {
     console.log("Changing page to:", page); // Debug log
@@ -35,6 +58,11 @@ const LectureDashboard = ({ setCurrentPage, currentPage }) => {
     if (setCurrentPage && typeof setCurrentPage === 'function') {
       setCurrentPage(page);
     }
+  };
+
+  // Toggle sidebar function
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen);
   };
 
   const features = [
@@ -90,17 +118,29 @@ const LectureDashboard = ({ setCurrentPage, currentPage }) => {
   };
 
   return (
-    <div className="flex bg-gray-50 min-h-screen">
+    <div className="h-screen bg-gray-50 overflow-hidden">
       {/* Sidebar */}
-      <Sidebar activePage={internalPage} setActivePage={handlePageChange} />
+      <Sidebar 
+        activePage={internalPage} 
+        setActivePage={handlePageChange}
+        isOpen={sidebarOpen}
+        toggleSidebar={toggleSidebar}
+        isMobile={isMobile}
+      />
       
-      {/* Main Content Area */}
-      <div className="flex flex-col flex-grow ml-64">
-        <Header
-          showNotifications={showNotifications}
-          setShowNotifications={setShowNotifications}
-        />
-        <main className="p-6 mt-16">
+      {/* Main content area - positioned absolutely to ensure it's always visible */}
+      <div className="absolute inset-y-0 right-0 left-0 md:left-16 bg-gray-50 transition-all duration-300 z-10">
+        {/* Header - fixed at top */}
+        <div className="fixed top-0 right-0 left-0 md:left-16 z-30">
+          <Header
+            showNotifications={showNotifications}
+            setShowNotifications={setShowNotifications}
+            toggleSidebar={toggleSidebar}
+          />
+        </div>
+        
+        {/* Main content - scrollable area */}
+        <main className="mt-16 px-4 py-6 overflow-y-auto h-full">
           <div className="max-w-6xl mx-auto">
             {renderContent()}
           </div>
@@ -109,5 +149,6 @@ const LectureDashboard = ({ setCurrentPage, currentPage }) => {
     </div>
   );
 };
+
 export default LectureDashboard;
 
