@@ -1682,7 +1682,7 @@ const LecturerRequestHandler = () => {
     .filter(r => r.status === 'rejected').length;
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-6">
+    <div className="max-w-6xl mx-auto px-4 py-0">
       <h2 className="text-xl sm:text-2xl font-medium text-center text-emerald-600 mb-6">
         Lecturer Request Handler
       </h2>
