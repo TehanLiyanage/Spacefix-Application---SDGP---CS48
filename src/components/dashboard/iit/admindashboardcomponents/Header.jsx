@@ -43,8 +43,8 @@ import { Bell, User, Menu } from 'lucide-react';
 
 const Header = ({ showNotifications, setShowNotifications, toggleSidebar, isMobile }) => {
   return (
-    <header className="bg-white shadow-sm border-b border-gray-200 w-full">
-      <div className="flex items-center justify-between px-4 py-4">
+    <header className="bg-white shadow-sm h-16 z-20 sticky top-0">
+      <div className="flex items-center justify-between h-full px-4">
         {/* Left section with title and mobile menu toggle */}
         <div className="flex items-center">
           {isMobile && (
@@ -74,7 +74,7 @@ const Header = ({ showNotifications, setShowNotifications, toggleSidebar, isMobi
             
             {/* Notification dropdown - conditionally rendered */}
             {showNotifications && (
-              <div className="absolute right-0 mt-2 bg-white rounded-md shadow-lg overflow-hidden z-20 w-72 sm:w-80 border border-gray-200">
+              <div className="absolute right-0 mt-2 bg-white rounded-md shadow-lg overflow-hidden z-50 w-72 sm:w-80 border border-gray-200">
                 <div className="p-3 border-b border-gray-200">
                   <h3 className="font-semibold text-gray-800">Notifications</h3>
                 </div>
@@ -103,15 +103,10 @@ const Header = ({ showNotifications, setShowNotifications, toggleSidebar, isMobi
           
           {/* User Profile */}
           <div className="flex items-center">
-            <button
-              className="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-100 transition-colors"
-              aria-label="User profile"
-            >
-              <div className="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center text-white">
-                <User className="w-5 h-5" />
-              </div>
-              <span className="text-sm font-medium text-gray-700 hidden sm:block">John Doe</span>
-            </button>
+            <div className="text-sm font-medium text-gray-700 mr-2 hidden sm:block">John Doe</div>
+            <div className="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center text-white">
+              <User className="w-5 h-5" />
+            </div>
           </div>
         </div>
       </div>

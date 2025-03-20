@@ -141,13 +141,17 @@
 
 
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { FileText, RefreshCcw, Info, Users, ChevronLeft, Menu, X } from 'lucide-react';
 
 const Sidebar = ({ activePage, setActivePage, isOpen, toggleSidebar, isMobile }) => {
   const [activeDropdown, setActiveDropdown] = useState(null); // "request", "update" or null
   
-  // Handle both setting page and closing sidebar on mobile
+  // References to store dropdown button positions
+  const requestButtonRef = useRef(null);
+  const updateButtonRef = useRef(null);
+  
+  // Handle navigation click
   const handleNavClick = (page) => {
     setActivePage(page);
     setActiveDropdown(null); // Close any open dropdown
@@ -158,7 +162,9 @@ const Sidebar = ({ activePage, setActivePage, isOpen, toggleSidebar, isMobile })
   };
 
   // Handle dropdown toggles
-  const handleDropdownToggle = (dropdown) => {
+  const handleDropdownToggle = (dropdown, event) => {
+    event.stopPropagation(); // Prevent event bubbling
+    
     if (activeDropdown === dropdown) {
       // If clicking the same dropdown, toggle it off
       setActiveDropdown(null);
@@ -168,21 +174,49 @@ const Sidebar = ({ activePage, setActivePage, isOpen, toggleSidebar, isMobile })
     }
   };
 
-  // Close dropdowns when sidebar collapses
+  // Close dropdowns when clicking outside
   useEffect(() => {
-    if (!isOpen) {
-      setActiveDropdown(null);
-    }
+    const handleClickOutside = (event) => {
+      // Don't close if we're clicking on a button or menu
+      if (
+        requestButtonRef.current?.contains(event.target) || 
+        updateButtonRef.current?.contains(event.target) ||
+        event.target.closest('.dropdown-menu')
+      ) {
+        return;
+      }
+      
+      // Otherwise, close active dropdown
+      if (activeDropdown) {
+        setActiveDropdown(null);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [activeDropdown]);
+
+  // Close dropdowns when sidebar collapses or opens
+  useEffect(() => {
+    setActiveDropdown(null);
   }, [isOpen]);
 
   // Determine if a main tab is active based on the current active page
   const isRequestActive = activePage === 'lectures-request' || activePage === 'student-request';
   const isUpdateInfoActive = activePage === 'update-lecturer-info' || activePage === 'update-student-info';
 
+  // Calculate positions for popups
+  const getPopupPosition = (ref) => {
+    if (!ref.current) return { top: 0 };
+    const rect = ref.current.getBoundingClientRect();
+    return { top: rect.top, left: rect.right };
+  };
+
   return (
-    // Sidebar component - higher z-index than overlay
     <div 
-      className={`bg-gradient-to-br from-emerald-500 to-cyan-600 text-white fixed left-0 top-0 z-50 transition-all duration-300 h-screen 
+      className={`bg-gradient-to-br from-emerald-500 to-cyan-600 text-white fixed h-full z-50 transition-all duration-300
       ${isOpen ? 'translate-x-0' : '-translate-x-full'} 
       ${isMobile ? 'w-64' : isOpen ? 'w-64' : 'w-16 md:translate-x-0'} 
       shadow-xl`}
@@ -212,16 +246,17 @@ const Sidebar = ({ activePage, setActivePage, isOpen, toggleSidebar, isMobile })
       <nav className="p-4 overflow-y-auto" style={{ height: 'calc(100vh - 64px)' }}>
         <ul className="space-y-4">
           {/* Request Handler Dropdown */}
-          <li>
+          <li className="relative">
             <button
-              onClick={() => handleDropdownToggle('request')}
+              ref={requestButtonRef}
+              onClick={(e) => handleDropdownToggle('request', e)}
               className={`w-full flex items-center justify-between p-2 rounded-lg transition-colors ${
                 (isRequestActive || activeDropdown === 'request') 
                   ? "bg-emerald-100 text-emerald-600" 
                   : "text-white hover:bg-emerald-50/50 hover:text-emerald-600"
               }`}
             >
-              <div className="flex items-center">
+              <div className={`flex items-center ${!isOpen && !isMobile && 'justify-center w-full'}`}>
                 <FileText className={`w-5 h-5 ${(isOpen || isMobile) ? 'mr-3' : 'mx-auto'}`} />
                 {(isOpen || isMobile) && <span>Request Handler</span>}
               </div>
@@ -239,9 +274,9 @@ const Sidebar = ({ activePage, setActivePage, isOpen, toggleSidebar, isMobile })
               )}
             </button>
             
-            {/* Dropdown menu - only show when active and sidebar is open or on mobile */}
+            {/* Expanded sidebar dropdown for Request Handler */}
             {activeDropdown === 'request' && (isOpen || isMobile) && (
-              <ul className="ml-6 mt-2 space-y-2">
+              <ul className="dropdown-menu ml-6 mt-2 space-y-2">
                 <li>
                   <button
                     onClick={() => handleNavClick('lectures-request')}
@@ -268,6 +303,44 @@ const Sidebar = ({ activePage, setActivePage, isOpen, toggleSidebar, isMobile })
                 </li>
               </ul>
             )}
+            
+            {/* Popup menu for collapsed sidebar */}
+            {activeDropdown === 'request' && !isOpen && !isMobile && (
+              <div className="dropdown-menu fixed left-16 z-50 w-64 bg-white rounded-lg shadow-xl" 
+                style={{ top: Math.max(requestButtonRef.current ? requestButtonRef.current.getBoundingClientRect().top : 0, 0) }}>
+                <div className="p-3 border-b border-gray-200">
+                  <h3 className="font-semibold text-gray-700">Request Handler</h3>
+                </div>
+                <ul className="p-2">
+                  <li className="mb-1">
+                    <button
+                      onClick={() => handleNavClick('lectures-request')}
+                      className={`w-full flex items-center p-2 rounded-lg transition-colors ${
+                        activePage === 'lectures-request' 
+                          ? "bg-emerald-100 text-emerald-600 font-medium" 
+                          : "text-gray-700 hover:bg-gray-100"
+                      }`}
+                    >
+                      <FileText className="w-5 h-5 mr-2" />
+                      Lectures Request Handler
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      onClick={() => handleNavClick('student-request')}
+                      className={`w-full flex items-center p-2 rounded-lg transition-colors ${
+                        activePage === 'student-request' 
+                          ? "bg-emerald-100 text-emerald-600 font-medium" 
+                          : "text-gray-700 hover:bg-gray-100"
+                      }`}
+                    >
+                      <FileText className="w-5 h-5 mr-2" />
+                      Student Request Handler
+                    </button>
+                  </li>
+                </ul>
+              </div>
+            )}
           </li>
 
           {/* Update Timetable */}
@@ -286,16 +359,17 @@ const Sidebar = ({ activePage, setActivePage, isOpen, toggleSidebar, isMobile })
           </li>
 
           {/* Update Info Dropdown */}
-          <li>
+          <li className="relative">
             <button
-              onClick={() => handleDropdownToggle('update')}
+              ref={updateButtonRef}
+              onClick={(e) => handleDropdownToggle('update', e)}
               className={`w-full flex items-center justify-between p-2 rounded-lg transition-colors ${
                 (isUpdateInfoActive || activeDropdown === 'update')
                   ? "bg-emerald-100 text-emerald-600"
                   : "text-white hover:bg-emerald-50/50 hover:text-emerald-600"
               }`}
             >
-              <div className="flex items-center">
+              <div className={`flex items-center ${!isOpen && !isMobile && 'justify-center w-full'}`}>
                 <Info className={`w-5 h-5 ${(isOpen || isMobile) ? 'mr-3' : 'mx-auto'}`} />
                 {(isOpen || isMobile) && <span>Update Info</span>}
               </div>
@@ -313,9 +387,9 @@ const Sidebar = ({ activePage, setActivePage, isOpen, toggleSidebar, isMobile })
               )}
             </button>
             
-            {/* Dropdown menu - only show when active and sidebar is open or on mobile */}
+            {/* Expanded sidebar dropdown for Update Info */}
             {activeDropdown === 'update' && (isOpen || isMobile) && (
-              <ul className="ml-6 mt-2 space-y-2">
+              <ul className="dropdown-menu ml-6 mt-2 space-y-2">
                 <li>
                   <button
                     onClick={() => handleNavClick('update-lecturer-info')}
@@ -341,6 +415,44 @@ const Sidebar = ({ activePage, setActivePage, isOpen, toggleSidebar, isMobile })
                   </button>
                 </li>
               </ul>
+            )}
+            
+            {/* Popup menu for collapsed sidebar */}
+            {activeDropdown === 'update' && !isOpen && !isMobile && (
+              <div className="dropdown-menu fixed left-16 z-50 w-64 bg-white rounded-lg shadow-xl"
+                style={{ top: Math.max(updateButtonRef.current ? updateButtonRef.current.getBoundingClientRect().top : 0, 0) }}>
+                <div className="p-3 border-b border-gray-200">
+                  <h3 className="font-semibold text-gray-700">Update Info</h3>
+                </div>
+                <ul className="p-2">
+                  <li className="mb-1">
+                    <button
+                      onClick={() => handleNavClick('update-lecturer-info')}
+                      className={`w-full flex items-center p-2 rounded-lg transition-colors ${
+                        activePage === 'update-lecturer-info' 
+                          ? "bg-emerald-100 text-emerald-600 font-medium" 
+                          : "text-gray-700 hover:bg-gray-100"
+                      }`}
+                    >
+                      <Info className="w-5 h-5 mr-2" />
+                      Update Lecturer Info
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      onClick={() => handleNavClick('update-student-info')}
+                      className={`w-full flex items-center p-2 rounded-lg transition-colors ${
+                        activePage === 'update-student-info' 
+                          ? "bg-emerald-100 text-emerald-600 font-medium" 
+                          : "text-gray-700 hover:bg-gray-100"
+                      }`}
+                    >
+                      <Info className="w-5 h-5 mr-2" />
+                      Update Student Info
+                    </button>
+                  </li>
+                </ul>
+              </div>
             )}
           </li>
 

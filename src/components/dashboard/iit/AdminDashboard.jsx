@@ -352,8 +352,8 @@ const AdminDashboard = () => {
   };
   
   return (
-    <div className="h-screen bg-gray-100 overflow-hidden">
-      {/* Sidebar component */}
+    <div className="flex h-screen overflow-hidden">
+      {/* Sidebar */}
       <Sidebar 
         activePage={activePage} 
         setActivePage={setActivePage} 
@@ -362,23 +362,34 @@ const AdminDashboard = () => {
         isMobile={isMobile}
       />
       
-      {/* Main content area - positioned absolutely to ensure it's always visible */}
-      <div className="absolute inset-y-0 right-0 left-0 md:left-16 bg-gray-100 transition-all duration-300 z-10">
-        {/* Header - fixed at top */}
-        <div className="fixed top-0 right-0 left-0 md:left-16 z-30">
-          <Header
-            showNotifications={showNotifications}
-            setShowNotifications={setShowNotifications}
-            toggleSidebar={toggleSidebar}
-            isMobile={isMobile}
-          />
-        </div>
+      {/* Main content area */}
+      <div 
+        className={`flex-1 transition-all duration-300 bg-gray-100 ${
+          isMobile ? 'ml-0' : (sidebarOpen ? 'ml-64' : 'ml-16')
+        }`}
+      >
+        {/* Header */}
+        <Header
+          showNotifications={showNotifications}
+          setShowNotifications={setShowNotifications}
+          toggleSidebar={toggleSidebar}
+          isMobile={isMobile}
+        />
         
-        {/* Main content - scrollable area */}
-        <main className="mt-16 px-4 py-6 overflow-y-auto h-full bg-gray-100">
+        {/* Main content */}
+        <main className="pt-16 px-4 md:px-6 h-full overflow-y-auto">
           {renderContent()}
         </main>
       </div>
+      
+      {/* Mobile overlay - only appears when sidebar is open on mobile */}
+      {isMobile && sidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 z-40"
+          onClick={toggleSidebar}
+          style={{ marginLeft: '256px' }}
+        />
+      )}
     </div>
   );
 };
