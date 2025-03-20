@@ -413,7 +413,7 @@ const StudentRequestHandler = () => {
   const pastGrouped = groupReservationsByDate(pastReservations);
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-6">
+    <div className="max-w-6xl mx-auto px-4 py-0">
       <h2 className="text-xl sm:text-2xl font-medium text-center text-emerald-600 mb-6">
         Student Reservation Handler
       </h2>
@@ -601,3 +601,4 @@ const StudentRequestHandler = () => {
 };
 
 export default StudentRequestHandler;
+
