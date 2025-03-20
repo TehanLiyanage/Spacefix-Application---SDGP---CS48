@@ -10,7 +10,6 @@ const Timetable = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-
   // Hard-coded list of lecturers
   const lecturers = [
     { code: "ADS", name: "Adshayani Pirapaharan" },
@@ -93,10 +92,49 @@ const Timetable = () => {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
+      
+      // If user is logged in, load saved preferences
+      if (currentUser) {
+        loadSavedPreferences();
+      }
     });
 
     return () => unsubscribe();
   }, []);
+
+  // Load saved preferences from localStorage
+  const loadSavedPreferences = () => {
+    try {
+      // Get saved lecturer code
+      const savedLecturerCode = localStorage.getItem('selectedLecturerCode');
+      if (savedLecturerCode) {
+        setSelectedLecturerCode(savedLecturerCode);
+        
+        // Get saved timetable data
+        const savedTimetableData = localStorage.getItem('timetableData');
+        if (savedTimetableData) {
+          setTimetableData(JSON.parse(savedTimetableData));
+        } else {
+          // If we have a code but no data, load the timetable
+          setTimeout(() => {
+            loadTimetable(savedLecturerCode);
+          }, 500); // Small delay to ensure state is updated
+        }
+      }
+    } catch (error) {
+      console.error("Error loading saved preferences:", error);
+    }
+  };
+
+  // Save preferences to localStorage
+  const savePreferences = (lecturerCode, data) => {
+    try {
+      localStorage.setItem('selectedLecturerCode', lecturerCode);
+      localStorage.setItem('timetableData', JSON.stringify(data));
+    } catch (error) {
+      console.error("Error saving preferences:", error);
+    }
+  };
 
   // Log important events to console only
   const logInfo = (message) => {
@@ -104,8 +142,10 @@ const Timetable = () => {
   };
 
   // Load timetable for the selected lecturer code
-  const loadTimetable = async () => {
-    if (!selectedLecturerCode) {
+  const loadTimetable = async (lecturerCode = null) => {
+    const codeToUse = lecturerCode || selectedLecturerCode;
+    
+    if (!codeToUse) {
       setError("Please select a lecturer code");
       return;
     }
@@ -113,7 +153,7 @@ const Timetable = () => {
     try {
       setLoading(true);
       setError(null);
-      logInfo(`Starting timetable search for lecturer: ${selectedLecturerCode}`);
+      logInfo(`Starting timetable search for lecturer: ${codeToUse}`);
       
       // Using the database path: /IIT/TimeTable/GroupTimeTables
       try {
@@ -162,8 +202,8 @@ const Timetable = () => {
               // Check for lecturer match
               const lecturerCodes = slotData.lecturers.split(',').map(code => code.trim());
               
-              if (lecturerCodes.includes(selectedLecturerCode)) {
-                logInfo(`Match found: ${selectedLecturerCode} in ${timetableId} > ${day} > ${timeSlot}`);
+              if (lecturerCodes.includes(codeToUse)) {
+                logInfo(`Match found: ${codeToUse} in ${timetableId} > ${day} > ${timeSlot}`);
                 filteredDaySchedule[timeSlot] = slotData;
                 dayHasMatches = true;
                 timetableHasMatches = true;
@@ -185,8 +225,12 @@ const Timetable = () => {
         // Set the timetable data
         if (Object.keys(timetableResults).length === 0) {
           setTimetableData(null);
+          // If no data found, clear the saved data
+          savePreferences(codeToUse, null);
         } else {
           setTimetableData(timetableResults);
+          // Save the preferences to localStorage
+          savePreferences(codeToUse, timetableResults);
         }
         
       } catch (err) {
@@ -311,6 +355,9 @@ const Timetable = () => {
       {user ? (
         <div className="bg-gray-50 p-3 rounded mb-6">
           <p>Logged in as: <span className="font-medium">{user.email}</span></p>
+          {selectedLecturerCode && (
+            <p className="mt-1">Showing timetable for: <span className="font-medium">{selectedLecturerCode} - {lecturers.find(l => l.code === selectedLecturerCode)?.name || ''}</span></p>
+          )}
         </div>
       ) : (
         <p className="text-red-500 mb-6">Please log in to view your timetable.</p>
@@ -329,17 +376,17 @@ const Timetable = () => {
               disabled={loading}
               className="w-full p-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500"
             >
-              <option value="">Select Lecturer Code</option>
+              <option value="">-Select Lecturer Code-</option>
               {lecturers.map(lecturer => (
                 <option key={lecturer.code} value={lecturer.code}>
-                  {lecturer.code}
+                  {lecturer.code} - {lecturer.name}
                 </option>
               ))}
             </select>
           </div>
           
           <button 
-            onClick={loadTimetable} 
+            onClick={() => loadTimetable()} 
             disabled={loading || !selectedLecturerCode}
             className={`px-4 py-2 rounded text-white ${loading || !selectedLecturerCode ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}`}
           >
@@ -349,8 +396,6 @@ const Timetable = () => {
       )}
       
       {error && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">{error}</div>}
-      
-
       
       {loading ? (
         <div className="text-center py-4">
