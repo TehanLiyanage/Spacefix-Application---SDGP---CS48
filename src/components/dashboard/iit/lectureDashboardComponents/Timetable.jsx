@@ -1,280 +1,369 @@
 import React, { useState, useEffect } from 'react';
+import { auth, db } from '../../../../firebase/firebaseConfig.js';
+import { onAuthStateChanged } from 'firebase/auth';
+import { collection, getDocs, getDoc, doc } from 'firebase/firestore';
 
-const Timetable = ({ setCurrentPage }) => {
-  // State for form inputs
-  const [day, setDay] = useState('Monday');
-  const [startTime, setStartTime] = useState('');
-  const [endTime, setEndTime] = useState('');
-  const [venue, setVenue] = useState('');
-  const [subject, setSubject] = useState('');
-  const [note, setNote] = useState('');
-  
-  // State for timetable data
-  const [timetableData, setTimetableData] = useState(() => {
-    // Try to load saved data from localStorage
-    const savedData = localStorage.getItem('lecturerTimetable');
-    return savedData ? JSON.parse(savedData) : [];
-  });
-  
-  // Filter for viewing specific days
-  const [filterDay, setFilterDay] = useState('All');
-  
-  // Save to localStorage whenever timetable data changes
+const Timetable = () => {
+  const [user, setUser] = useState(null);
+  const [selectedLecturerCode, setSelectedLecturerCode] = useState('');
+  const [timetableData, setTimetableData] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+
+  // Hard-coded list of lecturers
+  const lecturers = [
+    { code: "ADS", name: "Adshayani Pirapaharan" },
+    { code: "ADSH", name: "Adshayan Balachandran" },
+    { code: "AHTU", name: "Ahtshayan Udayasanthiran" },
+    { code: "AKAR", name: "Akarshani Ramanayake" },
+    { code: "AKSH", name: "Akarshani Amarasinghe" },
+    { code: "AMMR", name: "Ammar Raneez" },
+    { code: "ASIP", name: "Asith Pallemulla" },
+    { code: "AYB", name: "Mohamed Ayoob" },
+    { code: "BAL", name: "Bala Sathianathan" },
+    { code: "BHD", name: "Bhathiya Dissanayake" },
+    { code: "BNU", name: "Banu Athuraliya" },
+    { code: "BUD", name: "Buddhika Premarathne" },
+    { code: "CAS", name: "Cassim Farook" },
+    { code: "CHAJ", name: "Charitha Jayampathy" },
+    { code: "CLAW", name: "Claudia Warnakulaarachich" },
+    { code: "DAS", name: "Dasun Arandalage" },
+    { code: "DES", name: "Deshan Sumanathilaka" },
+    { code: "DILL", name: "Dilani Lunugalage" },
+    { code: "DLK", name: "Dileeka Alwis" },
+    { code: "GANR", name: "Gangulie Ranawaka" },
+    { code: "HASI", name: "Hasindu Ramanayake" },
+    { code: "HIR", name: "Hiruni Samarage" },
+    { code: "HIRUK", name: "Hiruni Kasthuriarachchi" },
+    { code: "IMA", name: "Imani Randuli" },
+    { code: "IMESH", name: "Imesh Pathirana" },
+    { code: "JIE", name: "Jiehfeng Hsu" },
+    { code: "JOH", name: "John Sriskandarajah" },
+    { code: "KALW", name: "Kalhari Walawage" },
+    { code: "KASUW", name: "Dr Kasuni Welihinda" },
+    { code: "KELUM", name: "Kelum De Silva" },
+    { code: "KRIPA", name: "Krishnakripa Jayakumar" },
+    { code: "KRISH", name: "Krishnamurthi Caucidheesan" },
+    { code: "KUS", name: "Kushan Bhareti" },
+    { code: "MAL", name: "Malsha Fernando" },
+    { code: "MANU", name: "Manul Singhe" },
+    { code: "MITHU", name: "Mithushan Jalangan" },
+    { code: "MJAN", name: "Mohanadas Jananie" },
+    { code: "MOSH", name: "Mohamed Shazeen" },
+    { code: "NEVI", name: "Nevindu Jayathilake" },
+    { code: "NPU", name: "Nipuna Senanayake" },
+    { code: "ODHS", name: "Odhith Seneviratne" },
+    { code: "PJN", name: "Pubudu Janith" },
+    { code: "PRMU", name: "Prashastha Mudannayake" },
+    { code: "PRSH", name: "Prashan Rathnayaka" },
+    { code: "PUBD", name: "Pubudu De Silva" },
+    { code: "PUSH", name: "Pushpika Prasad Liyanaarachchi" },
+    { code: "RAJ", name: "Rajeiha Sutharsan" },
+    { code: "RUW", name: "Ruwan Egodawatte" },
+    { code: "RUZK", name: "Ruzaik Seyed" },
+    { code: "SAADH", name: "Saadh Jawwadh" },
+    { code: "SACB", name: "Sachini Bambaranda" },
+    { code: "SACHT", name: "Sachithra Thilakarathne" },
+    { code: "SAHDI", name: "Sahdiya Hussain" },
+    { code: "SAHP", name: "Sahan Priyanayana" },
+    { code: "SALIP", name: "Salitha Perera" },
+    { code: "SANDU", name: "Sandunika Rasanjalee" },
+    { code: "SANM", name: "Santhusha Mallawatantri" },
+    { code: "SAP", name: "Sapna Kumarapathirage" },
+    { code: "SARK", name: "Saranga Kumarapeli" },
+    { code: "SAVH", name: "Savinu Hasanlanka" },
+    { code: "SAVM", name: "Savin Madapatha" },
+    { code: "SLR", name: "Sulari Fernando" },
+    { code: "SUR", name: "Suresh Peris" },
+    { code: "SUVE", name: "Suvetha Suvendran" },
+    { code: "THARR", name: "Thashin Rahuman" },
+    { code: "THE", name: "Theja Perera" },
+    { code: "THLG", name: "Thilanga Liyanage" },
+    { code: "TOR", name: "Torin Weerasinghe" },
+    { code: "UTHP", name: "Uthpala Nimanthi" },
+    { code: "UVI", name: "Uvini Abeyasinghe" },
+    { code: "VATD", name: "Vathila De Silva" },
+    { code: "VISHM", name: "Vishmi Embuldeniya" },
+    { code: "WIM", name: "Prof Prasad Wimalaratne" },
+    { code: "YAS", name: "Yasiru Rashan" }
+  ];
+
+  // Listen for authentication state changes
   useEffect(() => {
-    localStorage.setItem('lecturerTimetable', JSON.stringify(timetableData));
-  }, [timetableData]);
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  // Log important events to console only
+  const logInfo = (message) => {
+    console.log(message);
+  };
+
+  // Load timetable for the selected lecturer code
+  const loadTimetable = async () => {
+    if (!selectedLecturerCode) {
+      setError("Please select a lecturer code");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError(null);
+      logInfo(`Starting timetable search for lecturer: ${selectedLecturerCode}`);
+      
+      // Using the database path: /IIT/TimeTable/GroupTimeTables
+      try {
+        const groupTimeTablesRef = collection(db, 'IIT', 'TimeTable', 'GroupTimeTables');
+        const groupTimeTablesSnapshot = await getDocs(groupTimeTablesRef);
+        
+        logInfo(`Found ${groupTimeTablesSnapshot.docs.length} documents in GroupTimeTables collection`);
+        
+        if (groupTimeTablesSnapshot.docs.length === 0) {
+          setError("No timetable data found in the database.");
+          setLoading(false);
+          return;
+        }
+
+        // Process timetable documents
+        const timetableResults = {};
+        
+        for (const timetableDoc of groupTimeTablesSnapshot.docs) {
+          const timetableId = timetableDoc.id;
+          const timetableData = timetableDoc.data();
+          
+          logInfo(`Processing timetable: ${timetableId}`);
+          
+          // Check if schedule exists
+          if (!timetableData.schedule) {
+            logInfo(`No schedule found in timetable: ${timetableId}`);
+            continue;
+          }
+          
+          // Create filtered schedule
+          const filteredSchedule = {};
+          let timetableHasMatches = false;
+          
+          // Process each day in the schedule
+          for (const [day, daySchedule] of Object.entries(timetableData.schedule)) {
+            const filteredDaySchedule = {};
+            let dayHasMatches = false;
+            
+            // Process each time slot in the day
+            for (const [timeSlot, slotData] of Object.entries(daySchedule)) {
+              // Check if lecturers field exists
+              if (!slotData.lecturers) {
+                continue;
+              }
+              
+              // Check for lecturer match
+              const lecturerCodes = slotData.lecturers.split(',').map(code => code.trim());
+              
+              if (lecturerCodes.includes(selectedLecturerCode)) {
+                logInfo(`Match found: ${selectedLecturerCode} in ${timetableId} > ${day} > ${timeSlot}`);
+                filteredDaySchedule[timeSlot] = slotData;
+                dayHasMatches = true;
+                timetableHasMatches = true;
+              }
+            }
+            
+            // Only add days with matching slots
+            if (dayHasMatches) {
+              filteredSchedule[day] = filteredDaySchedule;
+            }
+          }
+          
+          // Only add timetables with matching data
+          if (timetableHasMatches) {
+            timetableResults[timetableId] = filteredSchedule;
+          }
+        }
+        
+        // Set the timetable data
+        if (Object.keys(timetableResults).length === 0) {
+          setTimetableData(null);
+        } else {
+          setTimetableData(timetableResults);
+        }
+        
+      } catch (err) {
+        console.error(`Error accessing GroupTimeTables collection: ${err.message}`);
+        setError(`Error accessing timetable collection: ${err.message}`);
+      }
+
+      setLoading(false);
+    } catch (err) {
+      console.error(`Error: ${err.message}`);
+      setError(`Error: ${err.message}`);
+      setLoading(false);
+    }
+  };
   
-  // Days of the week array
-  const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-  
-  // Handle form submission
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    
-    // Create new timetable entry
-    const newEntry = {
-      id: Date.now(), // Unique ID for each entry
-      day,
-      startTime,
-      endTime,
-      venue,
-      subject,
-      note,
-      createdAt: new Date().toISOString()
+  // Handle lecturer code selection
+  const handleLecturerCodeChange = (e) => {
+    setSelectedLecturerCode(e.target.value);
+  };
+
+  // Sort days of the week in correct order
+  const sortDays = (days) => {
+    const dayOrder = {
+      "Monday": 1,
+      "Tuesday": 2,
+      "Wednesday": 3,
+      "Thursday": 4,
+      "Friday": 5,
+      "Saturday": 6,
+      "Sunday": 7
     };
     
-    // Add new entry to timetable data
-    setTimetableData([...timetableData, newEntry]);
-    
-    // Reset form fields
-    setVenue('');
-    setSubject('');
-    setNote('');
-    // Keep day and time for convenience if adding multiple entries on same day
+    return [...days].sort((a, b) => dayOrder[a] - dayOrder[b]);
   };
   
-  // Delete an entry
-  const deleteEntry = (id) => {
-    setTimetableData(timetableData.filter(entry => entry.id !== id));
+  // Sort time slots in chronological order
+  const sortTimeSlots = (timeSlots) => {
+    return [...timeSlots].sort((a, b) => {
+      const aStart = a.split('-')[0];
+      const bStart = b.split('-')[0];
+      return aStart.localeCompare(bStart);
+    });
   };
-  
-  // Filter timetable data by day
-  const filteredData = filterDay === 'All' 
-    ? timetableData 
-    : timetableData.filter(entry => entry.day === filterDay);
-  
-  // Sort data by day and time
-  const sortedData = [...filteredData].sort((a, b) => {
-    // First sort by day of week
-    const dayDiff = days.indexOf(a.day) - days.indexOf(b.day);
-    if (dayDiff !== 0) return dayDiff;
+
+  // Render timetable organized by days of the week
+  const renderTimetable = () => {
+    if (!timetableData || Object.keys(timetableData).length === 0) {
+      return <p className="text-gray-600">No timetable data found for this lecturer code.</p>;
+    }
+
+    // Organize data by days rather than by groups
+    const dayBasedSchedule = {};
     
-    // Then sort by start time
-    return a.startTime.localeCompare(b.startTime);
-  });
-  
-  // Group entries by day for organized display
-  const groupedByDay = {};
-  days.forEach(day => {
-    groupedByDay[day] = sortedData.filter(entry => entry.day === day);
-  });
-  
-  return (
-    <div className="min-h-screen bg-white-100 p-4 pt-4">
-      <div className="max-w-6xl mx-auto">      
-        <h1 className="text-xl sm:text-2xl font-medium text-center text-emerald-600 mb-6">Timetable Management</h1>
+    // Collect all data across all groups, organized by days
+    Object.entries(timetableData).forEach(([timetableId, timetable]) => {
+      Object.entries(timetable).forEach(([day, daySchedule]) => {
+        if (!dayBasedSchedule[day]) {
+          dayBasedSchedule[day] = {};
+        }
         
-        {/* Add New Entry Form */}
-        <div className="bg-white p-6 rounded-lg shadow-md mb-8">
-          <h2 className="text-xl font-semibold mb-4">Add New Class</h2>
-          <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Day</label>
-              <select 
-                value={day} 
-                onChange={(e) => setDay(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-emerald-500 hover:border-emerald-300"
-                required
-              >
-                {days.map(d => (
-                  <option key={d} value={d}>{d}</option>
-                ))}
-              </select>
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Start Time</label>
-              <input 
-                type="time" 
-                value={startTime} 
-                onChange={(e) => setStartTime(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-emerald-500 hover:border-emerald-300"
-                required
-              />
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">End Time</label>
-              <input 
-                type="time" 
-                value={endTime} 
-                onChange={(e) => setEndTime(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-emerald-500 hover:border-emerald-300"
-                required
-              />
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Venue</label>
-              <input 
-                type="text" 
-                value={venue} 
-                onChange={(e) => setVenue(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-emerald-500 hover:border-emerald-300"
-                placeholder="1LA"
-                required
-              />
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Subject</label>
-              <input 
-                type="text" 
-                value={subject} 
-                onChange={(e) => setSubject(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-emerald-500 hover:border-emerald-300"
-                placeholder="OOP"
-                required
-              />
-            </div>
-            
-            <div className="md:col-span-2 lg:col-span-3">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Additional Notes (Optional)</label>
-              <textarea 
-                value={note} 
-                onChange={(e) => setNote(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-emerald-500 hover:border-emerald-300"
-                placeholder="Bring projector, quiz day, etc."
-                rows="2"
-              />
-            </div>
-            
-            <div className="md:col-span-2 lg:col-span-3">
-              <button 
-                type="submit"
-                className="w-full bg-emerald-600 text-white py-2 px-4 rounded-md hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 disabled:opacity-50"
-              >
-                Add to Timetable
-              </button>
-            </div>
-          </form>
-        </div>
-        
-        {/* Timetable Display */}
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold">Your Timetable</h2>
-            <div className="flex items-center">
-              <label className="mr-2 text-sm font-medium text-gray-700">Filter by day:</label>
-              <select 
-                value={filterDay} 
-                onChange={(e) => setFilterDay(e.target.value)}
-                className="p-2 border border-gray-300 rounded-md"
-              >
-                <option value="All">All Days</option>
-                {days.map(d => (
-                  <option key={d} value={d}>{d}</option>
-                ))}
-              </select>
+        Object.entries(daySchedule).forEach(([timeSlot, slotData]) => {
+          const uniqueKey = `${timeSlot}-${timetableId}`;
+          dayBasedSchedule[day][uniqueKey] = {
+            ...slotData,
+            group: timetableId  // Add group information to each slot
+          };
+        });
+      });
+    });
+    
+    // Sort days of the week
+    const sortedDays = sortDays(Object.keys(dayBasedSchedule));
+    
+    return (
+      <div className="space-y-8">
+        {sortedDays.map((day) => (
+          <div key={day} className="bg-white rounded-lg shadow p-4">
+            <h3 className="text-lg font-semibold mb-4">{day}</h3>
+            <div className="overflow-x-auto">
+              <table className="min-w-full border border-gray-200">
+                <thead>
+                  <tr className="bg-gray-50">
+                    <th className="py-2 px-4 border-b text-left">Time</th>
+                    <th className="py-2 px-4 border-b text-left">Group</th>
+                    <th className="py-2 px-4 border-b text-left">Course Code</th>
+                    <th className="py-2 px-4 border-b text-left">Type</th>
+                    <th className="py-2 px-4 border-b text-left">Location Type</th>
+                    <th className="py-2 px-4 border-b text-left">Room</th>
+                    <th className="py-2 px-4 border-b text-left">All Lecturers</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {sortTimeSlots(Object.keys(dayBasedSchedule[day])).map((uniqueKey) => {
+                    const slotData = dayBasedSchedule[day][uniqueKey];
+                    const timeSlot = uniqueKey.split('-')[0]; // Extract time from the unique key
+                    
+                    return (
+                      <tr key={uniqueKey} className="hover:bg-gray-50">
+                        <td className="py-2 px-4 border-b">{timeSlot}</td>
+                        <td className="py-2 px-4 border-b">{slotData.group}</td>
+                        <td className="py-2 px-4 border-b">{slotData.courseCode}</td>
+                        <td className="py-2 px-4 border-b">{slotData.type}</td>
+                        <td className="py-2 px-4 border-b">{slotData.locationType}</td>
+                        <td className="py-2 px-4 border-b">{slotData.room || 'N/A'}</td>
+                        <td className="py-2 px-4 border-b">{slotData.lecturers}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
             </div>
           </div>
-          
-          {sortedData.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">
-              No classes added to your timetable yet.
-            </div>
-          ) : (
-            filterDay === 'All' ? (
-              // Display grouped by day when showing all days
-              days.map(day => {
-                // Skip days with no entries
-                if (groupedByDay[day].length === 0) return null;
-                
-                return (
-                  <div key={day} className="mb-6">
-                    <h3 className="text-lg font-semibold text-gray-800 mb-2 border-b pb-1">{day}</h3>
-                    <div className="overflow-x-auto">
-                      <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-50">
-                          <tr>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Time</th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Subject</th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Venue</th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Notes</th>
-                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                          </tr>
-                        </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
-                          {groupedByDay[day].map(entry => (
-                            <tr key={entry.id}>
-                              <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">{entry.startTime} - {entry.endTime}</td>
-                              <td className="px-4 py-4 text-sm text-gray-900">{entry.subject}</td>
-                              <td className="px-4 py-4 text-sm text-gray-900">{entry.venue}</td>
-                              <td className="px-4 py-4 text-sm text-gray-500">{entry.note || '—'}</td>
-                              <td className="px-4 py-4 text-sm text-gray-500">
-                                <button 
-                                  onClick={() => deleteEntry(entry.id)} 
-                                  className="text-red-600 hover:text-red-800"
-                                >
-                                  Delete
-                                </button>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                );
-              })
-            ) : (
-              // Display a simple table when filtered to a specific day
-              <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Time</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Subject</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Venue</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Notes</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {sortedData.map(entry => (
-                      <tr key={entry.id}>
-                        <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">{entry.startTime} - {entry.endTime}</td>
-                        <td className="px-4 py-4 text-sm text-gray-900">{entry.subject}</td>
-                        <td className="px-4 py-4 text-sm text-gray-900">{entry.venue}</td>
-                        <td className="px-4 py-4 text-sm text-gray-500">{entry.note || '—'}</td>
-                        <td className="px-4 py-4 text-sm text-gray-500">
-                          <button 
-                            onClick={() => deleteEntry(entry.id)} 
-                            className="text-red-600 hover:text-red-800"
-                          >
-                            Delete
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )
-          )}
-        </div>
+        ))}
       </div>
+    );
+  };
+
+  return (
+    <div className="max-w-6xl mx-auto p-4">
+      <h2 className="text-2xl font-bold mb-6">Timetable</h2>
+      
+      {user ? (
+        <div className="bg-gray-50 p-3 rounded mb-6">
+          <p>Logged in as: <span className="font-medium">{user.email}</span></p>
+        </div>
+      ) : (
+        <p className="text-red-500 mb-6">Please log in to view your timetable.</p>
+      )}
+      
+      {user && (
+        <div className="flex flex-col md:flex-row gap-4 mb-6 items-end">
+          <div className="w-full md:w-2/3">
+            <label htmlFor="lecturerCode" className="block text-sm font-medium text-gray-700 mb-1">
+              Select Lecturer Code:
+            </label>
+            <select 
+              id="lecturerCode" 
+              value={selectedLecturerCode} 
+              onChange={handleLecturerCodeChange}
+              disabled={loading}
+              className="w-full p-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500"
+            >
+              <option value="">Select Lecturer Code</option>
+              {lecturers.map(lecturer => (
+                <option key={lecturer.code} value={lecturer.code}>
+                  {lecturer.code}
+                </option>
+              ))}
+            </select>
+          </div>
+          
+          <button 
+            onClick={loadTimetable} 
+            disabled={loading || !selectedLecturerCode}
+            className={`px-4 py-2 rounded text-white ${loading || !selectedLecturerCode ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}`}
+          >
+            {loading ? 'Loading...' : 'Load Timetable'}
+          </button>
+        </div>
+      )}
+      
+      {error && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">{error}</div>}
+      
+
+      
+      {loading ? (
+        <div className="text-center py-4">
+          <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-600"></div>
+          <p className="mt-2">Loading...</p>
+        </div>
+      ) : (
+        <div className="mt-4">
+          {timetableData && renderTimetable()}
+        </div>
+      )}
     </div>
   );
 };
+
 export default Timetable;
