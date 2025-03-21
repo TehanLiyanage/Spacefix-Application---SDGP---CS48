@@ -546,72 +546,53 @@
 
 
 import React, { useState, useEffect } from 'react';
+import { User, Mail, Phone, Building, Plus, Edit, Trash2, Search, X, Save, AlertCircle } from 'lucide-react';
 import axios from 'axios';
-import { Search, Mail, Phone, Building } from 'lucide-react';
 
 const StudentManagement = () => {
   const [students, setStudents] = useState([]);
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
   const [isEditing, setIsEditing] = useState(false);
+  const [isAdding, setIsAdding] = useState(false);
   const [formData, setFormData] = useState(null);
   const [message, setMessage] = useState({ type: '', text: '' });
 
+  const emptyStudentTemplate = {
+    displayName: "",
+    email: "",
+    phone: "",
+    department: ""
+  };
+
   // Fetch all students when component mounts
   useEffect(() => {
-    const fetchStudents = async () => {
-      try {
-        setLoading(true);
-        const response = await axios.get('http://localhost:5000/api/students');
-        
-        if (response.data.students) {
-          // Log the received data to check structure
-          console.log("Students data received:", response.data.students[0]);
-          setStudents(response.data.students);
-        }
-        setLoading(false);
-      } catch (err) {
-        console.error('Error fetching students:', err);
-        setError('Failed to load students. Please try again later.');
-        setLoading(false);
-      }
-    };
-
     fetchStudents();
   }, []);
 
-  // Fetch student details when a student is selected
-  useEffect(() => {
-    if (!selectedStudent) return;
-    
-    // Simply set the form data based on the selected student
-    setFormData(selectedStudent);
-    setLoading(false);
-    
-  }, [selectedStudent]);
-
-  const handleStudentSelect = (student) => {
-    // Directly set the selected student without navigation
-    setSelectedStudent(student);
-    setFormData(student);
-    setIsEditing(false); // Reset editing mode when selecting a new student
-    setMessage({ type: '', text: '' }); // Clear any messages
+  const fetchStudents = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get('http://localhost:5000/api/students');
+      
+      if (response.data.students) {
+        console.log("Students data received:", response.data.students[0]);
+        setStudents(response.data.students);
+      }
+      setLoading(false);
+    } catch (err) {
+      console.error('Error fetching students:', err);
+      setError('Failed to load students. Please try again later.');
+      setLoading(false);
+    }
   };
 
-  const handleSearchChange = (e) => {
-    setSearchQuery(e.target.value);
+  const showMessage = (type, text) => {
+    setMessage({ type, text });
+    setTimeout(() => setMessage({ type: '', text: '' }), 5000);
   };
-
-  const filteredStudents = students.filter(student => {
-    const searchLower = searchQuery.toLowerCase();
-    return (
-      (student.displayName && student.displayName.toLowerCase().includes(searchLower)) ||
-      (student.email && student.email.toLowerCase().includes(searchLower)) ||
-      (student.id && student.id.toLowerCase().includes(searchLower))
-    );
-  });
 
   const handleInputChange = (field, value) => {
     setFormData(prev => ({
@@ -622,7 +603,7 @@ const StudentManagement = () => {
 
   // Update display name with first and last name
   const handleNameChange = (type, value) => {
-    const names = splitName(formData.displayName);
+    const names = splitName(formData.displayName || '');
     if (type === 'firstName') {
       handleInputChange('displayName', `${value} ${names.lastName}`);
     } else {
@@ -630,8 +611,31 @@ const StudentManagement = () => {
     }
   };
 
+  const handleStudentSelect = (student) => {
+    setSelectedStudent(student);
+    setFormData(student);
+    setIsEditing(false);
+    setIsAdding(false);
+    setMessage({ type: '', text: '' }); // Clear any messages
+  };
+
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+  };
+
+  const filteredStudents = students.filter(student => {
+    const searchLower = searchTerm.toLowerCase();
+    return (
+      (student.displayName && student.displayName.toLowerCase().includes(searchLower)) ||
+      (student.email && student.email.toLowerCase().includes(searchLower)) ||
+      (student.id && student.id.toLowerCase().includes(searchLower)) ||
+      (student.department && student.department.toLowerCase().includes(searchLower))
+    );
+  });
+
   const handleEditToggle = () => {
     setIsEditing(!isEditing);
+    setIsAdding(false);
     if (!isEditing) {
       // Starting to edit - keep the current data
     } else {
@@ -640,50 +644,93 @@ const StudentManagement = () => {
     }
   };
 
+  const startAdding = () => {
+    setSelectedStudent(null);
+    setFormData(emptyStudentTemplate);
+    setIsAdding(true);
+    setIsEditing(false);
+  };
+
+  const resetForm = () => {
+    if (selectedStudent) {
+      setFormData(selectedStudent);
+    } else {
+      setFormData(emptyStudentTemplate);
+    }
+    setIsEditing(false);
+    setIsAdding(false);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
     try {
       setMessage({ type: '', text: '' });
+      setLoading(true);
       
-      // Prepare update data
-      const updateData = {
-        displayName: formData.displayName,
-        email: formData.email,
-        phone: formData.phone,
-        department: formData.department
-      };
-      
-      // Send update request
-      const response = await axios.put(`http://localhost:5000/api/students/${selectedStudent.id}`, updateData);
-      
-      if (response.data.success) {
-        // Update both the selected student and the student in the list
-        setSelectedStudent({...formData});
+      if (isAdding) {
+        // Add new student
+        const response = await axios.post('http://localhost:5000/api/students', formData);
         
-        // Update the student in the list
-        const updatedStudents = students.map(student => 
-          student.id === selectedStudent.id ? {...student, ...updateData} : student
-        );
-        setStudents(updatedStudents);
+        if (response.data.success) {
+          showMessage('success', 'Student added successfully!');
+          await fetchStudents();
+          resetForm();
+        } else {
+          throw new Error(response.data.message || 'Failed to add student');
+        }
+      } else if (isEditing && selectedStudent) {
+        // Update existing student
+        const response = await axios.put(`http://localhost:5000/api/students/${selectedStudent.id}`, formData);
         
-        setIsEditing(false);
-        setMessage({ 
-          type: 'success', 
-          text: 'Student information updated successfully!' 
-        });
-        
-        // Reset message after 3 seconds
-        setTimeout(() => setMessage({ type: '', text: '' }), 3000);
-      } else {
-        throw new Error(response.data.message || 'Update failed');
+        if (response.data.success) {
+          // Update both the selected student and the student in the list
+          setSelectedStudent({...formData});
+          
+          // Update the student in the list
+          const updatedStudents = students.map(student => 
+            student.id === selectedStudent.id ? {...student, ...formData} : student
+          );
+          setStudents(updatedStudents);
+          
+          setIsEditing(false);
+          showMessage('success', 'Student information updated successfully!');
+        } else {
+          throw new Error(response.data.message || 'Update failed');
+        }
       }
     } catch (err) {
-      console.error('Error updating student information:', err);
-      setMessage({ 
-        type: 'error', 
-        text: err.response?.data?.message || 'Failed to update student information. Please try again.' 
-      });
+      console.error('Error saving student information:', err);
+      showMessage('error', err.response?.data?.message || 'Failed to save student information. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async (studentId) => {
+    if (!window.confirm('Are you sure you want to delete this student?')) {
+      return;
+    }
+    
+    try {
+      setLoading(true);
+      const response = await axios.delete(`http://localhost:5000/api/students/${studentId}`);
+      
+      if (response.data.success) {
+        showMessage('success', 'Student deleted successfully!');
+        await fetchStudents();
+        
+        if (selectedStudent && selectedStudent.id === studentId) {
+          resetForm();
+        }
+      } else {
+        throw new Error(response.data.message || 'Delete failed');
+      }
+    } catch (err) {
+      console.error('Error deleting student:', err);
+      showMessage('error', err.response?.data?.message || 'Failed to delete student. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -696,12 +743,12 @@ const StudentManagement = () => {
     return { firstName, lastName };
   };
 
-  // Extract department shortcode
-  const getDepartmentShortcode = (student) => {
+  // Extract department or domain from email
+  const getDepartmentOrDomain = (student) => {
     if (student.department) return student.department;
-    // If no department, try to extract from email
+    
+    // Extract domain from email as fallback
     if (student.email && student.email.includes('@')) {
-      // This is just a placeholder logic - adjust as needed
       const emailParts = student.email.split('@');
       if (emailParts[1] && emailParts[1].includes('.')) {
         const domainParts = emailParts[1].split('.');
@@ -714,228 +761,308 @@ const StudentManagement = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4">
-      <h1 className="text-2xl font-semibold text-center text-green-600 mb-6">Student Management</h1>
-      
-      <div className="flex gap-4 max-w-7xl mx-auto">
-        {/* Left panel - Student list */}
-        <div className="w-1/3 bg-white rounded-md shadow-sm p-4">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-medium text-green-600">Students List</h2>
-            <button className="bg-green-500 text-white rounded-full w-8 h-8 flex items-center justify-center">
-              <span>+</span>
-            </button>
+    <div className="max-w-6xl mx-auto px-4 py-6">
+      <h2 className="text-xl sm:text-2xl font-medium text-center text-emerald-600 mb-6">
+        Student Management
+      </h2>
+
+      {message.text && (
+        <div className={`mb-4 p-4 rounded-md flex items-center ${
+          message.type === 'success' ? 'bg-emerald-100 text-emerald-700' : 
+          message.type === 'info' ? 'bg-blue-100 text-blue-700' :
+          'bg-red-100 text-red-700'
+        }`}>
+          {message.type === 'success' ? 
+            <Save className="w-5 h-5 mr-2" /> : 
+            <AlertCircle className="w-5 h-5 mr-2" />
+          }
+          {message.text}
+        </div>
+      )}
+
+      {error && (
+        <div className="mb-4 p-4 bg-red-100 text-red-700 rounded-md">
+          <h3 className="font-medium">Error Details:</h3>
+          <pre className="mt-2 text-sm overflow-x-auto">{error}</pre>
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* Students List Panel */}
+        <div className="bg-white rounded-md shadow">
+          <div className="px-5 py-3 border-b border-gray-200">
+            <div className="flex justify-between items-center">
+              <h3 className="text-md font-medium text-green-600">Students List</h3>
+              <button
+                onClick={startAdding}
+                className="p-2 bg-emerald-500 text-white rounded-full hover:bg-emerald-600 transition-colors"
+                title="Add new student"
+              >
+                <Plus className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="mt-3 relative">
+              <input
+                type="text"
+                placeholder="Search students..."
+                value={searchTerm}
+                onChange={handleSearchChange}
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 text-sm"
+              />
+              <Search className="w-4 h-4 text-gray-400 absolute left-3 top-2.5" />
+              {searchTerm && (
+                <button 
+                  onClick={() => setSearchTerm('')}
+                  className="absolute right-3 top-2.5"
+                >
+                  <X className="w-4 h-4 text-gray-400 hover:text-gray-600" />
+                </button>
+              )}
+            </div>
           </div>
           
-          {/* Search input */}
-          <div className="mb-4 relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-            <input
-              type="text"
-              placeholder="Search students..."
-              value={searchQuery}
-              onChange={handleSearchChange}
-              className="w-full pl-10 pr-4 py-2 border rounded-md border-gray-200 focus:outline-none focus:ring-1 focus:ring-green-500"
-            />
-          </div>
-          
-          {/* Student list */}
-          <div className="space-y-0">
-            {loading && students.length === 0 ? (
-              <div className="py-4 text-center text-gray-500">Loading students...</div>
-            ) : error ? (
-              <div className="py-4 text-center text-red-500">{error}</div>
-            ) : filteredStudents.length === 0 ? (
-              <div className="py-4 text-center text-gray-500">
-                {searchQuery ? 'No students found matching your search.' : 'No students found.'}
-              </div>
-            ) : (
-              filteredStudents.map(student => {
-                // Extract email domain as a simple identifier
-                const emailParts = student.email ? student.email.split('@') : [];
-                const domain = emailParts.length > 1 ? emailParts[1].split('.')[0].toUpperCase() : '';
-                
-                return (
-                  <div 
+          {loading && students.length === 0 ? (
+            <div className="p-4 text-center">
+              <div className="w-10 h-10 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
+              <p className="mt-4 text-gray-700 text-sm">Loading students...</p>
+            </div>
+          ) : error && students.length === 0 ? (
+            <div className="py-4 text-center text-red-500">{error}</div>
+          ) : filteredStudents.length === 0 ? (
+            <div className="py-4 text-center text-gray-500 text-sm">
+              {searchTerm ? 'No students found matching your search.' : 'No students found.'}
+            </div>
+          ) : (
+            <div className="divide-y divide-gray-200 max-h-96 overflow-y-auto">
+              <ul className="divide-y divide-gray-200">
+                {filteredStudents.map(student => (
+                  <li 
                     key={student.id}
                     onClick={() => handleStudentSelect(student)}
-                    className={`py-3 px-1 border-b flex justify-between items-center hover:bg-gray-50 cursor-pointer ${
-                      selectedStudent?.id === student.id ? 'bg-green-50' : ''
+                    className={`p-3 hover:bg-gray-50 cursor-pointer transition-colors flex justify-between items-center ${
+                      selectedStudent?.id === student.id ? 'bg-emerald-50' : ''
                     }`}
                   >
                     <div>
-                      <div className="font-medium">{student.displayName || 'Unnamed Student'}</div>
-                      <div className="text-sm text-gray-500">{domain}</div>
+                      <div className="font-medium text-sm">
+                        {student.displayName || 'Unnamed Student'}
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        {getDepartmentOrDomain(student)}
+                      </div>
                     </div>
                     <div className="flex space-x-2">
                       <button 
-                        className="text-gray-400 hover:text-gray-600"
+                        className="p-1 text-gray-500 hover:text-emerald-500 transition-colors"
                         onClick={(e) => {
                           e.stopPropagation();
                           handleStudentSelect(student);
                           setIsEditing(true);
                         }}
+                        title="Edit"
                       >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                        </svg>
+                        <Edit className="w-4 h-4" />
                       </button>
                       <button 
-                        className="text-gray-400 hover:text-gray-600"
+                        className="p-1 text-gray-500 hover:text-red-500 transition-colors"
                         onClick={(e) => {
                           e.stopPropagation();
-                          // Delete functionality would go here
+                          handleDelete(student.id);
                         }}
+                        title="Delete"
                       >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
+                        <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
-                  </div>
-                );
-              })
-            )}
-          </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
         
-        {/* Right panel - Student details */}
-        <div className="w-2/3 bg-white rounded-md shadow-sm p-4">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-lg font-medium text-green-600">Student Details</h2>
-            {selectedStudent && (
-              <button
-                onClick={handleEditToggle}
-                className={`${isEditing ? 'bg-red-500' : 'bg-green-500'} text-white py-2 px-4 rounded-md hover:${isEditing ? 'bg-red-600' : 'bg-green-600'}`}
-              >
-                {isEditing ? 'Cancel' : 'Edit Information'}
-              </button>
-            )}
-          </div>
-          
-          {!selectedStudent ? (
-            <div className="py-8 text-center text-gray-500">
-              Select a student from the list to view details
+        {/* Student Details/Form Panel */}
+        <div className="col-span-2">
+          <div className="bg-white rounded-md shadow">
+            <div className="px-5 py-3 border-b border-gray-200">
+              <div className="flex justify-between items-center">
+                <h3 className="text-md font-medium text-green-600">
+                  {isAdding ? "Add New Student" : 
+                   isEditing ? "Edit Student" : 
+                   selectedStudent ? "Student Details" : "Select a Student"}
+                </h3>
+                {selectedStudent && !isEditing && !isAdding && (
+                  <button
+                    onClick={handleEditToggle}
+                    className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors text-sm"
+                  >
+                    Edit Information
+                  </button>
+                )}
+              </div>
             </div>
-          ) : loading ? (
-            <div className="py-8 text-center text-gray-500">
-              Loading student details...
-            </div>
-          ) : (
-            <form onSubmit={handleSubmit}>
-              {message.text && (
-                <div className={`mb-4 p-3 rounded-md ${
-                  message.type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
-                }`}>
-                  {message.text}
-                </div>
-              )}
-              
-              <div className="mb-6">
-                <h3 className="text-md font-medium mb-4">Personal Information</h3>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      ID
-                    </label>
-                    <input
-                      type="text"
-                      value={selectedStudent.id || selectedStudent.uid || ''}
-                      disabled
-                      className="w-full p-2 border rounded-md bg-gray-50"
-                    />
-                  </div>
-                  
-                  {/* Title dropdown */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Title
-                    </label>
-                    <select
-                      disabled={!isEditing}
-                      className={`w-full p-2 border rounded-md ${!isEditing ? 'bg-gray-50' : ''}`}
-                      defaultValue="Mr."
-                    >
-                      <option>Mr.</option>
-                      <option>Ms.</option>
-                      <option>Mrs.</option>
-                      <option>Dr.</option>
-                      <option>Prof.</option>
-                    </select>
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      First Name
-                    </label>
-                    <input
-                      type="text"
-                      value={splitName(formData.displayName || '').firstName}
-                      onChange={(e) => handleNameChange('firstName', e.target.value)}
-                      disabled={!isEditing}
-                      className={`w-full p-2 border rounded-md ${!isEditing ? 'bg-gray-50' : ''}`}
-                    />
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Last Name
-                    </label>
-                    <input
-                      type="text"
-                      value={splitName(formData.displayName || '').lastName}
-                      onChange={(e) => handleNameChange('lastName', e.target.value)}
-                      disabled={!isEditing}
-                      className={`w-full p-2 border rounded-md ${!isEditing ? 'bg-gray-50' : ''}`}
-                    />
-                  </div>
-                  
-                  <div className="col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Email
-                    </label>
-                    <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+
+            {!selectedStudent && !isAdding ? (
+              <div className="p-8 text-center text-gray-500">
+                <User className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+                <p className="text-sm">Select a student to view details or click the "+" button to add a new student</p>
+              </div>
+            ) : (
+              <form onSubmit={handleSubmit} className="p-5">
+                {/* Personal Information Section */}
+                <div className="mb-6">
+                  <h4 className="font-medium text-gray-700 mb-4">Personal Information</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {!isAdding && (
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          ID
+                        </label>
+                        <input
+                          type="text"
+                          value={selectedStudent?.id || selectedStudent?.uid || ''}
+                          disabled
+                          className="w-full border border-gray-300 rounded-md p-2 bg-gray-100 text-sm"
+                        />
+                      </div>
+                    )}
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Title
+                      </label>
+                      <select
+                        defaultValue="Mr."
+                        disabled={!isEditing && !isAdding}
+                        className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500 disabled:bg-gray-100 text-sm"
+                      >
+                        <option value="Mr.">Mr.</option>
+                        <option value="Ms.">Ms.</option>
+                        <option value="Mrs.">Mrs.</option>
+                        <option value="Dr.">Dr.</option>
+                        <option value="Prof.">Prof.</option>
+                        <option value="Mx.">Mx.</option>
+                      </select>
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        First Name
+                      </label>
+                      <input
+                        type="text"
+                        value={splitName(formData?.displayName || '').firstName}
+                        onChange={(e) => handleNameChange('firstName', e.target.value)}
+                        disabled={!isEditing && !isAdding}
+                        required
+                        className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500 disabled:bg-gray-100 text-sm"
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Last Name
+                      </label>
+                      <input
+                        type="text"
+                        value={splitName(formData?.displayName || '').lastName}
+                        onChange={(e) => handleNameChange('lastName', e.target.value)}
+                        disabled={!isEditing && !isAdding}
+                        required
+                        className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500 disabled:bg-gray-100 text-sm"
+                      />
+                    </div>
+                    
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <div className="flex items-center gap-2">
+                          <Mail className="w-4 h-4" />
+                          Email
+                        </div>
+                      </label>
                       <input
                         type="email"
-                        value={formData.email || ''}
+                        value={formData?.email || ''}
                         onChange={(e) => handleInputChange('email', e.target.value)}
-                        disabled={!isEditing}
-                        className={`w-full pl-10 p-2 border rounded-md ${!isEditing ? 'bg-gray-50' : ''}`}
+                        disabled={!isEditing && !isAdding}
+                        required
+                        className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500 disabled:bg-gray-100 text-sm"
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <div className="flex items-center gap-2">
+                          <Phone className="w-4 h-4" />
+                          Phone Number
+                        </div>
+                      </label>
+                      <input
+                        type="tel"
+                        value={formData?.phone || ''}
+                        onChange={(e) => handleInputChange('phone', e.target.value)}
+                        disabled={!isEditing && !isAdding}
+                        className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500 disabled:bg-gray-100 text-sm"
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <div className="flex items-center gap-2">
+                          <Building className="w-4 h-4" />
+                          Department
+                        </div>
+                      </label>
+                      <input
+                        type="text"
+                        value={formData?.department || ''}
+                        onChange={(e) => handleInputChange('department', e.target.value)}
+                        disabled={!isEditing && !isAdding}
+                        className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500 disabled:bg-gray-100 text-sm"
                       />
                     </div>
                   </div>
                 </div>
-              </div>
-              
-              {/* Display created and last login time if available */}
-              {(formData.lastLogin || formData.createdAt) && (
-                <div className="text-sm text-gray-500 mb-6">
-                  {formData.lastLogin && (
-                    <div className="mb-1">
-                      Last login: {new Date(formData.lastLogin._seconds * 1000).toLocaleString()}
-                    </div>
-                  )}
-                  {formData.createdAt && (
-                    <div>
-                      Created at: {new Date(formData.createdAt._seconds * 1000).toLocaleString()}
-                    </div>
-                  )}
-                </div>
-              )}
-              
-              {isEditing && (
-                <div className="flex justify-end mt-6">
-                  <button
-                    type="submit"
-                    className="bg-green-500 text-white py-2 px-6 rounded-md hover:bg-green-600"
-                  >
-                    Save Changes
-                  </button>
-                </div>
-              )}
-            </form>
-          )}
+                
+                {/* Display created and last login time if available */}
+                {(formData?.lastLogin || formData?.createdAt) && !isAdding && (
+                  <div className="text-sm text-gray-500 mb-6">
+                    {formData.lastLogin && (
+                      <div className="mb-1">
+                        Last login: {new Date(formData.lastLogin._seconds * 1000).toLocaleString()}
+                      </div>
+                    )}
+                    {formData.createdAt && (
+                      <div>
+                        Created at: {new Date(formData.createdAt._seconds * 1000).toLocaleString()}
+                      </div>
+                    )}
+                  </div>
+                )}
+                
+                {(isEditing || isAdding) && (
+                  <div className="flex justify-end gap-2">
+                    <button
+                      type="button"
+                      onClick={resetForm}
+                      className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors text-sm"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={loading}
+                      className={`px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors text-sm ${
+                        loading ? 'opacity-70 cursor-not-allowed' : ''
+                      }`}
+                    >
+                      {loading ? 'Saving...' : 'Save Changes'}
+                    </button>
+                  </div>
+                )}
+              </form>
+            )}
+          </div>
         </div>
       </div>
     </div>
