@@ -381,15 +381,6 @@ const AdminDashboard = () => {
           {renderContent()}
         </main>
       </div>
-      
-      {/* Mobile overlay - only appears when sidebar is open on mobile */}
-      {isMobile && sidebarOpen && (
-        <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-40"
-          onClick={toggleSidebar}
-          style={{ marginLeft: '256px' }}
-        />
-      )}
     </div>
   );
 };
