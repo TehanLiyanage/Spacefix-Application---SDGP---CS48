@@ -565,7 +565,10 @@ const StudentManagement = () => {
       try {
         setLoading(true);
         const response = await axios.get('http://localhost:5000/api/students');
+        
         if (response.data.students) {
+          // Log the received data to check structure
+          console.log("Students data received:", response.data.students[0]);
           setStudents(response.data.students);
         }
         setLoading(false);
@@ -583,27 +586,18 @@ const StudentManagement = () => {
   useEffect(() => {
     if (!selectedStudent) return;
     
-    const fetchStudentDetails = async () => {
-      try {
-        setLoading(true);
-        const response = await axios.get(`http://localhost:5000/api/students/${selectedStudent.id}`);
-        const studentData = response.data;
-        
-        setSelectedStudent(studentData);
-        setFormData(studentData);
-        setLoading(false);
-      } catch (err) {
-        console.error('Error fetching student details:', err);
-        setError('Failed to load student details. Please try again later.');
-        setLoading(false);
-      }
-    };
-
-    fetchStudentDetails();
-  }, [selectedStudent?.id]);
+    // Simply set the form data based on the selected student
+    setFormData(selectedStudent);
+    setLoading(false);
+    
+  }, [selectedStudent]);
 
   const handleStudentSelect = (student) => {
+    // Directly set the selected student without navigation
     setSelectedStudent(student);
+    setFormData(student);
+    setIsEditing(false); // Reset editing mode when selecting a new student
+    setMessage({ type: '', text: '' }); // Clear any messages
   };
 
   const handleSearchChange = (e) => {
@@ -624,6 +618,16 @@ const StudentManagement = () => {
       ...prev,
       [field]: value
     }));
+  };
+
+  // Update display name with first and last name
+  const handleNameChange = (type, value) => {
+    const names = splitName(formData.displayName);
+    if (type === 'firstName') {
+      handleInputChange('displayName', `${value} ${names.lastName}`);
+    } else {
+      handleInputChange('displayName', `${names.firstName} ${value}`);
+    }
   };
 
   const handleEditToggle = () => {
@@ -654,7 +658,15 @@ const StudentManagement = () => {
       const response = await axios.put(`http://localhost:5000/api/students/${selectedStudent.id}`, updateData);
       
       if (response.data.success) {
-        setSelectedStudent(formData);
+        // Update both the selected student and the student in the list
+        setSelectedStudent({...formData});
+        
+        // Update the student in the list
+        const updatedStudents = students.map(student => 
+          student.id === selectedStudent.id ? {...student, ...updateData} : student
+        );
+        setStudents(updatedStudents);
+        
         setIsEditing(false);
         setMessage({ 
           type: 'success', 
@@ -728,7 +740,7 @@ const StudentManagement = () => {
           </div>
           
           {/* Student list */}
-          <div className="space-y-1">
+          <div className="space-y-0">
             {loading && students.length === 0 ? (
               <div className="py-4 text-center text-gray-500">Loading students...</div>
             ) : error ? (
@@ -739,26 +751,42 @@ const StudentManagement = () => {
               </div>
             ) : (
               filteredStudents.map(student => {
-                const departmentCode = getDepartmentShortcode(student);
+                // Extract email domain as a simple identifier
+                const emailParts = student.email ? student.email.split('@') : [];
+                const domain = emailParts.length > 1 ? emailParts[1].split('.')[0].toUpperCase() : '';
+                
                 return (
                   <div 
                     key={student.id}
                     onClick={() => handleStudentSelect(student)}
-                    className={`p-3 border-b flex justify-between items-center hover:bg-gray-50 cursor-pointer ${
+                    className={`py-3 px-1 border-b flex justify-between items-center hover:bg-gray-50 cursor-pointer ${
                       selectedStudent?.id === student.id ? 'bg-green-50' : ''
                     }`}
                   >
                     <div>
                       <div className="font-medium">{student.displayName || 'Unnamed Student'}</div>
-                      <div className="text-sm text-gray-500">{departmentCode}</div>
+                      <div className="text-sm text-gray-500">{domain}</div>
                     </div>
                     <div className="flex space-x-2">
-                      <button className="text-gray-400 hover:text-gray-600">
+                      <button 
+                        className="text-gray-400 hover:text-gray-600"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleStudentSelect(student);
+                          setIsEditing(true);
+                        }}
+                      >
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                         </svg>
                       </button>
-                      <button className="text-gray-400 hover:text-gray-600">
+                      <button 
+                        className="text-gray-400 hover:text-gray-600"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          // Delete functionality would go here
+                        }}
+                      >
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                         </svg>
@@ -778,7 +806,7 @@ const StudentManagement = () => {
             {selectedStudent && (
               <button
                 onClick={handleEditToggle}
-                className="bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600"
+                className={`${isEditing ? 'bg-red-500' : 'bg-green-500'} text-white py-2 px-4 rounded-md hover:${isEditing ? 'bg-red-600' : 'bg-green-600'}`}
               >
                 {isEditing ? 'Cancel' : 'Edit Information'}
               </button>
@@ -818,7 +846,7 @@ const StudentManagement = () => {
                     />
                   </div>
                   
-                  {/* Use select for title if needed */}
+                  {/* Title dropdown */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Title
@@ -826,6 +854,7 @@ const StudentManagement = () => {
                     <select
                       disabled={!isEditing}
                       className={`w-full p-2 border rounded-md ${!isEditing ? 'bg-gray-50' : ''}`}
+                      defaultValue="Mr."
                     >
                       <option>Mr.</option>
                       <option>Ms.</option>
@@ -841,9 +870,8 @@ const StudentManagement = () => {
                     </label>
                     <input
                       type="text"
-                      value={splitName(formData.displayName).firstName}
-                      onChange={(e) => handleInputChange('displayName', 
-                        `${e.target.value} ${splitName(formData.displayName).lastName}`)}
+                      value={splitName(formData.displayName || '').firstName}
+                      onChange={(e) => handleNameChange('firstName', e.target.value)}
                       disabled={!isEditing}
                       className={`w-full p-2 border rounded-md ${!isEditing ? 'bg-gray-50' : ''}`}
                     />
@@ -855,60 +883,23 @@ const StudentManagement = () => {
                     </label>
                     <input
                       type="text"
-                      value={splitName(formData.displayName).lastName}
-                      onChange={(e) => handleInputChange('displayName', 
-                        `${splitName(formData.displayName).firstName} ${e.target.value}`)}
+                      value={splitName(formData.displayName || '').lastName}
+                      onChange={(e) => handleNameChange('lastName', e.target.value)}
                       disabled={!isEditing}
                       className={`w-full p-2 border rounded-md ${!isEditing ? 'bg-gray-50' : ''}`}
                     />
                   </div>
                   
-                  <div className="flex">
-                    <div className="flex-grow">
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Email
-                      </label>
-                      <div className="relative">
-                        <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                        <input
-                          type="email"
-                          value={formData.email || ''}
-                          onChange={(e) => handleInputChange('email', e.target.value)}
-                          disabled={!isEditing}
-                          className={`w-full pl-10 p-2 border rounded-md ${!isEditing ? 'bg-gray-50' : ''}`}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="flex">
-                    <div className="flex-grow">
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Phone Number
-                      </label>
-                      <div className="relative">
-                        <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                        <input
-                          type="text"
-                          value={formData.phone || ''}
-                          onChange={(e) => handleInputChange('phone', e.target.value)}
-                          disabled={!isEditing}
-                          className={`w-full pl-10 p-2 border rounded-md ${!isEditing ? 'bg-gray-50' : ''}`}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                  
                   <div className="col-span-2">
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Department
+                      Email
                     </label>
                     <div className="relative">
-                      <Building className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                      <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                       <input
-                        type="text"
-                        value={formData.department || ''}
-                        onChange={(e) => handleInputChange('department', e.target.value)}
+                        type="email"
+                        value={formData.email || ''}
+                        onChange={(e) => handleInputChange('email', e.target.value)}
                         disabled={!isEditing}
                         className={`w-full pl-10 p-2 border rounded-md ${!isEditing ? 'bg-gray-50' : ''}`}
                       />
@@ -916,6 +907,22 @@ const StudentManagement = () => {
                   </div>
                 </div>
               </div>
+              
+              {/* Display created and last login time if available */}
+              {(formData.lastLogin || formData.createdAt) && (
+                <div className="text-sm text-gray-500 mb-6">
+                  {formData.lastLogin && (
+                    <div className="mb-1">
+                      Last login: {new Date(formData.lastLogin._seconds * 1000).toLocaleString()}
+                    </div>
+                  )}
+                  {formData.createdAt && (
+                    <div>
+                      Created at: {new Date(formData.createdAt._seconds * 1000).toLocaleString()}
+                    </div>
+                  )}
+                </div>
+              )}
               
               {isEditing && (
                 <div className="flex justify-end mt-6">
