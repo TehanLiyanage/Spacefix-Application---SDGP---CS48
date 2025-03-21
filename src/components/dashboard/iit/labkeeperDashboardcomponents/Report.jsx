@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 const Report = () => {
-  const [activeTab, setActiveTab] = useState('found');
+  const [activeTab, setActiveTab] = useState('all-items'); // Default to all-items view
   const [selectedCategory, setSelectedCategory] = useState('');
   const [itemName, setItemName] = useState('');
   const [location, setLocation] = useState('');
@@ -13,7 +13,7 @@ const Report = () => {
       category: 'Electronics',
       location: 'Library',
       description: 'White AirPods in a black case',
-      status: 'Found',
+      status: 'Lost',
       reporter: 'John Smith (Student)'
     },
     {
@@ -24,6 +24,15 @@ const Report = () => {
       description: 'Blue hardcover notebook with notes',
       status: 'Lost',
       reporter: 'Emma Johnson (Student)'
+    },
+    {
+      id: 3,
+      name: 'Student ID Card',
+      category: 'Student Card',
+      location: 'Computer Lab',
+      description: 'ID card for Sarah Wilson',
+      status: 'Lost',
+      reporter: 'Professor Thompson'
     }
   ]);
 
@@ -42,7 +51,7 @@ const Report = () => {
       category: selectedCategory,
       location: location,
       description: description,
-      status: activeTab === 'found' ? 'Found' : 'Lost',
+      status: 'Found',
       reporter: 'Lab Keeper'
     };
 
@@ -51,6 +60,12 @@ const Report = () => {
     setLocation('');
     setDescription('');
     setSelectedCategory('');
+    
+    // Show success message
+    alert('Item reported as found! This information will be shared with the admin dashboard.');
+    
+    // Switch to all-items tab to see the updated list
+    setActiveTab('all-items');
   };
 
   const handleStatusChange = (id, newStatus) => {
@@ -59,6 +74,12 @@ const Report = () => {
         item.id === id ? { ...item, status: newStatus } : item
       )
     );
+    
+    if (newStatus === 'Found') {
+      alert('Great! The item has been marked as found. The admin dashboard will be notified.');
+    } else if (newStatus === 'Claimed') {
+      alert('The item has been marked as claimed. This will be updated in the admin dashboard.');
+    }
   };
 
   return (
@@ -70,80 +91,97 @@ const Report = () => {
         <div className="flex space-x-3 mb-6">
           <button
             className={`flex-1 py-2 text-base font-medium rounded-lg transition ${
+              activeTab === 'all-items' ? 'bg-gradient-to-r from-emerald-500 to-cyan-500 text-white' : 'bg-gray-200 text-gray-700'
+            }`}
+            onClick={() => setActiveTab('all-items')}
+          >
+            All Reported Items
+          </button>
+          <button
+            className={`flex-1 py-2 text-base font-medium rounded-lg transition ${
               activeTab === 'found' ? 'bg-gradient-to-r from-emerald-500 to-cyan-500 text-white' : 'bg-gray-200 text-gray-700'
             }`}
             onClick={() => setActiveTab('found')}
           >
             Report Found Item
           </button>
-          <button
-            className={`flex-1 py-2 text-base font-medium rounded-lg transition ${
-              activeTab === 'lost' ? 'bg-gradient-to-r from-emerald-500 to-cyan-500 text-white' : 'bg-gray-200 text-gray-700'
-            }`}
-            onClick={() => setActiveTab('lost')}
-          >
-            Report Lost Item
-          </button>
-          <button
-            className={`flex-1 py-2 text-base font-medium rounded-lg transition ${
-              activeTab === 'all-items' ? 'bg-gradient-to-r from-emerald-500 to-cyan-500 text-white' : 'bg-gray-200 text-gray-700'
-            }`}
-            onClick={() => setActiveTab('all-items')}
-          >
-            All Items
-          </button>
         </div>
 
-        {/* Report Forms */}
-        {(activeTab === 'found' || activeTab === 'lost') && (
-          <form onSubmit={handleSubmit} className="bg-white p-5 rounded-md shadow-sm space-y-3">
-            <select
-              className="w-full p-3 text-base border border-gray-300 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
-            >
-              {categories.map((category, index) => (
-                <option key={index} value={category}>
-                  {category}
-                </option>
-              ))}
-            </select>
-            <input
-              type="text"
-              placeholder="Item name"
-              className="w-full p-3 text-base border border-gray-300 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-              value={itemName}
-              onChange={(e) => setItemName(e.target.value)}
-            />
-            <input
-              type="text"
-              placeholder={activeTab === 'found' ? "Found location" : "Last seen location"}
-              className="w-full p-3 text-base border border-gray-300 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-            />
-            <textarea
-              placeholder="Item description..."
-              className="w-full p-3 text-base border border-gray-300 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 h-24 resize-none"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-            ></textarea>
-            <button className="w-full bg-gradient-to-r from-emerald-500 to-cyan-500 text-white py-3 text-base rounded-md hover:from-emerald-600 hover:to-cyan-600 transition-colors">
-              {activeTab === 'found' ? "Submit Found Item" : "Submit Lost Item"}
-            </button>
-          </form>
+        {/* Report Found Item Form */}
+        {activeTab === 'found' && (
+          <div>
+            <div className="mb-4 bg-emerald-50 p-3 rounded-md border border-emerald-200 text-emerald-700 text-sm">
+              <p><strong>Instructions:</strong> Use this form when you find items in classrooms or labs. The information will be shared with the admin dashboard to help reunite items with their owners.</p>
+            </div>
+            
+            <form onSubmit={handleSubmit} className="bg-white p-5 rounded-md shadow-sm space-y-3">
+              <select
+                className="w-full p-3 text-base border border-gray-300 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+              >
+                {categories.map((category, index) => (
+                  <option key={index} value={category}>
+                    {category}
+                  </option>
+                ))}
+              </select>
+              <input
+                type="text"
+                placeholder="Item name"
+                className="w-full p-3 text-base border border-gray-300 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                value={itemName}
+                onChange={(e) => setItemName(e.target.value)}
+              />
+              <input
+                type="text"
+                placeholder="Where you found it (location)"
+                className="w-full p-3 text-base border border-gray-300 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+              />
+              <textarea
+                placeholder="Item description (color, brand, distinguishing features, etc.)"
+                className="w-full p-3 text-base border border-gray-300 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 h-24 resize-none"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+              ></textarea>
+              <button className="w-full bg-gradient-to-r from-emerald-500 to-cyan-500 text-white py-3 text-base rounded-md hover:from-emerald-600 hover:to-cyan-600 transition-colors">
+                Submit Found Item
+              </button>
+            </form>
+          </div>
         )}
 
         {/* All Items List */}
         {activeTab === 'all-items' && (
           <div>
-            <h3 className="text-lg font-semibold text-gray-700 mb-3">All Lost & Found Items</h3>
+            <div className="mb-4 bg-emerald-50 p-3 rounded-md border border-emerald-200 text-emerald-700 text-sm">
+              <p><strong>Instructions:</strong> This list shows items reported as lost by students and staff. If you find any of these items, click "Mark as Found".</p>
+            </div>
+            
+            <div className="mb-4 flex justify-between items-center">
+              <h3 className="text-lg font-semibold text-gray-700">All Reported Items</h3>
+              <div className="flex space-x-2">
+                <span className="text-xs px-2 py-1 rounded-full bg-red-100 text-red-700">Lost</span>
+                <span className="text-xs px-2 py-1 rounded-full bg-emerald-100 text-emerald-700">Found</span>
+                <span className="text-xs px-2 py-1 rounded-full bg-amber-100 text-amber-700">Claimed</span>
+              </div>
+            </div>
+            
             {reportedItems.length === 0 ? (
               <p className="text-gray-500 text-base">No items reported.</p>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 {reportedItems.map((item) => (
-                  <div key={item.id} className="bg-white shadow-sm rounded-md p-4 border-l-4 border-l-emerald-500">
+                  <div 
+                    key={item.id} 
+                    className={`bg-white shadow-sm rounded-md p-4 border-l-4 ${
+                      item.status === 'Lost' ? 'border-l-red-500' : 
+                      item.status === 'Found' ? 'border-l-emerald-500' : 
+                      'border-l-amber-500'
+                    }`}
+                  >
                     <div className="flex justify-between items-start">
                       <div>
                         <h4 className="text-lg font-semibold">{item.name}</h4>
@@ -154,7 +192,9 @@ const Report = () => {
                       </div>
                       <span
                         className={`text-sm px-3 py-1 rounded-full font-medium ${
-                          item.status === 'Lost' ? 'bg-red-100 text-red-700' : item.status === 'Found' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'
+                          item.status === 'Lost' ? 'bg-red-100 text-red-700' : 
+                          item.status === 'Found' ? 'bg-emerald-100 text-emerald-700' : 
+                          'bg-amber-100 text-amber-700'
                         }`}
                       >
                         {item.status}
