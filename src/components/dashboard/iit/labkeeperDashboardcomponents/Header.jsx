@@ -15,7 +15,7 @@ const Header = ({ showNotifications, setShowNotifications, toggleSidebar }) => {
             <Menu className="w-6 h-6" />
           </button>
           <div className="ml-0 md:ml-4">
-            <h2 className="text-lg md:text-xl font-semibold bg-gradient-to-r from-emerald-600 to-cyan-600 bg-clip-text text-transparent">Student Dashboard</h2>
+            <h2 className="text-lg md:text-xl font-semibold bg-gradient-to-r from-emerald-600 to-cyan-600 bg-clip-text text-transparent">Labkeeper Dashboard</h2>
           </div>
         </div>
 
@@ -38,16 +38,16 @@ const Header = ({ showNotifications, setShowNotifications, toggleSidebar }) => {
                 </div>
                 <div className="max-h-60 overflow-y-auto">
                   <div className="px-4 py-3 hover:bg-gray-50 border-b border-gray-100">
-                    <p className="text-sm font-medium text-gray-800">Class Canceled</p>
+                    <p className="text-sm font-medium text-gray-800">New Task Assigned</p>
                     <p className="text-xs text-gray-500">
-                      Object Oriented Programming class is canceled tomorrow.
+                      Room 101 needs to be opened at 10:00 AM.
                     </p>
                     <p className="text-xs text-gray-400 mt-1">2 hours ago</p>
                   </div>
                   <div className="px-4 py-3 hover:bg-gray-50">
-                    <p className="text-sm font-medium text-gray-800">New Assignment</p>
+                    <p className="text-sm font-medium text-gray-800">Lost Item Reported</p>
                     <p className="text-xs text-gray-500">
-                      HCI assignment uploaded - due next Friday.
+                      A student reported a lost laptop in Science Building.
                     </p>
                     <p className="text-xs text-gray-400 mt-1">Yesterday</p>
                   </div>
