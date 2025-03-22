@@ -195,83 +195,80 @@ const MiniMap = () => {
 
       {/* Modal */}
       {selectedClassroom && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-md shadow-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6">
-              <div className="flex justify-between items-start mb-4">
-                <div>
-                  <h3 className="text-xl font-medium text-emerald-600">
-                    Classroom {selectedClassroom.id}
-                  </h3>
-                  <p className="text-sm text-gray-500">
-                    {selectedClassroom.building}, Floor {selectedClassroom.floor}
-                  </p>
-                </div>
-                <button
-                  onClick={() => setSelectedClassroom(null)}
-                  className="text-gray-400 hover:text-gray-500"
-                >
-                  <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
+  <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50">
+    <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[95vh] overflow-hidden">
+      {/* Modal Header */}
+      <div className="flex justify-between items-center bg-emerald-600 text-white px-6 py-4">
+        <div>
+          <h3 className="text-xl font-semibold">Classroom {selectedClassroom.id}</h3>
+          <p className="text-sm opacity-80">
+            {selectedClassroom.building}, Floor {selectedClassroom.floor}
+          </p>
+        </div>
+        <button
+          onClick={() => setSelectedClassroom(null)}
+          className="hover:text-gray-300 transition"
+        >
+          <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <h4 className="text-sm font-medium text-gray-500 mb-2">Classroom Details</h4>
-                  <ul className="space-y-2 text-sm">
-                    <li className="flex justify-between">
-                      <span className="text-gray-600">Building:</span>
-                      <span className="font-medium text-gray-900">{selectedClassroom.building}</span>
-                    </li>
-                    <li className="flex justify-between">
-                      <span className="text-gray-600">Floor:</span>
-                      <span className="font-medium text-gray-900">{selectedClassroom.floor}</span>
-                    </li>
-                    <li className="flex justify-between">
-                      <span className="text-gray-600">Capacity:</span>
-                      <span className="font-medium text-gray-900">{selectedClassroom.capacity} students</span>
-                    </li>
-                    <li className="text-gray-600">Features:</li>
-                    <li className="flex flex-wrap gap-1">
-                      {selectedClassroom.features?.map((feature, idx) => (
-                        <span key={idx} className="bg-emerald-50 text-emerald-600 text-xs px-2 py-0.5 rounded-full">
-                          {feature}
-                        </span>
-                      ))}
-                    </li>
-                  </ul>
-                </div>
-
-                <div>
-                  <h4 className="text-sm font-medium text-gray-500 mb-2">Floor Plan</h4>
-                  <div className="border rounded-md overflow-hidden bg-gray-50">
-                    <img
-                      src={selectedClassroom.map}
-                      alt={`Floor plan for ${selectedClassroom.building}, floor ${selectedClassroom.floor}`}
-                      className="w-full h-auto object-contain"
-                      onError={(e) => {
-                        e.target.onerror = null;
-                        e.target.src = "/images/floor-plan-placeholder.png";
-                      }}
-                    />
-                  </div>
-                </div>
+      {/* Modal Content */}
+      <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6 overflow-y-auto max-h-[calc(95vh-72px)]">
+        {/* Classroom Info */}
+        <div>
+          <h4 className="text-lg font-medium text-gray-700 mb-4">Details</h4>
+          <ul className="space-y-3 text-sm text-gray-600">
+            <li><span className="font-medium text-gray-900">Building:</span> {selectedClassroom.building}</li>
+            <li><span className="font-medium text-gray-900">Floor:</span> {selectedClassroom.floor}</li>
+            <li><span className="font-medium text-gray-900">Capacity:</span> {selectedClassroom.capacity} students</li>
+            <li>
+              <span className="font-medium text-gray-900">Features:</span>
+              <div className="mt-1 flex flex-wrap gap-2">
+                {selectedClassroom.features?.map((feature, idx) => (
+                  <span key={idx} className="bg-emerald-100 text-emerald-700 text-xs font-medium px-2 py-1 rounded-full">
+                    {feature}
+                  </span>
+                ))}
               </div>
+            </li>
+          </ul>
+        </div>
 
-              <div className="mt-6 flex justify-end">
-                <button
-                  onClick={() => setSelectedClassroom(null)}
-                  className="bg-emerald-50 text-emerald-600 rounded-md py-2 px-4 hover:bg-emerald-100 transition-colors"
-                >
-                  Close
-                </button>
-              </div>
+        {/* Interactive Floor Plan */}
+        <div>
+          <h4 className="text-lg font-medium text-gray-700 mb-4">Floor Plan</h4>
+          <div className="border rounded-lg overflow-hidden bg-gray-100 relative group">
+            <div className="overflow-auto max-h-[400px]">
+              <img
+                src={selectedClassroom.map}
+                alt={`Floor plan for ${selectedClassroom.building}, floor ${selectedClassroom.floor}`}
+                className="w-full object-contain transition-transform duration-300 ease-in-out transform group-hover:scale-105 cursor-zoom-in"
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = "/images/floor-plan-placeholder.png";
+                }}
+              />
             </div>
           </div>
         </div>
-      )}
+      </div>
+
+      {/* Footer */}
+      <div className="flex justify-end px-6 py-4 bg-gray-50 border-t">
+        <button
+          onClick={() => setSelectedClassroom(null)}
+          className="bg-emerald-600 text-white px-4 py-2 rounded-md hover:bg-emerald-700 transition"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
     </div>
   );
 };
