@@ -8,7 +8,8 @@ const useSocket = (room) => {
 
   useEffect(() => {
     // Create socket connection
-    const socketConnection = io('http://localhost:5000');
+    // const socketConnection = io('http://localhost:5000');
+    const socketConnection = io('https://spacefix-application-backend-sdgp-cs48.onrender.com');
     setSocket(socketConnection);
     
     // Connect to the specified room
