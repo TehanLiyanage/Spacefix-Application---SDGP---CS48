@@ -1,38 +1,53 @@
-import React, { useState } from 'react';
-import { BellRing, Plus, Edit, Trash2, Check, X } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { BellRing, Plus, Edit, Trash2 } from 'lucide-react';
+import { db } from '../../../../firebase/firebaseConfig.js'; 
+import { 
+  collection, 
+  addDoc, 
+  getDocs, 
+  updateDoc, 
+  deleteDoc, 
+  doc, 
+  query, 
+  orderBy, 
+  serverTimestamp 
+} from 'firebase/firestore';
 
 const Announcements = () => {
-  const [announcements, setAnnouncements] = useState([
-    {
-      id: 1,
-      title: 'System Maintenance',
-      content: 'The system will be under maintenance on Sunday, 24th March from 2:00 AM to 6:00 AM.',
-      date: '2025-03-20',
-      priority: 'high'
-    },
-    {
-      id: 2,
-      title: 'New Semester Registration',
-      content: 'Registration for the Fall 2025 semester will open on April 15th. Please ensure all students complete their registration before May 10th.',
-      date: '2025-03-18',
-      priority: 'medium'
-    },
-    {
-      id: 3,
-      title: 'Faculty Meeting',
-      content: 'There will be a faculty meeting on March 25th at 2:00 PM in the conference room.',
-      date: '2025-03-15',
-      priority: 'low'
-    }
-  ]);
-
+  const [announcements, setAnnouncements] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({
     title: '',
     content: '',
     priority: 'medium'
   });
+
+  // Fetch announcements from Firestore
+  useEffect(() => {
+    const fetchAnnouncements = async () => {
+      try {
+        setLoading(true);
+        const announcementsRef = collection(db, 'IIT', 'Announcements', 'items');
+        const q = query(announcementsRef, orderBy('timestamp', 'desc'));
+        const querySnapshot = await getDocs(q);
+        
+        const fetchedAnnouncements = querySnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+        
+        setAnnouncements(fetchedAnnouncements);
+      } catch (error) {
+        console.error("Error fetching announcements:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAnnouncements();
+  }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -62,35 +77,62 @@ const Announcements = () => {
     setShowForm(true);
   };
 
-  const handleDelete = (id) => {
-    setAnnouncements(announcements.filter(item => item.id !== id));
+  const handleDelete = async (id) => {
+    try {
+      // Reference to the specific announcement document
+      const announcementRef = doc(db, 'IIT', 'Announcements', 'items', id);
+      
+      // Delete the document from Firestore
+      await deleteDoc(announcementRef);
+      
+      // Update local state to reflect the deletion
+      setAnnouncements(announcements.filter(item => item.id !== id));
+    } catch (error) {
+      console.error("Error deleting announcement:", error);
+    }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
-    const currentDate = new Date().toISOString().split('T')[0];
-    
-    if (editingId) {
-      // Update existing announcement
-      setAnnouncements(announcements.map(item => 
-        item.id === editingId 
-          ? { ...item, ...formData, date: currentDate } 
-          : item
-      ));
-    } else {
-      // Add new announcement
-      const newAnnouncement = {
-        id: Date.now(), // Simple way to generate unique ID
+    try {
+      const announcementData = {
         ...formData,
-        date: currentDate
+        date: new Date().toISOString().split('T')[0],
+        timestamp: serverTimestamp()
       };
-      setAnnouncements([newAnnouncement, ...announcements]);
+      
+      if (editingId) {
+        // Update existing announcement
+        const announcementRef = doc(db, 'IIT', 'Announcements', 'items', editingId);
+        await updateDoc(announcementRef, announcementData);
+        
+        // Update local state
+        setAnnouncements(announcements.map(item => 
+          item.id === editingId 
+            ? { ...item, ...announcementData } 
+            : item
+        ));
+      } else {
+        // Add new announcement with auto-generated ID
+        const announcementsRef = collection(db, 'IIT', 'Announcements', 'items');
+        const docRef = await addDoc(announcementsRef, announcementData);
+        
+        // Add to local state with the Firestore document ID
+        const newAnnouncement = {
+          id: docRef.id,
+          ...announcementData
+        };
+        
+        setAnnouncements([newAnnouncement, ...announcements]);
+      }
+      
+      // Reset form
+      setShowForm(false);
+      setEditingId(null);
+    } catch (error) {
+      console.error("Error saving announcement:", error);
     }
-    
-    // Reset form
-    setShowForm(false);
-    setEditingId(null);
   };
 
   const handleCancel = () => {
@@ -198,7 +240,11 @@ const Announcements = () => {
 
       {/* Announcements List */}
       <div className="space-y-4">
-        {announcements.length === 0 ? (
+        {loading ? (
+          <div className="text-center py-10 bg-white rounded-lg shadow-sm border border-gray-200">
+            <p className="text-gray-500">Loading announcements...</p>
+          </div>
+        ) : announcements.length === 0 ? (
           <div className="text-center py-10 bg-white rounded-lg shadow-sm border border-gray-200">
             <p className="text-gray-500">No announcements available. Create a new one!</p>
           </div>
