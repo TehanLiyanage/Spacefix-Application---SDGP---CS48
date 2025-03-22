@@ -549,6 +549,9 @@ import React, { useState, useEffect } from 'react';
 import { User, Mail, Phone, Building, Plus, Edit, Trash2, Search, X, Save, AlertCircle } from 'lucide-react';
 import axios from 'axios';
 
+// Use Vite environment variable with fallback to localhost for development
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
 const StudentManagement = () => {
   const [students, setStudents] = useState([]);
   const [selectedStudent, setSelectedStudent] = useState(null);
@@ -575,7 +578,8 @@ const StudentManagement = () => {
   const fetchStudents = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('http://localhost:5000/api/students');
+      // const response = await axios.get('http://localhost:5000/api/students');
+      const response = await axios.get(`${API_BASE_URL}/api/students`);
       
       if (response.data.students) {
         console.log("Students data received:", response.data.students[0]);
@@ -670,7 +674,8 @@ const StudentManagement = () => {
       
       if (isAdding) {
         // Add new student
-        const response = await axios.post('http://localhost:5000/api/students', formData);
+        // const response = await axios.post('http://localhost:5000/api/students', formData);
+        const response = await axios.post(`${API_BASE_URL}/api/students`, formData);
         
         if (response.data.success) {
           showMessage('success', 'Student added successfully!');
@@ -681,7 +686,8 @@ const StudentManagement = () => {
         }
       } else if (isEditing && selectedStudent) {
         // Update existing student
-        const response = await axios.put(`http://localhost:5000/api/students/${selectedStudent.id}`, formData);
+        // const response = await axios.put(`http://localhost:5000/api/students/${selectedStudent.id}`, formData);
+        const response = await axios.put(`${API_BASE_URL}/api/students/${selectedStudent.id}`, formData);
         
         if (response.data.success) {
           // Update both the selected student and the student in the list
@@ -714,7 +720,8 @@ const StudentManagement = () => {
     
     try {
       setLoading(true);
-      const response = await axios.delete(`http://localhost:5000/api/students/${studentId}`);
+      // const response = await axios.delete(`http://localhost:5000/api/students/${studentId}`);
+      const response = await axios.delete(`${API_BASE_URL}/api/students/${studentId}`);
       
       if (response.data.success) {
         showMessage('success', 'Student deleted successfully!');
