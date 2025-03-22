@@ -195,7 +195,7 @@ const MiniMap = () => {
 
       {/* Modal */}
       {selectedClassroom && (
-  <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50">
+    <div className="fixed inset-0 bg-white/30 backdrop-blur-sm flex items-center justify-center p-4 z-50">
     <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[95vh] overflow-hidden">
       {/* Modal Header */}
       <div className="flex justify-between items-center bg-emerald-600 text-white px-6 py-4">
