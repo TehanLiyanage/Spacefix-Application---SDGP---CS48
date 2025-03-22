@@ -155,7 +155,7 @@ const Timetable = () => {
       setError(null);
       logInfo(`Starting timetable search for lecturer: ${codeToUse}`);
       
-      // Using the database path: /IIT/TimeTable/GroupTimeTables
+      // Using the correct path: /IIT/TimeTable/GroupTimeTables
       try {
         const groupTimeTablesRef = collection(db, 'IIT', 'TimeTable', 'GroupTimeTables');
         const groupTimeTablesSnapshot = await getDocs(groupTimeTablesRef);
@@ -376,7 +376,7 @@ const Timetable = () => {
               disabled={loading}
               className="w-full p-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500"
             >
-              <option value="">-Select Lecturer Code-</option>
+              <option value="">- Select Lecturer Code -</option>
               {lecturers.map(lecturer => (
                 <option key={lecturer.code} value={lecturer.code}>
                   {lecturer.code} - {lecturer.name}
@@ -387,8 +387,8 @@ const Timetable = () => {
           
           <button 
             onClick={() => loadTimetable()} 
-            disabled={loading || !selectedLecturerCode}
-            className={`px-4 py-2 rounded text-white ${loading || !selectedLecturerCode ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}`}
+            disabled={loading}
+            className={`px-4 py-2 rounded text-white ${loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}`}
           >
             {loading ? 'Loading...' : 'Load Timetable'}
           </button>
