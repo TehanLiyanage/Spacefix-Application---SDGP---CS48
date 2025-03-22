@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { auth } from '../../../firebase/firebaseConfig'; // adjust the import path if needed
+import { auth } from '../../../../firebase/firebaseConfig'; // Adjust the import path if needed
 
 const LostItems = () => {
   const [activeTab, setActiveTab] = useState('report-lost');
@@ -26,7 +26,6 @@ const LostItems = () => {
       setUserEmail(user.email);
       fetchMyItems(user.email);
     } else {
-      // Optional: You can redirect to login or notify the user
       console.warn('No user is logged in.');
     }
   }, []);
@@ -70,7 +69,7 @@ const LostItems = () => {
       itemName,
       location,
       description,
-      userEmail, // use email instead of userId
+      userEmail,
     };
 
     try {
@@ -88,12 +87,11 @@ const LostItems = () => {
     }
   };
 
-  // Delete Item
+  // Delete Item (only for My Lost Items)
   const deleteItem = async (id) => {
     try {
       await axios.delete(`${API_URL}/api/lostitems/${id}`);
       fetchMyItems(userEmail);
-      fetchFoundItems();
     } catch (err) {
       console.error(err);
     }
@@ -229,11 +227,6 @@ const LostItems = () => {
                       <p className="text-xs text-gray-600"><strong>User Email:</strong> {item.userEmail}</p>
                     </div>
                     <span className="text-xs bg-green-100 text-green-600 px-2 py-0.5 rounded-full self-start">Found</span>
-                  </div>
-                  <div className="mt-2 flex justify-end">
-                    <button className="text-xs text-red-600" onClick={() => deleteItem(item.id)}>
-                      Remove
-                    </button>
                   </div>
                 </div>
               ))}
