@@ -25,7 +25,7 @@ const MiniMap = () => {
           floor: 4,
           capacity: 40,
           features: ["Projector", "Whiteboard"],
-          map: "/images/floor1.png",
+          map: "/images/floor4.png",
         };
 
         // Combine real classrooms with the mock classroom
