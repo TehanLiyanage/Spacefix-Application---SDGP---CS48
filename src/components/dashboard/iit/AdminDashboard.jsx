@@ -631,19 +631,19 @@ const AdminDashboard = () => {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mt-10">
                 <div className="bg-white p-4 sm:p-6 rounded-lg shadow-md border-l-4 border-blue-500 transition-all duration-300 hover:shadow-lg">
                   <h3 className="text-gray-500 text-xs sm:text-sm font-medium mb-1">Total Students</h3>
-                  <p className="text-xl sm:text-2xl font-bold text-gray-800">2,543</p>
+                  <p className="text-xl sm:text-2xl font-bold text-gray-800">1800+</p>
                 </div>
                 <div className="bg-white p-4 sm:p-6 rounded-lg shadow-md border-l-4 border-green-500 transition-all duration-300 hover:shadow-lg">
                   <h3 className="text-gray-500 text-xs sm:text-sm font-medium mb-1">Active Lecturers</h3>
-                  <p className="text-xl sm:text-2xl font-bold text-gray-800">125</p>
+                  <p className="text-xl sm:text-2xl font-bold text-gray-800">100+</p>
                 </div>
                 <div className="bg-white p-4 sm:p-6 rounded-lg shadow-md border-l-4 border-yellow-500 transition-all duration-300 hover:shadow-lg">
-                  <h3 className="text-gray-500 text-xs sm:text-sm font-medium mb-1">Classes Today</h3>
-                  <p className="text-xl sm:text-2xl font-bold text-gray-800">48</p>
+                  <h3 className="text-gray-500 text-xs sm:text-sm font-medium mb-1">Class Rooms</h3>
+                  <p className="text-xl sm:text-2xl font-bold text-gray-800">20</p>
                 </div>
                 <div className="bg-white p-4 sm:p-6 rounded-lg shadow-md border-l-4 border-purple-500 transition-all duration-300 hover:shadow-lg">
-                  <h3 className="text-gray-500 text-xs sm:text-sm font-medium mb-1">Pending Requests</h3>
-                  <p className="text-xl sm:text-2xl font-bold text-gray-800">12</p>
+                  <h3 className="text-gray-500 text-xs sm:text-sm font-medium mb-1">Total Programs</h3>
+                  <p className="text-xl sm:text-2xl font-bold text-gray-800">3</p>
                 </div>
               </div>
             </div>
