@@ -353,66 +353,85 @@ const Timetable = () => {
     <div className="max-w-6xl mx-auto p-4">
       <h2 className="text-2xl font-bold mb-6">Timetable</h2>
       
-      {user ? (
-        <div className="bg-gray-50 p-3 rounded mb-6">
-          <p>Logged in as: <span className="font-medium">{user.email}</span></p>
-          {selectedLecturerCode && (
-            <p className="mt-1">Showing timetable for: <span className="font-medium">{selectedLecturerCode} - {lecturers.find(l => l.code === selectedLecturerCode)?.name || ''}</span></p>
-          )}
-        </div>
-      ) : (
-        <p className="text-red-500 mb-6">Please log in to view your timetable.</p>
-      )}
-      
-      {user && (
-        <div className="flex flex-col md:flex-row gap-4 mb-6 items-end">
-          <div className="w-full md:w-2/3">
-            <label htmlFor="lecturerCode" className="block text-sm font-medium text-gray-700 mb-1">
-              Select Lecturer Code:
-            </label>
-            <select 
-              id="lecturerCode" 
-              value={selectedLecturerCode} 
-              onChange={handleLecturerCodeChange}
-              disabled={loading}
-              className="w-full p-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500"
-            >
-              <option value="">- Select Lecturer Code -</option>
-              {lecturers.map(lecturer => (
-                <option key={lecturer.code} value={lecturer.code}>
-                  {lecturer.code} - {lecturer.name}
-                </option>
-              ))}
-            </select>
+      {/* Section 1: User Info and Selection Controls */}
+      <div className="bg-white rounded-lg shadow-md p-4 mb-6">
+        {user ? (
+          <div className="bg-gray-50 p-3 rounded mb-4">
+            <p>Logged in as: <span className="font-medium">{user.email}</span></p>
+            {selectedLecturerCode && (
+              <p className="mt-1">Showing timetable for: <span className="font-medium">{selectedLecturerCode} - {lecturers.find(l => l.code === selectedLecturerCode)?.name || ''}</span></p>
+            )}
           </div>
-          
-          <button 
-            onClick={() => loadTimetable()} 
-            disabled={loading}
-            className={`px-4 py-2 rounded text-white ${loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}`}
-          >
-            {loading ? 'Loading...' : 'Load Timetable'}
-          </button>
-        </div>
-      )}
-      
-      {error && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">{error}</div>}
-      
-      {loading ? (
-        <div className="text-center py-4">
-          <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-600"></div>
-          <p className="mt-2">Loading...</p>
-        </div>
-      ) : (
-        <div className="mt-4">
-          {timetableData ? renderTimetable() : (
-            <div className="bg-gray-50 p-6 rounded-lg text-center">
-              <p className="text-lg text-gray-700">No timetable data to display</p>
-              <p className="text-gray-500 mt-2">Select a lecturer code and click "Load Timetable" to view their schedule</p>
+        ) : (
+          <p className="text-red-500 mb-4">Please log in to view your timetable.</p>
+        )}
+        
+        {user && (
+          <div className="flex flex-col md:flex-row gap-4 items-end">
+            <div className="w-full md:w-2/3">
+              <label htmlFor="lecturerCode" className="block text-sm font-medium text-gray-700 mb-1">
+                Select Lecturer Code:
+              </label>
+              <select 
+                id="lecturerCode" 
+                value={selectedLecturerCode} 
+                onChange={handleLecturerCodeChange}
+                disabled={loading}
+                className="w-full p-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500"
+              >
+                <option value="">-- Select Lecturer Code --</option>
+                {lecturers.map(lecturer => (
+                  <option key={lecturer.code} value={lecturer.code}>
+                    {lecturer.code} - {lecturer.name}
+                  </option>
+                ))}
+              </select>
             </div>
-          )}
-        </div>
-      )}
+            
+            <button 
+              onClick={() => loadTimetable()} 
+              disabled={loading}
+              className={`px-4 py-2 rounded text-white ${loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}`}
+            >
+              {loading ? 'Loading...' : 'Load Timetable'}
+            </button>
+          </div>
+        )}
+        
+        {error && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mt-4">{error}</div>}
+      </div>
+      
+      {/* Section 2: Timetable Display */}
+      <div className="bg-white rounded-lg shadow-md p-4">
+        <h3 className="text-xl font-semibold mb-4">Timetable Display</h3>
+        
+        {loading ? (
+          <div className="text-center py-8">
+            <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-600"></div>
+            <p className="mt-2">Loading timetable data...</p>
+          </div>
+        ) : (
+          <div>
+            {timetableData ? (
+              renderTimetable()
+            ) : (
+              <div className="bg-gray-50 p-8 rounded-lg text-center">
+                {selectedLecturerCode ? (
+                  <>
+                    <p className="text-lg text-gray-700">No timetable data found for {selectedLecturerCode}</p>
+                    <p className="text-gray-500 mt-2">Try selecting a different lecturer code</p>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-lg text-gray-700">Welcome to the Timetable Viewer</p>
+                    <p className="text-gray-500 mt-2">Select a lecturer code and click "Load Timetable" to view their schedule</p>
+                  </>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
