@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { ToastContainer } from 'react-toastify'; // Import ToastContainer
-import 'react-toastify/dist/ReactToastify.css'; // Import ToastContainer CSS
 import MyTimetable from "./studentDashboardComponents/MyTimetable";
 import SpaceAvailability from "./studentDashboardComponents/spaceAvailability";
 import Sidebar from "./studentDashboardComponents/sidebar";
@@ -58,9 +56,6 @@ const StudentDashboard = () => {
 
   return (
     <div className="h-screen bg-gray-100 overflow-hidden">
-      {/* Add ToastContainer for notifications */}
-      <ToastContainer position="top-right" autoClose={3000} />
-      
       {/* Sidebar component */}
       <Sidebar 
         activePage={activePage} 
