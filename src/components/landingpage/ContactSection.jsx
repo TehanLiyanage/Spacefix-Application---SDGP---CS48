@@ -1,14 +1,15 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { MdEmail, MdPhone } from 'react-icons/md';
-import { FaLinkedin, FaInstagram, FaTwitter } from 'react-icons/fa';
+import { FaLinkedin, FaInstagram, FaTwitter, FaYoutube } from 'react-icons/fa';
+
 
 const contactInfo = [
   {
     icon: <MdEmail className="w-6 h-6" />,
     title: "Email Us",
-    info: "support@spacefix.com",
-    href: "mailto:support@spacefix.com"
+    info: "spacefix.contact@gmail.com",
+    href: "mailto:spacefix.contact@gmail.com"
   },
   {
     icon: <MdPhone className="w-6 h-6" />,
@@ -22,7 +23,7 @@ const socialLinks = [
   { 
     icon: <FaLinkedin className="w-6 h-6" />, 
     name: 'LinkedIn',
-    href: 'http://www.linkedin.com/in/spacefix',
+    href: 'https://www.linkedin.com/company/spacefixlk',
     color: 'hover:text-[#0077B5]'
   },
   { 
@@ -36,8 +37,15 @@ const socialLinks = [
     name: 'Twitter',
     href: 'https://x.com/Spacefixlk',
     color: 'hover:text-[#1DA1F2]'
+  },
+  {
+    icon: <FaYoutube className="w-6 h-6" />,
+    name: 'YouTube',
+    href: 'https://www.youtube.com/@spacefixlk',
+    color: 'hover:text-[#FF0000]'
   }
 ];
+
 
 const ContactSection = () => {
   const containerVariants = {
@@ -97,7 +105,7 @@ const ContactSection = () => {
         >
           <div className="text-center mb-16">
             <motion.h2 
-              className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-emerald-600 to-cyan-600 bg-clip-text text-transparent mb-4 sm:mb-6"
+              className="text-3xl sm:text-5xl md:text-4xl font-bold bg-gradient-to-r from-emerald-600 to-cyan-600 bg-clip-text text-transparent mb-4 sm:mb-6"
               variants={itemVariants}
             >
               Let's Connect
