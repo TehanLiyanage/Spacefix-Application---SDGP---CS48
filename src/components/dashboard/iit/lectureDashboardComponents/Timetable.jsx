@@ -156,7 +156,7 @@ const Timetable = () => {
       setError(null);
       logInfo(`Starting timetable search for lecturer: ${codeToUse}`);
       
-      // Using the correct path: /IIT/TimeTable/GroupTimeTables
+      // Using the database path: /IIT/TimeTable/GroupTimeTables
       try {
         const groupTimeTablesRef = collection(db, 'IIT', 'TimeTable', 'GroupTimeTables');
         const groupTimeTablesSnapshot = await getDocs(groupTimeTablesRef);
@@ -351,12 +351,12 @@ const Timetable = () => {
 
   return (
     <div className="max-w-6xl mx-auto p-4">
-      <h2 className="text-2xl font-bold mb-6">Timetable</h2>
+      <h2 className="text-xl sm:text-2xl font-medium text-center text-emerald-600 mb-6">Timetable</h2>
       
       {/* Section 1: User Info and Selection Controls */}
       <div className="bg-white rounded-lg shadow-md p-4 mb-6">
         {user ? (
-          <div className="bg-gray-50 p-3 rounded mb-4">
+          <div className="bg-emerald-50 p-3 rounded mb-4">
             <p>Logged in as: <span className="font-medium">{user.email}</span></p>
             {selectedLecturerCode && (
               <p className="mt-1">Showing timetable for: <span className="font-medium">{selectedLecturerCode} - {lecturers.find(l => l.code === selectedLecturerCode)?.name || ''}</span></p>
@@ -377,9 +377,9 @@ const Timetable = () => {
                 value={selectedLecturerCode} 
                 onChange={handleLecturerCodeChange}
                 disabled={loading}
-                className="w-full p-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-emerald-500 hover:border-emerald-300"
               >
-                <option value="">-- Select Lecturer Code --</option>
+                <option value="">- Select Lecturer Code -</option>
                 {lecturers.map(lecturer => (
                   <option key={lecturer.code} value={lecturer.code}>
                     {lecturer.code} - {lecturer.name}
@@ -391,7 +391,7 @@ const Timetable = () => {
             <button 
               onClick={() => loadTimetable()} 
               disabled={loading}
-              className={`px-4 py-2 rounded text-white ${loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}`}
+              className={`px-4 py-2 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 ${loading ? 'bg-gray-400 cursor-not-allowed disabled:opacity-50' : 'bg-emerald-600 hover:bg-emerald-700'}`}
             >
               {loading ? 'Loading...' : 'Load Timetable'}
             </button>
@@ -403,7 +403,7 @@ const Timetable = () => {
       
       {/* Section 2: Timetable Display */}
       <div className="bg-white rounded-lg shadow-md p-4">
-        <h3 className="text-xl font-semibold mb-4">Timetable Display</h3>
+        <h3 className="text-xl font-semibold text-emerald-600 mb-4">Timetable Display</h3>
         
         {loading ? (
           <div className="text-center py-8">
