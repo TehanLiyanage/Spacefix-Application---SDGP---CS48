@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { auth } from '../../../firebase/firebaseConfig'; // adjust the import path if needed
 
 const LostItems = () => {
   const [activeTab, setActiveTab] = useState('report-lost');
@@ -7,7 +8,7 @@ const LostItems = () => {
   const [itemName, setItemName] = useState('');
   const [location, setLocation] = useState('');
   const [description, setDescription] = useState('');
-  const [userId, setUserId] = useState(localStorage.getItem('userId') || '');
+  const [userEmail, setUserEmail] = useState('');
   const [myItems, setMyItems] = useState([]);
   const [foundItems, setFoundItems] = useState([]);
 
@@ -18,12 +19,22 @@ const LostItems = () => {
     'Clothing', 'Helmet', 'Books', 'Personal Items', 'Wallet', 'Other'
   ];
 
-  // Fetch Lost Items of this User
-  const fetchMyItems = async (storedUserId = userId) => {
+  // Fetch Logged-in User's Email
+  useEffect(() => {
+    const user = auth.currentUser;
+    if (user && user.email) {
+      setUserEmail(user.email);
+      fetchMyItems(user.email);
+    } else {
+      // Optional: You can redirect to login or notify the user
+      console.warn('No user is logged in.');
+    }
+  }, []);
+
+  // Fetch My Lost Items
+  const fetchMyItems = async (email) => {
     try {
-      if (!storedUserId) return;
-      const res = await axios.get(`${API_URL}/api/lostitems/${storedUserId}`);
-      // Filter items with status === 'Lost'
+      const res = await axios.get(`${API_URL}/api/lostitems/${email}`);
       const lostItems = res.data.filter(item => item.status === 'Lost');
       setMyItems(lostItems);
     } catch (err) {
@@ -41,24 +52,15 @@ const LostItems = () => {
     }
   };
 
-  // Fetch items on mount if userId exists (refresh-safe)
   useEffect(() => {
-    const storedUserId = localStorage.getItem('userId');
-    if (storedUserId) {
-      setUserId(storedUserId);
-      fetchMyItems(storedUserId);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (activeTab === 'my-items' && userId) fetchMyItems();
+    if (activeTab === 'my-items' && userEmail) fetchMyItems(userEmail);
     if (activeTab === 'found-items') fetchFoundItems();
-  }, [activeTab, userId]);
+  }, [activeTab, userEmail]);
 
-  // Handle Form Submit
+  // Submit Lost Item
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!itemName || !location || !description || !selectedCategory || selectedCategory === 'Select category' || !userId) {
+    if (!itemName || !location || !description || !selectedCategory || selectedCategory === 'Select category' || !userEmail) {
       alert('Please fill all fields');
       return;
     }
@@ -68,7 +70,7 @@ const LostItems = () => {
       itemName,
       location,
       description,
-      userId,
+      userEmail, // use email instead of userId
     };
 
     try {
@@ -78,7 +80,7 @@ const LostItems = () => {
       setLocation('');
       setDescription('');
       setSelectedCategory('');
-      fetchMyItems();
+      fetchMyItems(userEmail);
       setActiveTab('my-items');
     } catch (err) {
       console.error(err);
@@ -86,18 +88,11 @@ const LostItems = () => {
     }
   };
 
-  // Update userId and save to localStorage
-  const handleUserIdChange = (e) => {
-    const value = e.target.value;
-    setUserId(value);
-    localStorage.setItem('userId', value);
-  };
-
   // Delete Item
   const deleteItem = async (id) => {
     try {
       await axios.delete(`${API_URL}/api/lostitems/${id}`);
-      fetchMyItems();
+      fetchMyItems(userEmail);
       fetchFoundItems();
     } catch (err) {
       console.error(err);
@@ -128,18 +123,6 @@ const LostItems = () => {
       {/* Report Lost Item */}
       {activeTab === 'report-lost' && (
         <form onSubmit={handleSubmit} className="space-y-3">
-          <div className="space-y-1">
-            <label htmlFor="userId" className="block text-xs font-medium text-gray-700">User ID</label>
-            <input
-              id="userId"
-              type="text"
-              placeholder="Enter your User ID"
-              className="w-full p-2 text-sm border border-gray-300 rounded-md focus:ring-emerald-500"
-              value={userId}
-              onChange={handleUserIdChange}
-            />
-          </div>
-
           <div className="space-y-1">
             <label htmlFor="category" className="block text-xs font-medium text-gray-700">Category</label>
             <select
@@ -211,7 +194,7 @@ const LostItems = () => {
                       <p className="text-xs text-gray-500">{item.category} • {item.date}</p>
                       <p className="text-xs text-gray-600 mt-1"><strong>Location:</strong> {item.location}</p>
                       <p className="text-xs text-gray-600"><strong>Description:</strong> {item.description}</p>
-                      <p className="text-xs text-gray-600"><strong>User ID:</strong> {item.userId}</p>
+                      <p className="text-xs text-gray-600"><strong>User Email:</strong> {item.userEmail}</p>
                     </div>
                     <span className="text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded-full self-start">Lost</span>
                   </div>
@@ -243,7 +226,7 @@ const LostItems = () => {
                       <p className="text-xs text-gray-500">{item.category} • {item.date}</p>
                       <p className="text-xs text-gray-600 mt-1"><strong>Location:</strong> {item.location}</p>
                       <p className="text-xs text-gray-600"><strong>Description:</strong> {item.description}</p>
-                      <p className="text-xs text-gray-600"><strong>User ID:</strong> {item.userId}</p>
+                      <p className="text-xs text-gray-600"><strong>User Email:</strong> {item.userEmail}</p>
                     </div>
                     <span className="text-xs bg-green-100 text-green-600 px-2 py-0.5 rounded-full self-start">Found</span>
                   </div>
