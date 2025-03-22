@@ -21,7 +21,8 @@ const Announcements = () => {
   const [formData, setFormData] = useState({
     title: '',
     content: '',
-    priority: 'medium'
+    priority: 'medium',
+    userType: 'student' // Default value for the new field
   });
 
   // Fetch announcements from Firestore
@@ -61,7 +62,8 @@ const Announcements = () => {
     setFormData({
       title: '',
       content: '',
-      priority: 'medium'
+      priority: 'medium',
+      userType: 'student' // Reset to default
     });
     setEditingId(null);
     setShowForm(true);
@@ -71,7 +73,8 @@ const Announcements = () => {
     setFormData({
       title: announcement.title,
       content: announcement.content,
-      priority: announcement.priority
+      priority: announcement.priority,
+      userType: announcement.userType || 'student' // Handle existing records that might not have this field
     });
     setEditingId(announcement.id);
     setShowForm(true);
@@ -149,6 +152,10 @@ const Announcements = () => {
     }
   };
 
+  const getUserTypeLabel = (userType) => {
+    return userType.charAt(0).toUpperCase() + userType.slice(1);
+  };
+
   return (
     <div className="p-4 md:p-6 lg:p-8 max-w-5xl mx-auto">
       <div className="mb-6 flex justify-between items-center">
@@ -202,21 +209,39 @@ const Announcements = () => {
               ></textarea>
             </div>
             
-            <div className="mb-4">
-              <label htmlFor="priority" className="block text-sm font-medium text-gray-700 mb-1">
-                Priority
-              </label>
-              <select
-                id="priority"
-                name="priority"
-                value={formData.priority}
-                onChange={handleInputChange}
-                className="w-full p-2 border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
-              >
-                <option value="high">High</option>
-                <option value="medium">Medium</option>
-                <option value="low">Low</option>
-              </select>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              <div>
+                <label htmlFor="priority" className="block text-sm font-medium text-gray-700 mb-1">
+                  Priority
+                </label>
+                <select
+                  id="priority"
+                  name="priority"
+                  value={formData.priority}
+                  onChange={handleInputChange}
+                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
+                >
+                  <option value="high">High</option>
+                  <option value="medium">Medium</option>
+                  <option value="low">Low</option>
+                </select>
+              </div>
+              
+              <div>
+                <label htmlFor="userType" className="block text-sm font-medium text-gray-700 mb-1">
+                  Target Audience
+                </label>
+                <select
+                  id="userType"
+                  name="userType"
+                  value={formData.userType}
+                  onChange={handleInputChange}
+                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-emerald-500 focus:border-emerald-500"
+                >
+                  <option value="student">Student</option>
+                  <option value="lecture">Lecture</option>
+                </select>
+              </div>
             </div>
             
             <div className="flex justify-end space-x-3">
@@ -271,10 +296,17 @@ const Announcements = () => {
               
               <div className="mt-2 mb-3 text-gray-600">{announcement.content}</div>
               
-              <div className="flex justify-between items-center mt-4">
-                <span className={`text-xs px-2 py-1 rounded-full border ${getPriorityColor(announcement.priority)}`}>
-                  {announcement.priority.charAt(0).toUpperCase() + announcement.priority.slice(1)} Priority
-                </span>
+              <div className="flex flex-wrap justify-between items-center mt-4">
+                <div className="flex space-x-2 mb-2 sm:mb-0">
+                  <span className={`text-xs px-2 py-1 rounded-full border ${getPriorityColor(announcement.priority)}`}>
+                    {announcement.priority.charAt(0).toUpperCase() + announcement.priority.slice(1)} Priority
+                  </span>
+                  {announcement.userType && (
+                    <span className="text-xs px-2 py-1 rounded-full border bg-blue-100 text-blue-800 border-blue-300">
+                      {getUserTypeLabel(announcement.userType)}
+                    </span>
+                  )}
+                </div>
                 <span className="text-sm text-gray-500">
                   Published: {new Date(announcement.date).toLocaleDateString()}
                 </span>
