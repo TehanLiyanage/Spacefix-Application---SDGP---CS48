@@ -146,7 +146,8 @@ const Timetable = () => {
     const codeToUse = lecturerCode || selectedLecturerCode;
     
     if (!codeToUse) {
-      setError("Please select a lecturer code");
+      setError("Please select a lecturer code to load timetable data");
+      setLoading(false);
       return;
     }
 
@@ -404,7 +405,12 @@ const Timetable = () => {
         </div>
       ) : (
         <div className="mt-4">
-          {timetableData && renderTimetable()}
+          {timetableData ? renderTimetable() : (
+            <div className="bg-gray-50 p-6 rounded-lg text-center">
+              <p className="text-lg text-gray-700">No timetable data to display</p>
+              <p className="text-gray-500 mt-2">Select a lecturer code and click "Load Timetable" to view their schedule</p>
+            </div>
+          )}
         </div>
       )}
     </div>
