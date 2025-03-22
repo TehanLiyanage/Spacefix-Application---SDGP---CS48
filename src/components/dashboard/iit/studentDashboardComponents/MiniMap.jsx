@@ -17,8 +17,22 @@ const MiniMap = () => {
       try {
         setLoading(true);
         const response = await axios.get(`${API_URL}/classrooms`);
-        setClassrooms(response.data);
-        setFilteredClassrooms(response.data);
+
+        // Mock classroom data
+        const mockClassroom = {
+          id: "4LA",
+          building: "GP Building",
+          floor: 4,
+          capacity: 40,
+          features: ["Projector", "Whiteboard"],
+          map: "/images/floor1.png",
+        };
+
+        // Combine real classrooms with the mock classroom
+        const combinedClassrooms = [...response.data, mockClassroom];
+
+        setClassrooms(combinedClassrooms);
+        setFilteredClassrooms(combinedClassrooms);
         setLoading(false);
       } catch (err) {
         console.error("Error fetching classrooms:", err);
@@ -44,7 +58,27 @@ const MiniMap = () => {
         if (filterFloor !== "all") queryParams.append("floor", filterFloor);
 
         const response = await axios.get(`${API_URL}/classrooms/filter?${queryParams}`);
-        setFilteredClassrooms(response.data);
+
+        // Add mock classroom again to filtered results
+        const mockClassroom = {
+          id: "Mock1A",
+          building: "GP Building",
+          floor: 1,
+          capacity: 40,
+          features: ["Projector", "Whiteboard"],
+          map: "/images/floor1.png",
+        };
+
+        const filteredWithMock = [...response.data, mockClassroom];
+
+        // Apply filters manually for mock if needed
+        const finalFiltered = filteredWithMock.filter(room => {
+          const matchBuilding = filterBuilding === "all" || room.building === filterBuilding;
+          const matchFloor = filterFloor === "all" || room.floor === Number(filterFloor);
+          return matchBuilding && matchFloor;
+        });
+
+        setFilteredClassrooms(finalFiltered);
       } catch (err) {
         console.error("Error filtering classrooms:", err);
         setError("Failed to filter classrooms");
