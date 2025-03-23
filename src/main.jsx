@@ -14,6 +14,7 @@ import StudentDashboard from './components/dashboard/iit/StudentDashboard.jsx';
 import LectureDashboard from './components/dashboard/iit/LectureDashboard.jsx';
 import LabkeeperDashboard from './components/dashboard/iit/LabkeeperDashboard.jsx';
 import IITLecturerLogin from './components/logins/iitlogins/IITLectureLogin.jsx';
+import IITLabkeeperLogin from './components/logins/iitlogins/IITLabkeeperLogin.jsx';
 
 
 createRoot(document.getElementById('root')).render(
@@ -32,6 +33,7 @@ createRoot(document.getElementById('root')).render(
         <Route path="/student-dashboard" element={<StudentDashboard />} />
         <Route path="/lecturer-dashboard" element={<LectureDashboard />} />
         <Route path="/labkeeper-dashboard" element={<LabkeeperDashboard />} /> 
+        <Route path="/iit-labkeeper-login" element={<IITLabkeeperLogin />} /> 
 
 
       </Routes>
