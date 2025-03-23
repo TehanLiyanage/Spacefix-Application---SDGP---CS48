@@ -1386,8 +1386,8 @@ import useSocket from "../../../../hooks/useSockets.js";
 import axios from "axios";
 
 // Use Vite environment variable with fallback to localhost for development
-// const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
-const API_BASE_URL = "https://spacefix-application-backend-sdgp-cs48.onrender.com"
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+// const API_BASE_URL = "https://spacefix-application-backend-sdgp-cs48.onrender.com"
 
 const LecturerRequestHandler = () => {
   const [requests, setRequests] = useState({
