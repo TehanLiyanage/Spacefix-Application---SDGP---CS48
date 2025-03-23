@@ -55,7 +55,7 @@ const MyTasks = () => {
   }, []);
 
   const handleStatusChange = async (taskId, newStatus) => {
-    if (newStatus === 'Not Completed') {
+    if (newStatus === 'not complete') {
       setSelectedTaskId(taskId);
       setShowReasonDialog(true);
       return;
@@ -95,7 +95,7 @@ const MyTasks = () => {
       // Update in Firestore
       const taskRef = doc(db, 'IIT', 'TimeTable', 'allocatetimetable', selectedTaskId);
       await updateDoc(taskRef, {
-        status: 'Not Completed',
+        status: 'not complete',
         reason: reason,
         updatedAt: new Date().toISOString()
       });
@@ -104,7 +104,7 @@ const MyTasks = () => {
       setMyTasks(prev => 
         prev.map(task => 
           task.id === selectedTaskId 
-            ? {...task, status: 'Not Completed', reason} 
+            ? {...task, status: 'not complete', reason} 
             : task
         )
       );
@@ -122,15 +122,15 @@ const MyTasks = () => {
 
   const getStatusBadgeColor = (status) => {
     switch(status.toLowerCase()) {
-      case 'not completed':
+      case 'not complete':
         return 'bg-red-50 text-red-700';
-      case 'completed':
+      case 'complete':
         return 'bg-emerald-50 text-emerald-700';
-      case 'opened':
-      case 'to be opened':
+      case 'open':
+      case 'to be open':
         return 'bg-emerald-50 text-emerald-700';
-      case 'closed':
-      case 'to be closed':
+      case 'close':
+      case 'to be close':
         return 'bg-gray-50 text-gray-700';
       case 'pending':
         return 'bg-blue-50 text-blue-700';
@@ -266,7 +266,7 @@ const MyTasks = () => {
                 </div>
 
                 {/* Display Reason if Not Completed */}
-                {task.status.toLowerCase() === 'not completed' && task.reason && (
+                {task.status.toLowerCase() === 'not complete' && task.reason && (
                   <div className="p-3 bg-red-50 text-red-700 text-sm rounded-lg border border-red-200">
                     <span className="font-medium">Reason:</span> {task.reason}
                   </div>
@@ -275,52 +275,52 @@ const MyTasks = () => {
                 {/* Status Buttons Group */}
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                   <button
-                    onClick={() => handleStatusChange(task.id, 'To Be Opened')}
+                    onClick={() => handleStatusChange(task.id, 'to be open')}
                     className="p-2 flex items-center justify-center rounded-lg border border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     disabled={updating}
                   >
                     {updating ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Clock className="h-4 w-4 mr-2" />}
-                    To Be Opened
+                    To Be Open
                   </button>
                   <button
-                    onClick={() => handleStatusChange(task.id, 'Opened')}
+                    onClick={() => handleStatusChange(task.id, 'open')}
                     className="p-2 flex items-center justify-center rounded-lg border border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     disabled={updating}
                   >
                     {updating ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <DoorOpen className="h-4 w-4 mr-2" />}
-                    Opened
+                    Open
                   </button>
                   <button
-                    onClick={() => handleStatusChange(task.id, 'To Be Closed')}
+                    onClick={() => handleStatusChange(task.id, 'to be close')}
                     className="p-2 flex items-center justify-center rounded-lg border border-yellow-200 bg-yellow-50 text-yellow-700 hover:bg-yellow-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     disabled={updating}
                   >
                     {updating ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Clock className="h-4 w-4 mr-2" />}
-                    To Be Closed
+                    To Be Close
                   </button>
                   <button
-                    onClick={() => handleStatusChange(task.id, 'Closed')}
+                    onClick={() => handleStatusChange(task.id, 'close')}
                     className="p-2 flex items-center justify-center rounded-lg border border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     disabled={updating}
                   >
                     {updating ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <DoorClosed className="h-4 w-4 mr-2" />}
-                    Closed
+                    Close
                   </button>
                   <button
-                    onClick={() => handleStatusChange(task.id, 'Completed')}
+                    onClick={() => handleStatusChange(task.id, 'complete')}
                     className="p-2 flex items-center justify-center rounded-lg border border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     disabled={updating}
                   >
                     {updating ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <CheckSquare className="h-4 w-4 mr-2" />}
-                    Completed
+                    Complete
                   </button>
                   <button
-                    onClick={() => handleStatusChange(task.id, 'Not Completed')}
+                    onClick={() => handleStatusChange(task.id, 'not complete')}
                     className="p-2 flex items-center justify-center rounded-lg border border-red-200 bg-red-50 text-red-700 hover:bg-red-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     disabled={updating}
                   >
                     {updating ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <XSquare className="h-4 w-4 mr-2" />}
-                    Not Completed
+                    Not Complete
                   </button>
                 </div>
               </div>
