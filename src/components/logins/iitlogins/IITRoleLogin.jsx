@@ -32,7 +32,7 @@ const IITRoleLogin = () => {
     },
     {
       id: 4,
-      title: 'Staff Login',
+      title: 'Labkeeper Login',
       icon: <Users className="w-8 h-8" />,
       description: 'Access staff resources and department tools',
       path: '/iit-labkeeper-login',
