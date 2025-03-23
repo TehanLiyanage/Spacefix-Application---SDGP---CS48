@@ -97,7 +97,7 @@ const Header = ({ showNotifications, setShowNotifications, toggleSidebar }) => {
               className="flex items-center space-x-2 focus:outline-none"
             >
               <span className="hidden sm:block text-sm text-gray-700">
-                {localStorage.getItem('iit_labkeeper_username') || 'John Doe'}
+                { ( 'Lab Keeper')}
               </span>
               <div className="w-8 h-8 rounded-full bg-gradient-to-r from-emerald-100 to-cyan-100 flex items-center justify-center text-emerald-600">
                 <User className="w-5 h-5" />
@@ -106,7 +106,7 @@ const Header = ({ showNotifications, setShowNotifications, toggleSidebar }) => {
 
             {showProfileDropdown && (
               <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg z-30 border border-gray-200 p-4">
-                <p className="text-sm text-gray-800">labkeeper@example.com</p>
+                {/* <p className="text-sm text-gray-800">labkeeper@example.com</p> */}
                 <button
                   onClick={handleLogout}
                   className="mt-3 w-full bg-red-500 text-white py-1 px-3 rounded hover:bg-red-600 text-sm"
