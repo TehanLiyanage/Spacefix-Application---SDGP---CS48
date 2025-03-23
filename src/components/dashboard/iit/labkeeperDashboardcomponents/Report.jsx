@@ -1,135 +1,280 @@
 import React, { useState } from 'react';
 
 const Report = () => {
-  const [activeTab, setActiveTab] = useState('found'); // Default to found items form
-  const [formData, setFormData] = useState({
-    category: '',
-    itemName: '',
-    location: '',
-    description: ''
-  });
+  const [activeTab, setActiveTab] = useState('all-items'); // Default to all-items view
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [itemName, setItemName] = useState('');
+  const [location, setLocation] = useState('');
+  const [description, setDescription] = useState('');
+  const [reportedItems, setReportedItems] = useState([
+    {
+      id: 1,
+      name: 'AirPods',
+      category: 'Electronics',
+      location: 'Library',
+      description: 'White AirPods in a black case',
+      status: 'Lost',
+      reporter: 'John Smith (Student)'
+    },
+    {
+      id: 2,
+      name: 'Blue Notebook',
+      category: 'Books',
+      location: 'Chemistry Lab',
+      description: 'Blue hardcover notebook with notes',
+      status: 'Lost',
+      reporter: 'Emma Johnson (Student)'
+    },
+    {
+      id: 3,
+      name: 'Student ID Card',
+      category: 'Student Card',
+      location: 'Computer Lab',
+      description: 'ID card for Sarah Wilson',
+      status: 'Lost',
+      reporter: 'Professor Thompson'
+    }
+  ]);
+
+  const categories = ['Select category', 'Student Card', 'Mobile Phones', 'Laptops', 'Other Electronics', 'Clothing', 'Helmet', 'Books', 'Personal Items', 'Wallet', 'Other'];
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Handle form submission based on active tab
-    if (activeTab === 'lost') {
-      console.log('Submitting lost item:', formData);
-    } else if (activeTab === 'found') {
-      console.log('Submitting found item:', formData);
+    if (!itemName || !location || !selectedCategory || selectedCategory === 'Select category') {
+      alert('Please fill in all required fields');
+      return;
     }
-    // Reset form
-    setFormData({
-      category: '',
-      itemName: '',
-      location: '',
-      description: ''
-    });
+
+    const newItem = {
+      id: reportedItems.length + 1,
+      name: itemName,
+      category: selectedCategory,
+      location: location,
+      description: description,
+      status: 'Found',
+      reporter: 'Lab Keeper'
+    };
+
+    setReportedItems([...reportedItems, newItem]);
+    setItemName('');
+    setLocation('');
+    setDescription('');
+    setSelectedCategory('');
+    
+    // Show success message
+    alert('Item reported as found! This information will be shared with the admin dashboard.');
+    
+    // Switch to found tab to see the updated list
+    setActiveTab('found');
+    
+    // In a real implementation, this is where you would connect to Firebase
+    // to share the information with the admin dashboard
+    // For example:
+    // firebaseDB.collection('lostItems').add(newItem);
   };
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+  const handleStatusChange = (id, newStatus) => {
+    setReportedItems(
+      reportedItems.map(item => 
+        item.id === id ? { ...item, status: newStatus } : item
+      )
+    );
+    
+    if (newStatus === 'Found') {
+      alert('Great! The item has been marked as found. The admin dashboard will be notified.');
+      
+      // In a real implementation, this is where you would update the status in Firebase
+      // For example:
+      // firebaseDB.collection('lostItems').doc(id).update({status: 'Found'});
+    }
   };
+
+  // Filter items based on status
+  const lostItems = reportedItems.filter(item => item.status === 'Lost');
+  const foundItems = reportedItems.filter(item => item.status === 'Found');
 
   return (
-    <div className="p-8 max-w-4xl mx-auto">
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-2xl font-semibold text-gray-900">Welcome to Spacefix</h1>
-        <p className="text-gray-600 mt-1">Select a feature to get started</p>
-      </div>
+    <div className="p-6 bg-gray-100 min-h-screen">
+      <h2 className="text-2xl font-bold mb-6 bg-gradient-to-r from-emerald-600 to-cyan-600 bg-clip-text text-transparent">Lost & Found Management</h2>
+      <div className="max-w-4xl mx-auto bg-white shadow-md rounded-lg p-5">
 
-      {/* Report Section */}
-      <div className="bg-white rounded-lg p-6 shadow-sm">
-        <h2 className="text-xl font-semibold text-gray-900 mb-6">Lost & Found Report</h2>
-
-        {/* Tabs */}
-        <div className="flex space-x-4 mb-6">
+        {/* Tab Navigation */}
+        <div className="flex space-x-3 mb-6">
           <button
-            onClick={() => setActiveTab('lost')}
-            className={`flex-1 py-2 px-4 rounded-lg transition-colors ${
-              activeTab === 'lost'
-                ? 'bg-emerald-500 text-white'
-                : 'text-gray-600 hover:bg-gray-50'
+            className={`flex-1 py-2 text-base font-medium rounded-lg transition ${
+              activeTab === 'all-items' ? 'bg-gradient-to-r from-emerald-500 to-cyan-500 text-white' : 'bg-gray-200 text-gray-700'
             }`}
+            onClick={() => setActiveTab('all-items')}
           >
-            Report Lost Item
+            Reported Lost Items
           </button>
           <button
-            onClick={() => setActiveTab('found')}
-            className={`flex-1 py-2 px-4 rounded-lg transition-colors ${
-              activeTab === 'found'
-                ? 'bg-emerald-500 text-white'
-                : 'text-gray-600 hover:bg-gray-50'
+            className={`flex-1 py-2 text-base font-medium rounded-lg transition ${
+              activeTab === 'found' ? 'bg-gradient-to-r from-emerald-500 to-cyan-500 text-white' : 'bg-gray-200 text-gray-700'
             }`}
+            onClick={() => setActiveTab('found')}
+          >
+            Found Items
+          </button>
+          <button
+            className={`flex-1 py-2 text-base font-medium rounded-lg transition ${
+              activeTab === 'report-found' ? 'bg-gradient-to-r from-emerald-500 to-cyan-500 text-white' : 'bg-gray-200 text-gray-700'
+            }`}
+            onClick={() => setActiveTab('report-found')}
           >
             Report Found Item
           </button>
-          <button
-            onClick={() => setActiveTab('student')}
-            className={`flex-1 py-2 px-4 rounded-lg transition-colors ${
-              activeTab === 'student'
-                ? 'bg-emerald-500 text-white'
-                : 'text-gray-600 hover:bg-gray-50'
-            }`}
-          >
-            Student Lost Items
-          </button>
         </div>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <select
-            name="category"
-            value={formData.category}
-            onChange={handleInputChange}
-            className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-          >
-            <option value="">Select category</option>
-            <option value="electronics">Electronics</option>
-            <option value="clothing">Clothing</option>
-            <option value="books">Books</option>
-            <option value="accessories">Accessories</option>
-            <option value="other">Other</option>
-          </select>
+        {/* Report Found Item Form */}
+        {activeTab === 'report-found' && (
+          <div>
+            <div className="mb-4 bg-emerald-50 p-3 rounded-md border border-emerald-200 text-emerald-700 text-sm">
+              <p><strong>Instructions:</strong> Use this form when you find items in classrooms or labs. The information will be shared with the admin dashboard to help reunite items with their owners.</p>
+            </div>
+            
+            <form onSubmit={handleSubmit} className="bg-white p-5 rounded-md shadow-sm space-y-3">
+              <select
+                className="w-full p-3 text-base border border-gray-300 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+              >
+                {categories.map((category, index) => (
+                  <option key={index} value={category}>
+                    {category}
+                  </option>
+                ))}
+              </select>
+              <input
+                type="text"
+                placeholder="Item name"
+                className="w-full p-3 text-base border border-gray-300 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                value={itemName}
+                onChange={(e) => setItemName(e.target.value)}
+              />
+              <input
+                type="text"
+                placeholder="Where you found it (location)"
+                className="w-full p-3 text-base border border-gray-300 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+              />
+              <textarea
+                placeholder="Item description (color, brand, distinguishing features, etc.)"
+                className="w-full p-3 text-base border border-gray-300 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 h-24 resize-none"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+              ></textarea>
+              <button className="w-full bg-gradient-to-r from-emerald-500 to-cyan-500 text-white py-3 text-base rounded-md hover:from-emerald-600 hover:to-cyan-600 transition-colors">
+                Submit Found Item
+              </button>
+            </form>
+          </div>
+        )}
 
-          <input
-            type="text"
-            name="itemName"
-            value={formData.itemName}
-            onChange={handleInputChange}
-            placeholder="Item name"
-            className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-          />
+        {/* Lost Items List */}
+        {activeTab === 'all-items' && (
+          <div>
+            <div className="mb-4 bg-emerald-50 p-3 rounded-md border border-emerald-200 text-emerald-700 text-sm">
+              <p><strong>Instructions:</strong> This list shows items reported as lost by students and staff. If you find any of these items, click "Mark as Found".</p>
+            </div>
+            
+            <div className="mb-4 flex justify-between items-center">
+              <h3 className="text-lg font-semibold text-gray-700">Reported Lost Items</h3>
+              <div className="flex space-x-2">
+                <span className="text-xs px-2 py-1 rounded-full bg-red-100 text-red-700">Lost</span>
+                <span className="text-xs px-2 py-1 rounded-full bg-emerald-100 text-emerald-700">Found</span>
+              </div>
+            </div>
+            
+            {lostItems.length === 0 ? (
+              <p className="text-gray-500 text-base">No lost items reported.</p>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                {lostItems.map((item) => (
+                  <div 
+                    key={item.id} 
+                    className="bg-white shadow-sm rounded-md p-4 border-l-4 border-l-red-500"
+                  >
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h4 className="text-lg font-semibold">{item.name}</h4>
+                        <p className="text-sm text-gray-600">{item.category}</p>
+                        <p className="text-sm text-gray-500">Location: {item.location}</p>
+                        <p className="text-sm text-gray-500">{item.description}</p>
+                        <p className="text-sm text-gray-500 mt-1">Reported by: {item.reporter}</p>
+                      </div>
+                      <span className="text-sm px-3 py-1 rounded-full font-medium bg-red-100 text-red-700">
+                        {item.status}
+                      </span>
+                    </div>
+                    <div className="mt-3 flex space-x-2">
+                      <button
+                        className="flex-1 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white py-2 text-sm rounded-md hover:from-emerald-600 hover:to-cyan-600 transition-colors"
+                        onClick={() => handleStatusChange(item.id, 'Found')}
+                      >
+                        Mark as Found
+                      </button>
+                      <button
+                        className="flex-1 bg-red-500 text-white py-2 text-sm rounded-md hover:bg-red-600 transition-colors"
+                        onClick={() => setReportedItems(reportedItems.filter((i) => i.id !== item.id))}
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
 
-          <input
-            type="text"
-            name="location"
-            value={formData.location}
-            onChange={handleInputChange}
-            placeholder={activeTab === 'found' ? 'Found location' : 'Last seen location'}
-            className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-          />
-
-          <textarea
-            name="description"
-            value={formData.description}
-            onChange={handleInputChange}
-            placeholder="Item description..."
-            rows={4}
-            className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 resize-none"
-          />
-
-          <button
-            type="submit"
-            className="w-full py-2 px-4 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors font-medium"
-          >
-            {activeTab === 'found' ? 'Submit Found Item Report' : 'Submit Lost Item Report'}
-          </button>
-        </form>
+        {/* Found Items List */}
+        {activeTab === 'found' && (
+          <div>
+            <div className="mb-4 bg-emerald-50 p-3 rounded-md border border-emerald-200 text-emerald-700 text-sm">
+              <p><strong>Instructions:</strong> This list shows all items that have been found. These items have been reported to the admin dashboard.</p>
+            </div>
+            
+            <div className="mb-4">
+              <h3 className="text-lg font-semibold text-gray-700">Found Items</h3>
+            </div>
+            
+            {foundItems.length === 0 ? (
+              <p className="text-gray-500 text-base">No found items to display.</p>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                {foundItems.map((item) => (
+                  <div 
+                    key={item.id} 
+                    className="bg-white shadow-sm rounded-md p-4 border-l-4 border-l-emerald-500"
+                  >
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h4 className="text-lg font-semibold">{item.name}</h4>
+                        <p className="text-sm text-gray-600">{item.category}</p>
+                        <p className="text-sm text-gray-500">Location: {item.location}</p>
+                        <p className="text-sm text-gray-500">{item.description}</p>
+                        <p className="text-sm text-gray-500 mt-1">Reported by: {item.reporter}</p>
+                      </div>
+                      <span className="text-sm px-3 py-1 rounded-full font-medium bg-emerald-100 text-emerald-700">
+                        {item.status}
+                      </span>
+                    </div>
+                    <div className="mt-3">
+                      <button
+                        className="w-full bg-red-500 text-white py-2 text-sm rounded-md hover:bg-red-600 transition-colors"
+                        onClick={() => setReportedItems(reportedItems.filter((i) => i.id !== item.id))}
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
