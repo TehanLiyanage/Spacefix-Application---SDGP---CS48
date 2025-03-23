@@ -21,7 +21,7 @@ const MiniMap = () => {
 
         // Mock classroom data
         const mockClassroom = {
-          id: "4LA",
+          id: "1LD",
           building: "GP Building",
           floor: 4,
           capacity: 40,

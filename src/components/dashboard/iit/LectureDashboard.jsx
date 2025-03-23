@@ -6,9 +6,9 @@ import MiniMap from './studentDashboardComponents/MiniMap';
 import SpaceBooking from './lectureDashboardComponents/SpaceBooking';
 
 // Feature card component for the dashboard home
-const FeatureCard = ({ title, description, onClick }) => (
+const FeatureCard = ({ title, description, onClick, color }) => (
   <div
-    className="cursor-pointer bg-white p-6 rounded-lg shadow-md transform transition-all duration-300 hover:scale-105 hover:shadow-lg"
+    className={`cursor-pointer bg-white p-4 sm:p-6 rounded-lg shadow-md border-l-4 border-${color}-500 transition-all duration-300 hover:shadow-lg`}
     onClick={onClick}
   >
     <h2 className="text-xl font-bold mb-2">{title}</h2>
@@ -69,17 +69,20 @@ const LectureDashboard = ({ setCurrentPage, currentPage }) => {
     {
       title: "Space Booking",
       description: "Book lecture halls, labs, and meeting rooms. Manage your bookings in one place.",
-      page: "booking"
+      page: "booking",
+      color: "blue"
     },
     {
       title: "Timetable",
       description: "View your personalized teaching schedule, class details, and upcoming sessions.",
-      page: "timetable"
+      page: "timetable",
+      color: "green" 
     },
     {
       title: "Mini Map",
       description: "Campus map showing building locations, room numbers, and navigation guides.",
-      page: "map"
+      page: "map",
+      color: "yellow"
     }
   ];
 
@@ -97,17 +100,40 @@ const LectureDashboard = ({ setCurrentPage, currentPage }) => {
         // Home dashboard with feature cards
         return (
           <div className="min-h-screen p-4">
-            <div className="mb-8">
-              <h1 className="text-xl sm:text-2xl font-medium text-center text-emerald-600 mb-6">Welcome to Spacefix</h1>
-              <p className="text-gray-600 text-center mt-2">Select a feature to get started</p>
+            {/* Added dashboard content with image first, then title below */}
+            <div className="p-4 md:p-6 lg:p-8">
+              <div className="flex flex-col">
+                {/* Image container with responsive sizing */}
+                <div className="mb-8 overflow-hidden rounded-xl shadow-lg transform transition-all duration-300 hover:shadow-xl">
+                  <img 
+                    src="https://images.unsplash.com/photo-1625297673112-06b459140555?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" 
+                    alt="Admin Dashboard Overview" 
+                    className="w-full object-cover transition-transform duration-500 hover:scale-105"
+                    style={{ height: 'clamp(200px, 40vh, 500px)' }}
+                  />
+                </div>
+                
+                {/* Welcome text below image */}
+                <div className="text-center">
+                  <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-3 text-gray-800 tracking-tight">
+                    Welcome to Admin Dashboard
+                  </h1>
+                  <p className="text-gray-600 md:text-lg max-w-2xl mx-auto">
+                    Select an option 
+                  </p>
+                </div>
+              </div>
             </div>
+
+ 
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6 mt-10">
               {features.map((feature, index) => (
                 <FeatureCard
                   key={index}
                   title={feature.title}
                   description={feature.description}
+                  color={feature.color}
                   onClick={() => handlePageChange(feature.page)}
                 />
               ))}
@@ -151,4 +177,3 @@ const LectureDashboard = ({ setCurrentPage, currentPage }) => {
 };
 
 export default LectureDashboard;
-
