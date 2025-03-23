@@ -58,16 +58,9 @@ const MyTasks = () => {
   };
 
   return (
-    <div className="p-8 max-w-4xl mx-auto">
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-2xl font-semibold text-gray-900">Welcome to Spacefix</h1>
-        <p className="text-gray-600 mt-1">Select a feature to get started</p>
-      </div>
-
-      {/* Space Booking Section */}
-      <div>
-        <h2 className="text-xl font-semibold text-gray-900 mb-6">Space Booking</h2>
+    <div className="p-6 bg-gray-100 min-h-screen">
+      <h2 className="text-2xl font-bold mb-6 bg-gradient-to-r from-emerald-600 to-cyan-600 bg-clip-text text-transparent">My Tasks</h2>
+      <div className="max-w-4xl mx-auto bg-white shadow-md rounded-lg p-5">
         <div className="space-y-6">
           {myTasks.map(task => (
             <div key={task.id} className="space-y-4">
@@ -75,8 +68,8 @@ const MyTasks = () => {
               <div className={`border-l-4 ${
                 task.id === selectedTaskId && showReasonDialog 
                   ? 'border-l-yellow-500 bg-yellow-50'
-                  : 'border-l-cyan-500 bg-white'
-              } rounded-lg p-4`}>
+                  : 'border-l-emerald-500 bg-white'
+              } rounded-lg p-4 shadow-sm`}>
                 <div className="flex justify-between items-start">
                   <div>
                     <h3 className="text-gray-900 font-medium">{task.roomName}</h3>
@@ -94,7 +87,11 @@ const MyTasks = () => {
                   <span className={`px-2.5 py-1 text-xs font-medium rounded-full ${
                     task.status === 'Not Completed' 
                       ? 'bg-red-50 text-red-700'
-                      : 'bg-cyan-50 text-cyan-700'
+                      : task.status === 'Completed'
+                        ? 'bg-emerald-50 text-emerald-700'
+                        : task.status === 'Opened' || task.status === 'To Be Opened'
+                          ? 'bg-emerald-50 text-emerald-700'
+                          : 'bg-gray-50 text-gray-700'
                   }`}>
                     {task.status}
                   </span>
@@ -109,7 +106,7 @@ const MyTasks = () => {
                     <select
                       value={reason}
                       onChange={(e) => setReason(e.target.value)}
-                      className="w-full p-2 text-sm border border-gray-200 rounded-lg mb-3 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                      className="w-full p-2 text-sm border border-gray-200 rounded-lg mb-3 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                     >
                       <option value="">Select a reason</option>
                       <option value="Can't open the room">Can't open the room</option>
@@ -154,42 +151,42 @@ const MyTasks = () => {
               <div className="grid grid-cols-2 gap-2">
                 <button
                   onClick={() => handleStatusChange(task.id, 'To Be Opened')}
-                  className="p-2 flex items-center justify-center rounded-lg border border-cyan-200 bg-cyan-50 text-cyan-700"
+                  className="p-2 flex items-center justify-center rounded-lg border border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 transition-colors"
                 >
                   <Clock className="h-4 w-4 mr-2" />
                   To Be Opened
                 </button>
                 <button
                   onClick={() => handleStatusChange(task.id, 'Opened')}
-                  className="p-2 flex items-center justify-center rounded-lg border border-emerald-200 bg-emerald-50 text-emerald-700"
+                  className="p-2 flex items-center justify-center rounded-lg border border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 transition-colors"
                 >
                   <DoorOpen className="h-4 w-4 mr-2" />
                   Opened
                 </button>
                 <button
                   onClick={() => handleStatusChange(task.id, 'To Be Closed')}
-                  className="p-2 flex items-center justify-center rounded-lg border border-yellow-200 bg-yellow-50 text-yellow-700"
+                  className="p-2 flex items-center justify-center rounded-lg border border-yellow-200 bg-yellow-50 text-yellow-700 hover:bg-yellow-100 transition-colors"
                 >
                   <Clock className="h-4 w-4 mr-2" />
                   To Be Closed
                 </button>
                 <button
                   onClick={() => handleStatusChange(task.id, 'Closed')}
-                  className="p-2 flex items-center justify-center rounded-lg border border-gray-200 bg-gray-50 text-gray-700"
+                  className="p-2 flex items-center justify-center rounded-lg border border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100 transition-colors"
                 >
                   <DoorClosed className="h-4 w-4 mr-2" />
                   Closed
                 </button>
                 <button
                   onClick={() => handleStatusChange(task.id, 'Completed')}
-                  className="p-2 flex items-center justify-center rounded-lg border border-emerald-200 bg-emerald-50 text-emerald-700"
+                  className="p-2 flex items-center justify-center rounded-lg border border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 transition-colors"
                 >
                   <CheckSquare className="h-4 w-4 mr-2" />
                   Completed
                 </button>
                 <button
                   onClick={() => handleStatusChange(task.id, 'Not Completed')}
-                  className="p-2 flex items-center justify-center rounded-lg border border-red-200 bg-red-50 text-red-700"
+                  className="p-2 flex items-center justify-center rounded-lg border border-red-200 bg-red-50 text-red-700 hover:bg-red-100 transition-colors"
                 >
                   <XSquare className="h-4 w-4 mr-2" />
                   Not Completed
