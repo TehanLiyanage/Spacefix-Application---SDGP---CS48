@@ -197,7 +197,7 @@ const MyTasks = () => {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="py-4">
             <h2 className="text-xl sm:text-2xl font-medium text-center text-emerald-600 mb-2 sm:mb-6">
-              Lecturer Request Handler
+             MyTask
             </h2>
             <p className="text-xs sm:text-sm text-gray-500 text-center">
               Manage classroom allocations and status updates
