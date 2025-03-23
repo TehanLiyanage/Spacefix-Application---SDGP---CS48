@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Clock, MapPin, DoorOpen, DoorClosed, CheckSquare, XSquare, AlertCircle, Loader2 } from 'lucide-react';
+import { Clock, MapPin, DoorOpen, DoorClosed, CheckSquare, XSquare, AlertCircle, Loader2, Filter } from 'lucide-react';
 import { collection, query, getDocs, doc, updateDoc, where } from 'firebase/firestore';
 import { db } from '../../../../firebase/firebaseConfig.js'; // Adjust the import path as needed
 
@@ -11,6 +11,19 @@ const MyTasks = () => {
   const [selectedTaskId, setSelectedTaskId] = useState(null);
   const [reason, setReason] = useState('');
   const [updating, setUpdating] = useState(false);
+  const [activeTab, setActiveTab] = useState('all');
+
+  // Status options
+  const statusOptions = [
+    { value: 'all', label: 'All Tasks' },
+    { value: 'pending', label: 'Pending' },
+    { value: 'to be open', label: 'To Be Open' },
+    { value: 'open', label: 'Open' },
+    { value: 'to be close', label: 'To Be Close' },
+    { value: 'close', label: 'Close' },
+    { value: 'complete', label: 'Complete' },
+    { value: 'not complete', label: 'Not Complete' }
+  ];
 
   // Fetch tasks from Firestore
   useEffect(() => {
@@ -18,7 +31,7 @@ const MyTasks = () => {
       try {
         setLoading(true);
         const tasksRef = collection(db, 'IIT', 'TimeTable', 'allocatetimetable');
-        const q = query(tasksRef, where("status", "!=", "completed")); // Optionally filter by status
+        const q = query(tasksRef); // Get all tasks
         
         const querySnapshot = await getDocs(q);
         const tasks = [];
@@ -30,7 +43,7 @@ const MyTasks = () => {
             roomName: data.room || 'No Room',
             bookingTime: data.timeSlot || 'No Time',
             floor: data.floor || 'No Floor',
-            building: 'IIT', // Assuming all are in IIT building, adjust as needed
+            building: 'IIT', // Assuming all are in IIT building
             status: data.status || 'pending',
             allocateTo: data.allocateTo || 'Not specified',
             allocationType: data.allocationType || 'Not specified',
@@ -139,9 +152,14 @@ const MyTasks = () => {
     }
   };
 
+  // Filter tasks based on active tab
+  const filteredTasks = activeTab === 'all' 
+    ? myTasks 
+    : myTasks.filter(task => task.status.toLowerCase() === activeTab);
+
   if (loading) {
     return (
-      <div className="p-6 flex flex-col items-center justify-center h-screen">
+      <div className="p-6 flex flex-col items-center justify-center min-h-screen">
         <Loader2 className="h-8 w-8 animate-spin text-emerald-500 mb-4" />
         <p className="text-gray-600">Loading tasks...</p>
       </div>
@@ -150,7 +168,7 @@ const MyTasks = () => {
 
   if (error) {
     return (
-      <div className="p-6 flex flex-col items-center justify-center h-screen">
+      <div className="p-6 flex flex-col items-center justify-center min-h-screen">
         <AlertCircle className="h-8 w-8 text-red-500 mb-4" />
         <p className="text-red-600">{error}</p>
         <button 
@@ -164,57 +182,97 @@ const MyTasks = () => {
   }
 
   return (
-    <div className="p-6 bg-gray-100 min-h-screen">
-      <h2 className="text-2xl font-bold mb-6 bg-gradient-to-r from-emerald-600 to-cyan-600 bg-clip-text text-transparent">
-        My Tasks
-      </h2>
-      
-      {myTasks.length === 0 ? (
-        <div className="max-w-4xl mx-auto bg-white shadow-md rounded-lg p-8 text-center">
-          <p className="text-gray-600">No tasks assigned. Check back later.</p>
+    <div className="bg-gray-50 min-h-screen">
+      {/* Header */}
+      <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="py-4">
+            <h1 className="text-2xl font-bold text-gray-900">My Tasks</h1>
+            <p className="text-sm text-gray-500 mt-1">Manage classroom allocations and status updates</p>
+          </div>
+          
+          {/* Tabs */}
+          <div className="border-b border-gray-200 overflow-x-auto">
+            <div className="flex space-x-8">
+              {statusOptions.map(option => (
+                <button
+                  key={option.value}
+                  onClick={() => setActiveTab(option.value)}
+                  className={`py-3 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${
+                    activeTab === option.value
+                      ? 'border-emerald-500 text-emerald-600'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  }`}
+                >
+                  {option.label}
+                  <span className="ml-2 text-xs font-semibold px-2 py-0.5 rounded-full bg-gray-100">
+                    {option.value === 'all' 
+                      ? myTasks.length 
+                      : myTasks.filter(t => t.status.toLowerCase() === option.value).length}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
-      ) : (
-        <div className="max-w-4xl mx-auto bg-white shadow-md rounded-lg p-5">
-          <div className="space-y-6">
-            {myTasks.map(task => (
-              <div key={task.id} className="space-y-4">
-                {/* Task Info Card */}
-                <div className={`border-l-4 ${
-                  task.id === selectedTaskId && showReasonDialog 
-                    ? 'border-l-yellow-500 bg-yellow-50'
-                    : 'border-l-emerald-500 bg-white'
-                } rounded-lg p-4 shadow-sm`}>
-                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2">
-                    <div>
-                      <div className="flex items-start">
-                        <h3 className="text-gray-900 font-medium">{task.roomName}</h3>
-                        <span className="ml-2 px-2 py-0.5 text-xs font-medium rounded-full bg-blue-50 text-blue-700">
-                          {task.allocateTo}
-                        </span>
-                      </div>
-                      <div className="mt-2 space-y-1">
-                        <div className="flex items-center text-gray-600">
-                          <Clock className="h-4 w-4 mr-2" />
-                          <span>{task.bookingTime}</span>
-                          <span className="ml-2 text-sm text-gray-500">({task.day})</span>
-                        </div>
-                        <div className="flex items-center text-gray-600">
-                          <MapPin className="h-4 w-4 mr-2" />
-                          <span>{task.floor}, Building {task.building}</span>
-                        </div>
-                        {task.notes && (
-                          <div className="flex items-start text-gray-600 mt-2">
-                            <span className="text-sm italic">Notes: {task.notes}</span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                    <span className={`px-2.5 py-1 text-xs font-medium rounded-full ${getStatusBadgeColor(task.status)}`}>
-                      {task.status}
+      </div>
+
+      {/* Main Content */}
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        {filteredTasks.length === 0 ? (
+          <div className="text-center py-12 bg-white rounded-lg shadow">
+            <div className="inline-block p-4 bg-emerald-50 rounded-full mb-4">
+              <Filter className="h-8 w-8 text-emerald-500" />
+            </div>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No tasks found</h3>
+            <p className="text-gray-500">
+              {activeTab === 'all' 
+                ? "You don't have any tasks assigned yet." 
+                : `No tasks with status "${activeTab}" found.`}
+            </p>
+          </div>
+        ) : (
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {filteredTasks.map(task => (
+              <div key={task.id} className="bg-white overflow-hidden shadow rounded-lg flex flex-col">
+                {/* Card Header */}
+                <div className="p-4 flex justify-between items-start border-b border-gray-200">
+                  <div>
+                    <h3 className="font-medium text-gray-900">{task.roomName}</h3>
+                    <span className="inline-block mt-1 text-xs font-medium rounded-full px-2 py-0.5 bg-blue-50 text-blue-700">
+                      {task.allocateTo}
                     </span>
                   </div>
+                  <span className={`px-2.5 py-1 text-xs font-medium rounded-full ${getStatusBadgeColor(task.status)}`}>
+                    {task.status}
+                  </span>
+                </div>
+                
+                {/* Card Body */}
+                <div className="p-4 flex-grow space-y-3">
+                  <div className="flex items-center text-gray-600">
+                    <Clock className="h-4 w-4 mr-2 flex-shrink-0" />
+                    <span>{task.bookingTime}</span>
+                    <span className="ml-2 text-sm text-gray-500">({task.day})</span>
+                  </div>
+                  <div className="flex items-center text-gray-600">
+                    <MapPin className="h-4 w-4 mr-2 flex-shrink-0" />
+                    <span>{task.floor}, Building {task.building}</span>
+                  </div>
+                  {task.notes && (
+                    <div className="text-gray-600 text-sm pt-2 border-t border-gray-100">
+                      <span className="italic block">Notes: {task.notes}</span>
+                    </div>
+                  )}
 
-                  {/* Reason Selection Dialog */}
+                  {/* Show Reason if Not Complete */}
+                  {task.status.toLowerCase() === 'not complete' && task.reason && (
+                    <div className="p-3 bg-red-50 text-red-700 text-sm rounded-lg border border-red-200 mt-2">
+                      <span className="font-medium">Reason:</span> {task.reason}
+                    </div>
+                  )}
+                  
+                  {/* Reason Dialog */}
                   {showReasonDialog && selectedTaskId === task.id && (
                     <div className="mt-4 p-4 bg-white rounded-lg border border-yellow-200">
                       <h4 className="text-sm font-medium text-gray-900 mb-2">
@@ -264,70 +322,68 @@ const MyTasks = () => {
                     </div>
                   )}
                 </div>
-
-                {/* Display Reason if Not Completed */}
-                {task.status.toLowerCase() === 'not complete' && task.reason && (
-                  <div className="p-3 bg-red-50 text-red-700 text-sm rounded-lg border border-red-200">
-                    <span className="font-medium">Reason:</span> {task.reason}
+                
+                {/* Card Footer - Status Actions */}
+                <div className="border-t border-gray-200 p-4">
+                  <div className="grid grid-cols-3 gap-2">
+                    <button
+                      onClick={() => handleStatusChange(task.id, 'open')}
+                      className="p-2 flex items-center justify-center rounded-lg border border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      disabled={updating}
+                    >
+                      <DoorOpen className="h-4 w-4 mr-1" />
+                      <span className="text-xs">Open</span>
+                    </button>
+                    <button
+                      onClick={() => handleStatusChange(task.id, 'close')}
+                      className="p-2 flex items-center justify-center rounded-lg border border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      disabled={updating}
+                    >
+                      <DoorClosed className="h-4 w-4 mr-1" />
+                      <span className="text-xs">Close</span>
+                    </button>
+                    <button
+                      onClick={() => handleStatusChange(task.id, 'complete')}
+                      className="p-2 flex items-center justify-center rounded-lg border border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      disabled={updating}
+                    >
+                      <CheckSquare className="h-4 w-4 mr-1" />
+                      <span className="text-xs">Complete</span>
+                    </button>
                   </div>
-                )}
-
-                {/* Status Buttons Group */}
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                  <button
-                    onClick={() => handleStatusChange(task.id, 'to be open')}
-                    className="p-2 flex items-center justify-center rounded-lg border border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    disabled={updating}
-                  >
-                    {updating ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Clock className="h-4 w-4 mr-2" />}
-                    To Be Open
-                  </button>
-                  <button
-                    onClick={() => handleStatusChange(task.id, 'open')}
-                    className="p-2 flex items-center justify-center rounded-lg border border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    disabled={updating}
-                  >
-                    {updating ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <DoorOpen className="h-4 w-4 mr-2" />}
-                    Open
-                  </button>
-                  <button
-                    onClick={() => handleStatusChange(task.id, 'to be close')}
-                    className="p-2 flex items-center justify-center rounded-lg border border-yellow-200 bg-yellow-50 text-yellow-700 hover:bg-yellow-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    disabled={updating}
-                  >
-                    {updating ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Clock className="h-4 w-4 mr-2" />}
-                    To Be Close
-                  </button>
-                  <button
-                    onClick={() => handleStatusChange(task.id, 'close')}
-                    className="p-2 flex items-center justify-center rounded-lg border border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    disabled={updating}
-                  >
-                    {updating ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <DoorClosed className="h-4 w-4 mr-2" />}
-                    Close
-                  </button>
-                  <button
-                    onClick={() => handleStatusChange(task.id, 'complete')}
-                    className="p-2 flex items-center justify-center rounded-lg border border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    disabled={updating}
-                  >
-                    {updating ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <CheckSquare className="h-4 w-4 mr-2" />}
-                    Complete
-                  </button>
-                  <button
-                    onClick={() => handleStatusChange(task.id, 'not complete')}
-                    className="p-2 flex items-center justify-center rounded-lg border border-red-200 bg-red-50 text-red-700 hover:bg-red-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    disabled={updating}
-                  >
-                    {updating ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <XSquare className="h-4 w-4 mr-2" />}
-                    Not Complete
-                  </button>
+                  
+                  <div className="mt-2 grid grid-cols-3 gap-2">
+                    <button
+                      onClick={() => handleStatusChange(task.id, 'to be open')}
+                      className="p-2 flex items-center justify-center rounded-lg border border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      disabled={updating}
+                    >
+                      <Clock className="h-4 w-4 mr-1" />
+                      <span className="text-xs">To Be Open</span>
+                    </button>
+                    <button
+                      onClick={() => handleStatusChange(task.id, 'to be close')}
+                      className="p-2 flex items-center justify-center rounded-lg border border-yellow-200 bg-yellow-50 text-yellow-700 hover:bg-yellow-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      disabled={updating}
+                    >
+                      <Clock className="h-4 w-4 mr-1" />
+                      <span className="text-xs">To Be Close</span>
+                    </button>
+                    <button
+                      onClick={() => handleStatusChange(task.id, 'not complete')}
+                      className="p-2 flex items-center justify-center rounded-lg border border-red-200 bg-red-50 text-red-700 hover:bg-red-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      disabled={updating}
+                    >
+                      <XSquare className="h-4 w-4 mr-1" />
+                      <span className="text-xs">Not Complete</span>
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };
