@@ -1,4 +1,3 @@
-// UNIVERSITY SELECT DASHBOARD
 
 import React from 'react';
 import { Building2, ChevronRight } from 'lucide-react';

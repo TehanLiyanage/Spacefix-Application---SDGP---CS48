@@ -15,6 +15,15 @@ const IITStudentLogin = () => {
     // Check if user is already logged in when component mounts
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
+        // First check if email domain is valid
+        if (!user.email.endsWith('@iit.ac.lk')) {
+          // Sign out unauthorized users
+          await signOut(auth);
+          setError('Only @iit.ac.lk email addresses are allowed to access this portal.');
+          setCheckingAuth(false);
+          return;
+        }
+        
         // User is logged in, check if token is expired (3 months)
         const lastLoginTime = localStorage.getItem('iit_last_login');
         const currentTime = Date.now();
@@ -72,19 +81,30 @@ const IITStudentLogin = () => {
       
       if (lastLoginTime && (currentTime - parseInt(lastLoginTime)) > threeMonthsInMs) {
         // Force sign out if token is older than 3 months
-        await auth.signOut();
+        await signOut(auth);
         localStorage.removeItem('iit_last_login');
         // This will make the user log in again, which will reset the timer
+      }
+      
+      googleProvider.setCustomParameters({
+        prompt: 'select_account',
+        // You can add hd parameter to pre-filter to the domain, but we'll still check after
+        hd: 'iit.ac.lk'
+      });
+      
+      const result = await signInWithPopup(auth, googleProvider);
+      
+      // Verify email domain after login
+      if (!result.user.email.endsWith('@iit.ac.lk')) {
+        // Sign out unauthorized users
+        await signOut(auth);
+        setError('Only @iit.ac.lk email addresses are allowed to access this portal.');
+        return;
       }
       
       // Store the login timestamp
       localStorage.setItem('iit_last_login', currentTime.toString());
       
-      googleProvider.setCustomParameters({
-        prompt: 'select_account'
-      });
-      
-      const result = await signInWithPopup(auth, googleProvider);
       await saveUserToFirestore(result.user);
       navigate('/student-dashboard');
     } catch (error) {
@@ -93,6 +113,8 @@ const IITStudentLogin = () => {
         setError('Sign-in cancelled. Please try again.');
       } else if (error.code === 'auth/popup-blocked') {
         setError('Popup was blocked. Please allow popups for this site.');
+      } else if (error.code === 'auth/invalid-email' || error.code === 'auth/wrong-password') {
+        setError('Only @iit.ac.lk email addresses are allowed to access this portal.');
       } else {
         setError('Failed to sign in with Google. Please try again.');
       }
@@ -132,6 +154,10 @@ const IITStudentLogin = () => {
           <p className="text-emerald-50 text-lg">
             Access your student dashboard to manage your courses, assignments, and academic progress.
           </p>
+          <div className="bg-white/20 rounded-lg p-4 text-white">
+            <p className="font-medium">Important</p>
+            <p className="text-sm">Only official IIT emails (@iit.ac.lk) are allowed to access this portal.</p>
+          </div>
         </div>
         
         <div className="text-sm text-emerald-50 opacity-70">
@@ -145,7 +171,7 @@ const IITStudentLogin = () => {
           <div className="text-center lg:text-left px-4 pt-4 pb-2">
             <h2 className="text-2xl font-bold text-gray-900">Sign in to Portal</h2>
             <p className="mt-2 text-base text-gray-600">
-              Continue with your Google account to access the student portal
+              Continue with your IIT Google account (@iit.ac.lk) to access the student portal
             </p>
           </div>
 
@@ -173,7 +199,7 @@ const IITStudentLogin = () => {
                     <path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z" />
                     <path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z" />
                   </svg>
-                  <span className="text-gray-700">Continue with Google</span>
+                  <span className="text-gray-700">Sign in with IIT account</span>
                 </>
               )}
             </button>
