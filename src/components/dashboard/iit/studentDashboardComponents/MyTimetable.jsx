@@ -1,209 +1,222 @@
-import React, { useState } from "react";
-
-const mockTimetable = [
-  {
-    day: "Monday",
-    courses: [
-      { id: 1, name: "Object Oriented Programming (5COSC009)", time: "09:00 - 11:00", room: "5LA", professor: "Dr. Smith", type: "Lecture" },
-      { id: 2, name: "Advanced Client-Side Development (4COCS007)", time: "13:00 - 15:00", room: "3LC", professor: "Dr. Johnson", type: "Lab" },
-    ],
-  },
-  {
-    day: "Tuesday",
-    courses: [
-      { id: 3, name: "Advanced Server-Side Development (3COSC009)", time: "10:00 - 12:00", room: "1LC", professor: "Dr. Brown", type: "Lecture" },
-      { id: 4, name: "Human Computer Interaction (6COSC008)", time: "14:00 - 16:00", room: "4LA", professor: "Prof. Wilson", type: "Tutorial" },
-    ],
-  },
-  {
-    day: "Wednesday",
-    courses: [
-      { id: 5, name: "Database Systems (3COSC012)", time: "09:00 - 11:00", room: "2LA", professor: "Dr. Williams", type: "Lecture" },
-    ],
-  },
-];
+import React, { useState, useEffect } from 'react';
+import { auth, db } from '../../../../firebase/firebaseConfig.js';
+import { onAuthStateChanged } from 'firebase/auth';
+import { collection, getDocs, doc, getDoc } from 'firebase/firestore';
 
 const MyTimetable = () => {
-  const [group, setGroup] = useState("");
-  const [batch, setBatch] = useState("");
-  const [year, setYear] = useState("");
-  const [timetable, setTimetable] = useState([]);
-  const [activeDay, setActiveDay] = useState("all");
+  const [user, setUser] = useState(null);
+  const [groupList, setGroupList] = useState([]);
+  const [selectedGroup, setSelectedGroup] = useState('');
+  const [timetableData, setTimetableData] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  const loadTimetable = () => {
-    setTimetable(mockTimetable);
+  // Auth state
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+      if (currentUser) {
+        loadGroups();
+        loadSavedPreferences();
+      }
+    });
+    return () => unsubscribe();
+  }, []);
+
+  // Load group IDs from Firestore
+  const loadGroups = async () => {
+    try {
+      const groupRef = collection(db, 'IIT', 'TimeTable', 'GroupTimeTables');
+      const snapshot = await getDocs(groupRef);
+      const groups = snapshot.docs.map(doc => doc.id);
+      setGroupList(groups);
+    } catch (err) {
+      console.error('Error loading groups:', err.message);
+      setError('Failed to load groups from the database.');
+    }
   };
 
-  // Get all unique days from the timetable
-  const days = timetable.map(day => day.day);
-  
-  // Filter timetable based on active day
-  const filteredTimetable = activeDay === "all" 
-    ? timetable 
-    : timetable.filter(day => day.day === activeDay);
+  const loadSavedPreferences = () => {
+    try {
+      const savedGroup = localStorage.getItem('selectedGroup');
+      if (savedGroup) {
+        setSelectedGroup(savedGroup);
+        const savedTimetable = localStorage.getItem('groupTimetableData');
+        if (savedTimetable) {
+          setTimetableData(JSON.parse(savedTimetable));
+        } else {
+          setTimeout(() => loadTimetable(savedGroup), 500);
+        }
+      }
+    } catch (error) {
+      console.error("Error loading saved preferences:", error);
+    }
+  };
+
+  const savePreferences = (group, data) => {
+    try {
+      localStorage.setItem('selectedGroup', group);
+      localStorage.setItem('groupTimetableData', JSON.stringify(data));
+    } catch (error) {
+      console.error("Error saving preferences:", error);
+    }
+  };
+
+  const loadTimetable = async (group = null) => {
+    const groupToUse = group || selectedGroup;
+    if (!groupToUse) {
+      setError("Please select your group.");
+      setLoading(false);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError(null);
+      const docRef = doc(db, 'IIT', 'TimeTable', 'GroupTimeTables', groupToUse);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        setTimetableData(data.schedule || {});
+        savePreferences(groupToUse, data.schedule || {});
+      } else {
+        setTimetableData(null);
+        savePreferences(groupToUse, null);
+        setError("No timetable data found for the selected group.");
+      }
+    } catch (err) {
+      console.error("Error loading timetable:", err.message);
+      setError("Failed to load timetable.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const sortDays = (days) => {
+    const order = {
+      "Monday": 1, "Tuesday": 2, "Wednesday": 3,
+      "Thursday": 4, "Friday": 5, "Saturday": 6, "Sunday": 7
+    };
+    return [...days].sort((a, b) => order[a] - order[b]);
+  };
+
+  const sortTimeSlots = (slots) => {
+    return [...slots].sort((a, b) => a.localeCompare(b));
+  };
+
+  const renderTimetable = () => {
+    if (!timetableData || Object.keys(timetableData).length === 0) {
+      return <p className="text-gray-600">No timetable data found for this group.</p>;
+    }
+
+    const sortedDays = sortDays(Object.keys(timetableData));
+
+    return (
+      <div className="space-y-8">
+        {sortedDays.map(day => (
+          <div key={day} className="bg-white rounded-lg shadow p-4">
+            <h3 className="text-lg font-semibold mb-4">{day}</h3>
+            <div className="overflow-x-auto">
+              <table className="min-w-full border border-gray-200">
+                <thead>
+                  <tr className="bg-gray-50">
+                    <th className="py-2 px-4 border-b text-left">Time</th>
+                    <th className="py-2 px-4 border-b text-left">Course Code</th>
+                    <th className="py-2 px-4 border-b text-left">Type</th>
+                    <th className="py-2 px-4 border-b text-left">Location Type</th>
+                    <th className="py-2 px-4 border-b text-left">Room</th>
+                    <th className="py-2 px-4 border-b text-left">Lecturers</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {sortTimeSlots(Object.keys(timetableData[day])).map(timeSlot => {
+                    const slot = timetableData[day][timeSlot];
+                    return (
+                      <tr key={timeSlot} className="hover:bg-gray-50">
+                        <td className="py-2 px-4 border-b">{timeSlot}</td>
+                        <td className="py-2 px-4 border-b">{slot.courseCode}</td>
+                        <td className="py-2 px-4 border-b">{slot.type}</td>
+                        <td className="py-2 px-4 border-b">{slot.locationType}</td>
+                        <td className="py-2 px-4 border-b">{slot.room || 'N/A'}</td>
+                        <td className="py-2 px-4 border-b">{slot.lecturers}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  };
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-6">
-      <h2 className="text-xl sm:text-2xl font-medium text-center text-emerald-600 mb-6">
-        My Timetable
-      </h2>
-      
-      <div className="bg-white rounded-md shadow p-5 md:p-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Group Number
-            </label>
-            <input
-              type="text"
-              className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500"
-              value={group}
-              onChange={(e) => setGroup(e.target.value)}
-              placeholder="Enter group number (e.g. G23)"
-            />
-          </div>
+    <div className="max-w-6xl mx-auto p-4">
+      <h2 className="text-xl sm:text-2xl font-medium text-center text-emerald-600 mb-6">My Timetable</h2>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Batch
-            </label>
-            <input
-              type="text"
-              className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500"
-              value={batch}
-              onChange={(e) => setBatch(e.target.value)}
-              placeholder="Enter batch (e.g. L5)"
-            />
+      <div className="bg-white rounded-lg shadow-md p-4 mb-6">
+        {user ? (
+          <div className="bg-emerald-50 p-3 rounded mb-4">
+            <p>Logged in as: <span className="font-medium">{user.email}</span></p>
+            {selectedGroup && (
+              <p className="mt-1">Selected Group: <span className="font-medium">{selectedGroup}</span></p>
+            )}
           </div>
-          
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Year
-            </label>
-            <input
-              type="text"
-              className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500"
-              value={year}
-              onChange={(e) => setYear(e.target.value)}
-              placeholder="Enter year (e.g. 2025)"
-            />
+        ) : (
+          <p className="text-red-500 mb-4">Please log in to view your timetable.</p>
+        )}
+
+        {user && (
+          <div className="flex flex-col md:flex-row gap-4 items-end">
+            <div className="w-full md:w-2/3">
+              <label htmlFor="group" className="block text-sm font-medium text-gray-700 mb-1">
+                Select Your Group:
+              </label>
+              <select
+                id="group"
+                value={selectedGroup}
+                onChange={(e) => setSelectedGroup(e.target.value)}
+                disabled={loading}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-emerald-500 hover:border-emerald-300"
+              >
+                <option value="">- Select Group -</option>
+                {groupList.map(group => (
+                  <option key={group} value={group}>{group}</option>
+                ))}
+              </select>
+            </div>
+
+            <button
+              onClick={() => loadTimetable()}
+              disabled={loading}
+              className={`px-4 py-2 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 ${loading ? 'bg-gray-400 cursor-not-allowed disabled:opacity-50' : 'bg-emerald-600 hover:bg-emerald-700'}`}
+            >
+              {loading ? 'Loading...' : 'Load Timetable'}
+            </button>
           </div>
-        </div>
-        
-        <button
-          onClick={loadTimetable}
-          className="w-full mt-4 bg-emerald-400 text-white rounded-md py-2 px-4 hover:bg-emerald-500 transition-colors disabled:opacity-50 focus:outline-none text-sm"
-        >
-          Load Timetable
-        </button>
+        )}
+
+        {error && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mt-4">{error}</div>}
       </div>
 
-      {timetable.length > 0 && (
-        <div className="mt-6">
-          {/* Day Navigation */}
-          <div className="flex overflow-x-auto pb-2 mb-4">
-            <button
-              className={`px-4 py-2 text-sm font-medium rounded-md border mr-2 flex-shrink-0 ${
-                activeDay === "all"
-                  ? "bg-emerald-500 text-white border-emerald-500"
-                  : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
-              }`}
-              onClick={() => setActiveDay("all")}
-            >
-              All Days
-            </button>
-            {days.map((day) => (
-              <button
-                key={day}
-                className={`px-4 py-2 text-sm font-medium rounded-md border mr-2 flex-shrink-0 ${
-                  activeDay === day
-                    ? "bg-emerald-500 text-white border-emerald-500"
-                    : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
-                }`}
-                onClick={() => setActiveDay(day)}
-              >
-                {day}
-              </button>
-            ))}
+      <div className="bg-white rounded-lg shadow-md p-4">
+        <h3 className="text-xl font-semibold text-emerald-600 mb-4">Timetable Display</h3>
+        {loading ? (
+          <div className="text-center py-8">
+            <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-600"></div>
+            <p className="mt-2">Loading timetable data...</p>
           </div>
-
-          {/* Timetable Display */}
-          <div className="space-y-4">
-            {filteredTimetable.map((day) => (
-              <div key={day.day} className="bg-white rounded-md shadow">
-                <div className="px-5 py-3 border-b border-gray-200 bg-gray-50 rounded-t-md">
-                  <h3 className="text-md font-medium text-emerald-600">{day.day}</h3>
-                </div>
-                <div className="divide-y divide-gray-200">
-                  {day.courses.map((course) => (
-                    <div 
-                      key={course.id} 
-                      className="p-4 hover:bg-gray-50 transition-colors"
-                    >
-                      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center">
-                        <div className="mb-2 sm:mb-0">
-                          <div className="flex items-center">
-                            <span className={`inline-block w-2 h-2 rounded-full mr-2 ${
-                              course.type === 'Lecture' ? 'bg-blue-400' : 
-                              course.type === 'Lab' ? 'bg-purple-400' : 'bg-yellow-400'
-                            }`}></span>
-                            <h4 className="font-medium text-gray-800">{course.name}</h4>
-                          </div>
-                          <div className="flex items-center mt-1 text-sm text-gray-500">
-                            <span>{course.professor}</span>
-                            <span className="mx-2">•</span>
-                            <span>{course.type}</span>
-                          </div>
-                        </div>
-                        <div className="flex items-center">
-                          <div className="text-right mr-4">
-                            <p className="text-emerald-600 font-medium">{course.time}</p>
-                            <p className="text-sm text-gray-500">Room {course.room}</p>
-                          </div>
-                          <div className="text-gray-400 hover:text-emerald-500">
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                            </svg>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {timetable.length === 0 && (
-        <div className="bg-white rounded-md shadow p-5 mt-6 text-center">
-          <svg className="w-12 h-12 text-gray-300 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-          </svg>
-          <p className="text-gray-500">No timetable available. Please enter your details and click Load Timetable.</p>
-        </div>
-      )}
-
-      {timetable.length > 0 && (
-        <div className="bg-white rounded-md shadow p-4 mt-6">
-          <h3 className="text-md font-medium text-emerald-600 mb-3">Class Types</h3>
-          <div className="flex flex-wrap gap-4">
-            <div className="flex items-center">
-              <span className="inline-block w-3 h-3 rounded-full bg-blue-400 mr-2"></span>
-              <span className="text-sm text-gray-700">Lecture</span>
+        ) : (
+          <div>{timetableData ? renderTimetable() : (
+            <div className="bg-gray-50 p-8 rounded-lg text-center">
+              <p className="text-lg text-gray-700">Welcome to MyTimetable</p>
+              <p className="text-gray-500 mt-2">Select your group and click "Load Timetable" to view your schedule</p>
             </div>
-            <div className="flex items-center">
-              <span className="inline-block w-3 h-3 rounded-full bg-purple-400 mr-2"></span>
-              <span className="text-sm text-gray-700">Lab</span>
-            </div>
-            <div className="flex items-center">
-              <span className="inline-block w-3 h-3 rounded-full bg-yellow-400 mr-2"></span>
-              <span className="text-sm text-gray-700">Tutorial</span>
-            </div>
-          </div>
-        </div>
-      )}
+          )}</div>
+        )}
+      </div>
     </div>
   );
 };
