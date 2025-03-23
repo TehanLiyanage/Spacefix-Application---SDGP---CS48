@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Bell, Menu, User } from "lucide-react";
 import { onAuthStateChanged, signOut } from "firebase/auth";
-import { auth } from '../../../../firebase/firebaseConfig'; // Adjust path if needed
+import { auth } from '../../../../firebase/firebaseConfig.js'; // Adjust path if needed
 import { useNavigate } from "react-router-dom";
 
 const Header = ({ showNotifications, setShowNotifications, toggleSidebar }) => {

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { db } from '../../../../firebase/firebaseConfig';  // Adjust path as needed
+import { db } from '../../../../firebase/firebaseConfig.js';  // Adjust path as needed
 import { collection, getDocs } from "firebase/firestore";
 
 // Room capacity config

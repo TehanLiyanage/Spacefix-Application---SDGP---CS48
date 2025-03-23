@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { auth } from '../../../../firebase/firebaseConfig'; // Adjust the import path if needed
+import { auth } from '../../../../firebase/firebaseConfig.js'; // Adjust the import path if needed
 
 const LostItems = () => {
   const [activeTab, setActiveTab] = useState('report-lost');
@@ -12,7 +12,7 @@ const LostItems = () => {
   const [myItems, setMyItems] = useState([]);
   const [foundItems, setFoundItems] = useState([]);
 
-  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+  const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
   const categories = [
     'Select category', 'Student Card', 'Mobile Phones', 'Laptops', 'Other Electronics',
@@ -33,7 +33,7 @@ const LostItems = () => {
   // Fetch My Lost Items
   const fetchMyItems = async (email) => {
     try {
-      const res = await axios.get(`${API_URL}/api/lostitems/${email}`);
+      const res = await axios.get(`${API_BASE_URL}/api/lostitems/${email}`);
       const lostItems = res.data.filter(item => item.status === 'Lost');
       setMyItems(lostItems);
     } catch (err) {
@@ -44,7 +44,7 @@ const LostItems = () => {
   // Fetch Found Items
   const fetchFoundItems = async () => {
     try {
-      const res = await axios.get(`${API_URL}/api/founditems`);
+      const res = await axios.get(`${API_BASE_URL}/api/founditems`);
       setFoundItems(res.data);
     } catch (err) {
       console.error(err);
@@ -73,7 +73,7 @@ const LostItems = () => {
     };
 
     try {
-      await axios.post(`${API_URL}/api/lostitems`, newItem);
+      await axios.post(`${API_BASE_URL}/api/lostitems`, newItem);
       alert('Lost item reported successfully');
       setItemName('');
       setLocation('');
@@ -90,7 +90,7 @@ const LostItems = () => {
   // Delete Item (only for My Lost Items)
   const deleteItem = async (id) => {
     try {
-      await axios.delete(`${API_URL}/api/lostitems/${id}`);
+      await axios.delete(`${API_BASE_URL}/api/lostitems/${id}`);
       fetchMyItems(userEmail);
     } catch (err) {
       console.error(err);
