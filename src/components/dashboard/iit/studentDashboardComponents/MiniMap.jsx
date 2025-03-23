@@ -10,13 +10,14 @@ const MiniMap = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const API_URL = "http://localhost:5000/api";
+  // const API_URL = "http://localhost:5000/api";
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
   useEffect(() => {
     const fetchClassrooms = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`${API_URL}/classrooms`);
+        const response = await axios.get(`${API_URL}/api/classrooms`);
 
         // Mock classroom data
         const mockClassroom = {
@@ -57,7 +58,7 @@ const MiniMap = () => {
         if (filterBuilding !== "all") queryParams.append("building", filterBuilding);
         if (filterFloor !== "all") queryParams.append("floor", filterFloor);
 
-        const response = await axios.get(`${API_URL}/classrooms/filter?${queryParams}`);
+        const response = await axios.get(`${API_URL}/api/classrooms/filter?${queryParams}`);
 
         // Add mock classroom again to filtered results
         const mockClassroom = {
