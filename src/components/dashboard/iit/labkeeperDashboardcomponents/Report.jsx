@@ -64,8 +64,13 @@ const Report = () => {
     // Show success message
     alert('Item reported as found! This information will be shared with the admin dashboard.');
     
-    // Switch to all-items tab to see the updated list
-    setActiveTab('all-items');
+    // Switch to found tab to see the updated list
+    setActiveTab('found');
+    
+    // In a real implementation, this is where you would connect to Firebase
+    // to share the information with the admin dashboard
+    // For example:
+    // firebaseDB.collection('lostItems').add(newItem);
   };
 
   const handleStatusChange = (id, newStatus) => {
@@ -77,10 +82,16 @@ const Report = () => {
     
     if (newStatus === 'Found') {
       alert('Great! The item has been marked as found. The admin dashboard will be notified.');
-    } else if (newStatus === 'Claimed') {
-      alert('The item has been marked as claimed. This will be updated in the admin dashboard.');
+      
+      // In a real implementation, this is where you would update the status in Firebase
+      // For example:
+      // firebaseDB.collection('lostItems').doc(id).update({status: 'Found'});
     }
   };
+
+  // Filter items based on status
+  const lostItems = reportedItems.filter(item => item.status === 'Lost');
+  const foundItems = reportedItems.filter(item => item.status === 'Found');
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
@@ -95,7 +106,7 @@ const Report = () => {
             }`}
             onClick={() => setActiveTab('all-items')}
           >
-            All Reported Items
+            Reported Lost Items
           </button>
           <button
             className={`flex-1 py-2 text-base font-medium rounded-lg transition ${
@@ -103,12 +114,20 @@ const Report = () => {
             }`}
             onClick={() => setActiveTab('found')}
           >
+            Found Items
+          </button>
+          <button
+            className={`flex-1 py-2 text-base font-medium rounded-lg transition ${
+              activeTab === 'report-found' ? 'bg-gradient-to-r from-emerald-500 to-cyan-500 text-white' : 'bg-gray-200 text-gray-700'
+            }`}
+            onClick={() => setActiveTab('report-found')}
+          >
             Report Found Item
           </button>
         </div>
 
         {/* Report Found Item Form */}
-        {activeTab === 'found' && (
+        {activeTab === 'report-found' && (
           <div>
             <div className="mb-4 bg-emerald-50 p-3 rounded-md border border-emerald-200 text-emerald-700 text-sm">
               <p><strong>Instructions:</strong> Use this form when you find items in classrooms or labs. The information will be shared with the admin dashboard to help reunite items with their owners.</p>
@@ -153,7 +172,7 @@ const Report = () => {
           </div>
         )}
 
-        {/* All Items List */}
+        {/* Lost Items List */}
         {activeTab === 'all-items' && (
           <div>
             <div className="mb-4 bg-emerald-50 p-3 rounded-md border border-emerald-200 text-emerald-700 text-sm">
@@ -161,26 +180,21 @@ const Report = () => {
             </div>
             
             <div className="mb-4 flex justify-between items-center">
-              <h3 className="text-lg font-semibold text-gray-700">All Reported Items</h3>
+              <h3 className="text-lg font-semibold text-gray-700">Reported Lost Items</h3>
               <div className="flex space-x-2">
                 <span className="text-xs px-2 py-1 rounded-full bg-red-100 text-red-700">Lost</span>
                 <span className="text-xs px-2 py-1 rounded-full bg-emerald-100 text-emerald-700">Found</span>
-                <span className="text-xs px-2 py-1 rounded-full bg-amber-100 text-amber-700">Claimed</span>
               </div>
             </div>
             
-            {reportedItems.length === 0 ? (
-              <p className="text-gray-500 text-base">No items reported.</p>
+            {lostItems.length === 0 ? (
+              <p className="text-gray-500 text-base">No lost items reported.</p>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                {reportedItems.map((item) => (
+                {lostItems.map((item) => (
                   <div 
                     key={item.id} 
-                    className={`bg-white shadow-sm rounded-md p-4 border-l-4 ${
-                      item.status === 'Lost' ? 'border-l-red-500' : 
-                      item.status === 'Found' ? 'border-l-emerald-500' : 
-                      'border-l-amber-500'
-                    }`}
+                    className="bg-white shadow-sm rounded-md p-4 border-l-4 border-l-red-500"
                   >
                     <div className="flex justify-between items-start">
                       <div>
@@ -190,35 +204,66 @@ const Report = () => {
                         <p className="text-sm text-gray-500">{item.description}</p>
                         <p className="text-sm text-gray-500 mt-1">Reported by: {item.reporter}</p>
                       </div>
-                      <span
-                        className={`text-sm px-3 py-1 rounded-full font-medium ${
-                          item.status === 'Lost' ? 'bg-red-100 text-red-700' : 
-                          item.status === 'Found' ? 'bg-emerald-100 text-emerald-700' : 
-                          'bg-amber-100 text-amber-700'
-                        }`}
-                      >
+                      <span className="text-sm px-3 py-1 rounded-full font-medium bg-red-100 text-red-700">
                         {item.status}
                       </span>
                     </div>
                     <div className="mt-3 flex space-x-2">
-                      {item.status === 'Lost' && (
-                        <button
-                          className="flex-1 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white py-2 text-sm rounded-md hover:from-emerald-600 hover:to-cyan-600 transition-colors"
-                          onClick={() => handleStatusChange(item.id, 'Found')}
-                        >
-                          Mark as Found
-                        </button>
-                      )}
-                      {item.status === 'Found' && (
-                        <button
-                          className="flex-1 bg-gradient-to-r from-amber-500 to-yellow-500 text-white py-2 text-sm rounded-md hover:from-amber-600 hover:to-yellow-600 transition-colors"
-                          onClick={() => handleStatusChange(item.id, 'Claimed')}
-                        >
-                          Mark as Claimed
-                        </button>
-                      )}
+                      <button
+                        className="flex-1 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white py-2 text-sm rounded-md hover:from-emerald-600 hover:to-cyan-600 transition-colors"
+                        onClick={() => handleStatusChange(item.id, 'Found')}
+                      >
+                        Mark as Found
+                      </button>
                       <button
                         className="flex-1 bg-red-500 text-white py-2 text-sm rounded-md hover:bg-red-600 transition-colors"
+                        onClick={() => setReportedItems(reportedItems.filter((i) => i.id !== item.id))}
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Found Items List */}
+        {activeTab === 'found' && (
+          <div>
+            <div className="mb-4 bg-emerald-50 p-3 rounded-md border border-emerald-200 text-emerald-700 text-sm">
+              <p><strong>Instructions:</strong> This list shows all items that have been found. These items have been reported to the admin dashboard.</p>
+            </div>
+            
+            <div className="mb-4">
+              <h3 className="text-lg font-semibold text-gray-700">Found Items</h3>
+            </div>
+            
+            {foundItems.length === 0 ? (
+              <p className="text-gray-500 text-base">No found items to display.</p>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                {foundItems.map((item) => (
+                  <div 
+                    key={item.id} 
+                    className="bg-white shadow-sm rounded-md p-4 border-l-4 border-l-emerald-500"
+                  >
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h4 className="text-lg font-semibold">{item.name}</h4>
+                        <p className="text-sm text-gray-600">{item.category}</p>
+                        <p className="text-sm text-gray-500">Location: {item.location}</p>
+                        <p className="text-sm text-gray-500">{item.description}</p>
+                        <p className="text-sm text-gray-500 mt-1">Reported by: {item.reporter}</p>
+                      </div>
+                      <span className="text-sm px-3 py-1 rounded-full font-medium bg-emerald-100 text-emerald-700">
+                        {item.status}
+                      </span>
+                    </div>
+                    <div className="mt-3">
+                      <button
+                        className="w-full bg-red-500 text-white py-2 text-sm rounded-md hover:bg-red-600 transition-colors"
                         onClick={() => setReportedItems(reportedItems.filter((i) => i.id !== item.id))}
                       >
                         Remove
