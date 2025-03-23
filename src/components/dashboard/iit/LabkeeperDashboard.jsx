@@ -1,5 +1,5 @@
+// Updated LabkeeperDashboard.jsx
 import React, { useState, useEffect } from "react";
-import Tasks from './labkeeperDashboardcomponents/Tasks';
 import MyTasks from './labkeeperDashboardcomponents/Mytasks';
 import Help from './labkeeperDashboardcomponents/Help';
 import Report from './labkeeperDashboardcomponents/Report';
@@ -7,7 +7,7 @@ import Sidebar from './labkeeperDashboardcomponents/Sidebar';
 import Header from './labkeeperDashboardcomponents/Header';
 
 const LabkeeperDashboard = () => {
-  const [activePage, setActivePage] = useState('tasks'); // Changed default to 'tasks'
+  const [activePage, setActivePage] = useState('mytasks'); // Changed default to 'mytasks'
   const [showNotifications, setShowNotifications] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -34,8 +34,6 @@ const LabkeeperDashboard = () => {
   // Function to dynamically render the selected page
   const renderContent = () => {
     switch (activePage) {
-      case 'tasks':
-        return <Tasks />;
       case 'mytasks':
         return <MyTasks />;
       case 'help':
@@ -43,7 +41,7 @@ const LabkeeperDashboard = () => {
       case 'report':
         return <Report />;
       default:
-        return <Tasks />; // Default to Tasks instead of welcome message
+        return <MyTasks />; // Default to MyTasks
     }
   };
 
