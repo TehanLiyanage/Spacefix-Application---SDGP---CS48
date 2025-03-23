@@ -187,7 +187,7 @@ const Report = () => {
 
   if (loading && reportedItems.length === 0) {
     return (
-      <div className="p-6 bg-gray-100 min-h-screen flex flex-col items-center justify-center">
+      <div className="p-4 md:p-6 bg-white rounded-lg shadow max-w-3xl mx-auto flex flex-col items-center justify-center min-h-64">
         <Loader className="h-8 w-8 animate-spin text-emerald-500 mb-4" />
         <p className="text-gray-600">Loading lost and found items...</p>
       </div>
@@ -196,12 +196,12 @@ const Report = () => {
 
   if (error && reportedItems.length === 0) {
     return (
-      <div className="p-6 bg-gray-100 min-h-screen flex flex-col items-center justify-center">
+      <div className="p-4 md:p-6 bg-white rounded-lg shadow max-w-3xl mx-auto flex flex-col items-center justify-center min-h-64">
         <AlertCircle className="h-8 w-8 text-red-500 mb-4" />
         <p className="text-red-600">{error}</p>
         <button 
           onClick={() => window.location.reload()}
-          className="mt-4 px-4 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors"
+          className="mt-4 px-4 py-2 bg-emerald-500 text-white rounded-md hover:bg-emerald-600 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-opacity-50"
         >
           Retry
         </button>
@@ -210,229 +210,277 @@ const Report = () => {
   }
 
   return (
-    <div className="p-4 sm:p-6 bg-gray-100 min-h-screen">
-      <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-center text-emerald-600">Lost & Found Management</h2>
-      <div className="max-w-4xl mx-auto bg-white shadow-md rounded-lg p-4 sm:p-5">
+    <div className="p-4 md:p-6 bg-white rounded-lg shadow max-w-3xl mx-auto">
+      <h2 className="text-xl sm:text-2xl font-medium text-center text-emerald-600 mb-6">Lost & Found Management</h2>
+      
+      {/* Tab Navigation */}
+      <div className="flex flex-col sm:flex-row sm:space-x-2 space-y-2 sm:space-y-0 mb-4">
+        <button
+          className={`flex-1 py-2 text-sm font-medium rounded-lg transition-colors ${
+            activeTab === 'all-items' ? 'bg-emerald-500 text-white' : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'
+          }`}
+          onClick={() => setActiveTab('all-items')}
+        >
+          Reported Lost Items
+        </button>
+        <button
+          className={`flex-1 py-2 text-sm font-medium rounded-lg transition-colors ${
+            activeTab === 'found' ? 'bg-emerald-500 text-white' : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'
+          }`}
+          onClick={() => setActiveTab('found')}
+        >
+          Found Items
+        </button>
+        <button
+          className={`flex-1 py-2 text-sm font-medium rounded-lg transition-colors ${
+            activeTab === 'report-found' ? 'bg-emerald-500 text-white' : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'
+          }`}
+          onClick={() => setActiveTab('report-found')}
+        >
+          Report Found Item
+        </button>
+      </div>
 
-        {/* Tab Navigation */}
-        <div className="flex flex-wrap sm:flex-nowrap gap-2 sm:space-x-3 mb-6">
-          <button
-            className={`flex-1 py-2 text-sm sm:text-base font-medium rounded-lg transition ${
-              activeTab === 'all-items' ? 'bg-gradient-to-r from-emerald-500 to-cyan-500 text-white' : 'bg-gray-200 text-gray-700'
-            }`}
-            onClick={() => setActiveTab('all-items')}
-          >
-            Reported Lost Items
-          </button>
-          <button
-            className={`flex-1 py-2 text-sm sm:text-base font-medium rounded-lg transition ${
-              activeTab === 'found' ? 'bg-gradient-to-r from-emerald-500 to-cyan-500 text-white' : 'bg-gray-200 text-gray-700'
-            }`}
-            onClick={() => setActiveTab('found')}
-          >
-            Found Items
-          </button>
-          <button
-            className={`flex-1 py-2 text-sm sm:text-base font-medium rounded-lg transition ${
-              activeTab === 'report-found' ? 'bg-gradient-to-r from-emerald-500 to-cyan-500 text-white' : 'bg-gray-200 text-gray-700'
-            }`}
-            onClick={() => setActiveTab('report-found')}
-          >
-            Report Found Item
-          </button>
+      {/* Search bar for lists */}
+      {activeTab !== 'report-found' && (
+        <div className="mb-4 relative">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <Search className="h-5 w-5 text-gray-400" />
+          </div>
+          <input
+            type="text"
+            placeholder="Search items..."
+            className="block w-full pl-10 pr-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
         </div>
+      )}
 
-        {/* Search bar for lists */}
-        {activeTab !== 'report-found' && (
-          <div className="mb-4 relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <Search className="h-5 w-5 text-gray-400" />
-            </div>
+      {/* Report Found Item Form */}
+      {activeTab === 'report-found' && (
+        <form onSubmit={handleSubmit} className="space-y-3">
+          <div className="space-y-1">
+            <label htmlFor="category" className="block text-xs font-medium text-gray-700">Category</label>
+            <select
+              id="category"
+              className="w-full p-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500"
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              disabled={submitting}
+            >
+              {categories.map((category, index) => (
+                <option key={index} value={category}>
+                  {category}
+                </option>
+              ))}
+            </select>
+          </div>
+          
+          <div className="space-y-1">
+            <label htmlFor="itemName" className="block text-xs font-medium text-gray-700">Item Name</label>
             <input
+              id="itemName"
               type="text"
-              placeholder="Search items..."
-              className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 sm:text-sm"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="e.g., Laptop, Backpack, Phone"
+              className="w-full p-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500"
+              value={itemName}
+              onChange={(e) => setItemName(e.target.value)}
+              disabled={submitting}
             />
           </div>
-        )}
-
-        {/* Report Found Item Form */}
-        {activeTab === 'report-found' && (
-          <div>
-            <div className="mb-4 bg-emerald-50 p-3 rounded-md border border-emerald-200 text-emerald-700 text-sm">
-              <p><strong>Instructions:</strong> Use this form when you find items in classrooms or labs. The information will be shared with the admin dashboard to help reunite items with their owners.</p>
-            </div>
-            
-            <form onSubmit={handleSubmit} className="bg-white p-3 sm:p-5 rounded-md shadow-sm space-y-3">
-              <select
-                className="w-full p-2 sm:p-3 text-sm sm:text-base border border-gray-300 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
-                disabled={submitting}
-              >
-                {categories.map((category, index) => (
-                  <option key={index} value={category}>
-                    {category}
-                  </option>
-                ))}
-              </select>
-              <input
-                type="text"
-                placeholder="Item name"
-                className="w-full p-2 sm:p-3 text-sm sm:text-base border border-gray-300 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                value={itemName}
-                onChange={(e) => setItemName(e.target.value)}
-                disabled={submitting}
-              />
-              <input
-                type="text"
-                placeholder="Where you found it (location)"
-                className="w-full p-2 sm:p-3 text-sm sm:text-base border border-gray-300 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                disabled={submitting}
-              />
-              <textarea
-                placeholder="Item description (color, brand, distinguishing features, etc.)"
-                className="w-full p-2 sm:p-3 text-sm sm:text-base border border-gray-300 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 h-24 resize-none"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                disabled={submitting}
-              ></textarea>
-              <button 
-                className="w-full bg-gradient-to-r from-emerald-500 to-cyan-500 text-white py-2 sm:py-3 text-sm sm:text-base rounded-md hover:from-emerald-600 hover:to-cyan-600 transition-colors flex items-center justify-center disabled:opacity-70 disabled:cursor-not-allowed"
-                disabled={submitting}
-              >
-                {submitting ? (
-                  <>
-                    <Loader className="animate-spin h-4 w-4 mr-2" />
-                    Submitting...
-                  </>
-                ) : 'Submit Found Item'}
-              </button>
-            </form>
+          
+          <div className="space-y-1">
+            <label htmlFor="location" className="block text-xs font-medium text-gray-700">Location Found</label>
+            <input
+              id="location"
+              type="text"
+              placeholder="e.g., Library, Cafeteria, Classroom 2LA"
+              className="w-full p-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500"
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+              disabled={submitting}
+            />
           </div>
-        )}
+          
+          <div className="space-y-1">
+            <label htmlFor="description" className="block text-xs font-medium text-gray-700">Description</label>
+            <textarea
+              id="description"
+              placeholder="Item description (color, brand, distinguishing features, etc.)"
+              className="w-full p-2 text-sm border border-gray-300 rounded-md h-20 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              disabled={submitting}
+            ></textarea>
+          </div>
+          
+          <button 
+            className="w-full bg-emerald-500 text-white py-2 text-sm rounded-md hover:bg-emerald-600 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-opacity-50 disabled:opacity-70 disabled:cursor-not-allowed"
+            disabled={submitting}
+          >
+            {submitting ? (
+              <>
+                <Loader className="inline-block w-4 h-4 mr-2 animate-spin" />
+                Submitting...
+              </>
+            ) : 'Submit Found Item'}
+          </button>
+          
+          {/* Tips Section */}
+          <div className="mt-5 bg-blue-50 p-3 rounded-md">
+            <h4 className="text-sm font-medium text-blue-800 mb-1">Instructions:</h4>
+            <ul className="text-xs text-blue-700 space-y-1 ml-4 list-disc">
+              <li>Use this form when you find items in classrooms or labs</li>
+              <li>The information will be shared with the admin dashboard</li>
+              <li>Provide as much detail as possible to help identify the item</li>
+              <li>Include any distinguishing features in the description</li>
+            </ul>
+          </div>
+        </form>
+      )}
 
-        {/* Lost Items List */}
-        {activeTab === 'all-items' && (
-          <div>
-            <div className="mb-4 bg-emerald-50 p-3 rounded-md border border-emerald-200 text-emerald-700 text-sm">
-              <p><strong>Instructions:</strong> This list shows items reported as lost by students and staff. If you find any of these items, click "Mark as Found".</p>
+      {/* Lost Items List */}
+      {activeTab === 'all-items' && (
+        <div>
+          <h3 className="text-md font-semibold text-emerald-600 mb-3">Reported Lost Items</h3>
+          
+          {loading && (
+            <div className="flex justify-center py-4">
+              <Loader className="h-6 w-6 animate-spin text-emerald-500" />
             </div>
-            
-            <div className="mb-4 flex justify-between items-center">
-              <h3 className="text-lg font-semibold text-gray-700">Reported Lost Items</h3>
-              <div className="flex space-x-2">
-                <span className="text-xs px-2 py-1 rounded-full bg-red-100 text-red-700">Lost</span>
-                <span className="text-xs px-2 py-1 rounded-full bg-emerald-100 text-emerald-700">Found</span>
-              </div>
+          )}
+          
+          {!loading && lostItems.length === 0 ? (
+            <div className="text-center py-6">
+              <svg className="mx-auto h-10 w-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <h3 className="mt-2 text-xs font-medium text-gray-900">No lost items</h3>
+              <p className="text-xs text-gray-500">No items have been reported as lost yet.</p>
             </div>
-            
-            {loading && <div className="flex justify-center py-4"><Loader className="h-6 w-6 animate-spin text-emerald-500" /></div>}
-            
-            {!loading && lostItems.length === 0 ? (
-              <p className="text-gray-500 text-sm sm:text-base py-4 text-center">No lost items reported.</p>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-5">
-                {lostItems.map((item) => (
-                  <div 
-                    key={item.id} 
-                    className="bg-white shadow-sm rounded-md p-3 sm:p-4 border-l-4 border-l-red-500"
-                  >
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <h4 className="text-base sm:text-lg font-semibold">{item.name}</h4>
-                        <p className="text-xs sm:text-sm text-gray-600">{item.category}</p>
-                        <p className="text-xs sm:text-sm text-gray-500">Location: {item.location}</p>
-                        <p className="text-xs sm:text-sm text-gray-500">{item.description}</p>
-                        <p className="text-xs sm:text-sm text-gray-500 mt-1">
-                          Reported by: {item.reporter}
-                          {item.date && <span className="ml-2">({item.date})</span>}
-                        </p>
+          ) : (
+            <div className="grid grid-cols-1 gap-3">
+              {lostItems.map((item) => (
+                <div 
+                  key={item.id} 
+                  className="bg-white rounded-md p-3 border border-gray-200 hover:border-emerald-300 transition-colors"
+                >
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h4 className="text-md font-semibold text-gray-800">{item.name}</h4>
+                      <div className="flex items-center mt-1">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                          {item.category}
+                        </span>
+                        <span className="mx-1 text-gray-300">•</span>
+                        <span className="text-xs text-gray-500">
+                          {item.date}
+                        </span>
                       </div>
-                      <span className="text-xs sm:text-sm px-2 sm:px-3 py-1 rounded-full font-medium bg-red-100 text-red-700">
-                        {item.status}
-                      </span>
                     </div>
-                    <div className="mt-3 flex space-x-2">
-                      <button
-                        className="flex-1 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white py-2 text-xs sm:text-sm rounded-md hover:from-emerald-600 hover:to-cyan-600 transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
-                        onClick={() => handleStatusChange(item.id, 'Found')}
-                        disabled={loading}
-                      >
-                        {loading ? 'Updating...' : 'Mark as Found'}
-                      </button>
-                      <button
-                        className="flex-1 bg-red-500 text-white py-2 text-xs sm:text-sm rounded-md hover:bg-red-600 transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
-                        onClick={() => handleRemoveItem(item.id)}
-                        disabled={loading}
-                      >
-                        {loading ? 'Removing...' : 'Remove'}
-                      </button>
-                    </div>
+                    <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-red-100 text-red-800">
+                      Lost
+                    </span>
                   </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
+                  
+                  <div className="mt-2">
+                    <p className="text-xs text-gray-600"><span className="font-medium">Location:</span> {item.location}</p>
+                    <p className="text-xs text-gray-600 mt-0.5"><span className="font-medium">Description:</span> {item.description}</p>
+                    <p className="text-xs text-gray-600 mt-0.5"><span className="font-medium">Reported by:</span> {item.reporter}</p>
+                  </div>
+                  
+                  <div className="mt-2 pt-2 border-t border-gray-100 flex justify-between">
+                    <button
+                      className="text-xs font-medium text-emerald-600 hover:text-emerald-700"
+                      onClick={() => handleStatusChange(item.id, 'Found')}
+                      disabled={loading}
+                    >
+                      Mark as Found
+                    </button>
+                    <button
+                      className="text-xs font-medium text-red-600 hover:text-red-700"
+                      onClick={() => handleRemoveItem(item.id)}
+                      disabled={loading}
+                    >
+                      Remove
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
-        {/* Found Items List */}
-        {activeTab === 'found' && (
-          <div>
-            <div className="mb-4 bg-emerald-50 p-3 rounded-md border border-emerald-200 text-emerald-700 text-sm">
-              <p><strong>Instructions:</strong> This list shows all items that have been found. These items have been reported to the admin dashboard.</p>
+      {/* Found Items List */}
+      {activeTab === 'found' && (
+        <div>
+          <h3 className="text-md font-semibold text-emerald-600 mb-3">Found Items</h3>
+          
+          {loading && (
+            <div className="flex justify-center py-4">
+              <Loader className="h-6 w-6 animate-spin text-emerald-500" />
             </div>
-            
-            <div className="mb-4">
-              <h3 className="text-lg font-semibold text-gray-700">Found Items</h3>
+          )}
+          
+          {!loading && foundItems.length === 0 ? (
+            <div className="text-center py-6">
+              <svg className="mx-auto h-10 w-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <h3 className="mt-2 text-xs font-medium text-gray-900">No found items</h3>
+              <p className="text-xs text-gray-500">No items have been marked as found yet.</p>
             </div>
-            
-            {loading && <div className="flex justify-center py-4"><Loader className="h-6 w-6 animate-spin text-emerald-500" /></div>}
-            
-            {!loading && foundItems.length === 0 ? (
-              <p className="text-gray-500 text-sm sm:text-base py-4 text-center">No found items to display.</p>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-5">
-                {foundItems.map((item) => (
-                  <div 
-                    key={item.id} 
-                    className="bg-white shadow-sm rounded-md p-3 sm:p-4 border-l-4 border-l-emerald-500"
-                  >
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <h4 className="text-base sm:text-lg font-semibold">{item.name}</h4>
-                        <p className="text-xs sm:text-sm text-gray-600">{item.category}</p>
-                        <p className="text-xs sm:text-sm text-gray-500">Location: {item.location}</p>
-                        <p className="text-xs sm:text-sm text-gray-500">{item.description}</p>
-                        <p className="text-xs sm:text-sm text-gray-500 mt-1">
-                          Reported by: {item.reporter}
-                          {item.date && <span className="ml-2">({item.date})</span>}
-                        </p>
+          ) : (
+            <div className="grid grid-cols-1 gap-3">
+              {foundItems.map((item) => (
+                <div 
+                  key={item.id} 
+                  className="bg-white rounded-md p-3 border border-gray-200 hover:border-emerald-300 transition-colors"
+                >
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h4 className="text-md font-semibold text-gray-800">{item.name}</h4>
+                      <div className="flex items-center mt-1">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                          {item.category}
+                        </span>
+                        <span className="mx-1 text-gray-300">•</span>
+                        <span className="text-xs text-gray-500">
+                          {item.date}
+                        </span>
                       </div>
-                      <span className="text-xs sm:text-sm px-2 sm:px-3 py-1 rounded-full font-medium bg-emerald-100 text-emerald-700">
-                        {item.status}
-                      </span>
                     </div>
-                    <div className="mt-3">
-                      <button
-                        className="w-full bg-red-500 text-white py-2 text-xs sm:text-sm rounded-md hover:bg-red-600 transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
-                        onClick={() => handleRemoveItem(item.id)}
-                        disabled={loading}
-                      >
-                        {loading ? 'Removing...' : 'Remove'}
-                      </button>
-                    </div>
+                    <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-emerald-100 text-emerald-800">
+                      Found
+                    </span>
                   </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-      </div>
+                  
+                  <div className="mt-2">
+                    <p className="text-xs text-gray-600"><span className="font-medium">Location:</span> {item.location}</p>
+                    <p className="text-xs text-gray-600 mt-0.5"><span className="font-medium">Description:</span> {item.description}</p>
+                    <p className="text-xs text-gray-600 mt-0.5"><span className="font-medium">Reported by:</span> {item.reporter}</p>
+                  </div>
+                  
+                  <div className="mt-2 pt-2 border-t border-gray-100 flex justify-between">
+                    <span className="text-xs font-medium text-emerald-600">
+                      ✓ Marked as Found
+                    </span>
+                    <button
+                      className="text-xs font-medium text-red-600 hover:text-red-700"
+                      onClick={() => handleRemoveItem(item.id)}
+                      disabled={loading}
+                    >
+                      Remove
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };
